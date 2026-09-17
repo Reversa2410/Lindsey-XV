@@ -4,7 +4,18 @@ Invitación de quince años hecha como página web. Una sola columna, pensada
 primero para celular. Sin dependencias, sin framework y sin paso de compilación:
 es HTML, CSS y JavaScript plano.
 
+**Ver en vivo: <https://reversa2410.github.io/Lindsey-XV/>**
+
 Repositorio: <https://github.com/Reversa2410/Lindsey-XV>
+
+La página publicada se actualiza sola con cada `git push` a `main`. Tarda uno o
+dos minutos en reflejar los cambios.
+
+> **Este repositorio es público.** Los datos sensibles del evento —dirección
+> exacta del salón, WhatsApp de la familia y enlace de subida de fotos— son
+> **ficticios a propósito** y están marcados como tales en `config.js`. Los
+> valores reales no deben escribirse aquí: el historial de git los conservaría
+> para siempre aunque después se borren.
 
 ## Cómo verla
 
