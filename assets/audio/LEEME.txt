@@ -1,0 +1,1 @@
+Aqui va la cancion de fondo, con el nombre cancion.mp3 (o cambia la ruta en assets/js/config.js)

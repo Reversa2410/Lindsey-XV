@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6E8FC0">
+<title>Mis XV · Loren Briceño</title>
+<meta name="description" content="Invitación digital a los quince años de Loren Briceño.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/estilos.css">
+</head>
+<body class="bloqueado">
+
+<!-- ====================================================================
+     BIBLIOTECA DE ILUSTRACIONES (SVG propios, reutilizables con <use>)
+     ==================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gradAzul" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#CFE0F2"/>
+      <stop offset="55%" stop-color="#9DBBDE"/>
+      <stop offset="100%" stop-color="#6E8FC0"/>
+    </linearGradient>
+    <linearGradient id="gradAzulClaro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#E4EFF9"/>
+      <stop offset="100%" stop-color="#A9C6E6"/>
+    </linearGradient>
+
+    <!-- Lazo -->
+    <symbol id="ico-lazo" viewBox="0 0 200 170">
+      <path d="M92 70C78 104 64 128 40 152l20 8c24-26 38-52 44-82z" fill="url(#gradAzulClaro)" opacity=".85"/>
+      <path d="M108 70c14 34 28 58 52 82l-20 8c-24-26-38-52-44-82z" fill="url(#gradAzulClaro)" opacity=".85"/>
+      <path d="M100 62C62 12 18 24 28 60c8 28 48 26 72 2z" fill="url(#gradAzul)" opacity=".92"/>
+      <path d="M100 62c38-50 82-38 72-2-8 28-48 26-72 2z" fill="url(#gradAzul)" opacity=".92"/>
+      <path d="M100 62C62 12 18 24 28 60c8 28 48 26 72 2z" fill="none" stroke="#6E8FC0" stroke-width="1.6" opacity=".55"/>
+      <path d="M100 62c38-50 82-38 72-2-8 28-48 26-72 2z" fill="none" stroke="#6E8FC0" stroke-width="1.6" opacity=".55"/>
+      <ellipse cx="100" cy="64" rx="12" ry="14" fill="#8CAFD8"/>
+      <ellipse cx="100" cy="64" rx="12" ry="14" fill="none" stroke="#5E80B4" stroke-width="1.4" opacity=".6"/>
+    </symbol>
+
+    <!-- Tiara -->
+    <symbol id="ico-tiara" viewBox="0 0 140 62">
+      <path d="M8 52 L30 16 L46 42 L70 6 L94 42 L110 16 L132 52" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M6 52h128" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="30" cy="14" r="3.4" fill="currentColor"/>
+      <circle cx="70" cy="5"  r="4"   fill="currentColor"/>
+      <circle cx="110" cy="14" r="3.4" fill="currentColor"/>
+      <circle cx="46" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
+      <circle cx="94" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
+    </symbol>
+
+    <!-- Quinceañera de espaldas -->
+    <symbol id="ico-vestido" viewBox="0 0 220 330">
+      <!-- falda -->
+      <path d="M83 148H137C162 190 178 245 184 300C146 320 74 320 36 300C42 245 58 190 83 148Z" fill="url(#gradAzul)"/>
+      <path d="M83 148H137C162 190 178 245 184 300C146 320 74 320 36 300C42 245 58 190 83 148Z" fill="none" stroke="#8CAFD8" stroke-width="1.1" opacity=".65"/>
+      <path d="M95 162c-11 44-18 92-20 140M110 160c-2 48-2 96 0 144M125 162c11 44 18 92 20 140" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity=".42"/>
+      <!-- brazos -->
+      <path d="M95 100c-10 4-17 13-20 24l-9 57c-1 5 8 6 9 1l11-51 10-17z" fill="#E8C6AE"/>
+      <path d="M125 100c10 4 17 13 20 24l9 57c1 5-8 6-9 1l-11-51-10-17z" fill="#E8C6AE"/>
+      <!-- corpiño -->
+      <path d="M110 94c-9 0-18 4-24 10l-5 46h58l-5-46c-6-6-15-10-24-10z" fill="#C6DAEF"/>
+      <path d="M110 94c-9 0-18 4-24 10l-5 46h58l-5-46c-6-6-15-10-24-10z" fill="none" stroke="#9DBBDE" stroke-width="1" opacity=".7"/>
+      <path d="M97 108c2 14 3 30 3 44M123 108c-2 14-3 30-3 44" stroke="#FFFFFF" stroke-width="1.4" fill="none" opacity=".5"/>
+      <!-- cuello -->
+      <path d="M103 78h14v20h-14z" fill="#E8C6AE"/>
+      <!-- cabello recogido -->
+      <path d="M110 30c-19 0-31 15-31 33 0 12 4 21 11 26h40c7-5 11-14 11-26 0-18-12-33-31-33z" fill="#77594A"/>
+      <path d="M92 44c-6 11-8 23-6 36M128 44c6 11 8 23 6 36" stroke="#66483B" stroke-width="2" fill="none" opacity=".55"/>
+      <ellipse cx="110" cy="24" rx="15" ry="13" fill="#66483B"/>
+      <ellipse cx="110" cy="21" rx="9" ry="6" fill="#8A6754" opacity=".55"/>
+      <!-- lazo de la cintura -->
+      <path d="M104 146c-12-7-25-3-27 7-1 9 11 13 21 8z" fill="#8CAFD8"/>
+      <path d="M116 146c12-7 25-3 27 7 1 9-11 13-21 8z" fill="#8CAFD8"/>
+      <path d="M105 158c-3 22-10 39-20 55l11 4c11-19 16-37 18-56z" fill="#9DBBDE"/>
+      <path d="M115 158c3 22 10 39 20 55l-11 4c-11-19-16-37-18-56z" fill="#9DBBDE"/>
+      <ellipse cx="110" cy="152" rx="7.5" ry="8.5" fill="#6E8FC0"/>
+    </symbol>
+
+    <!-- Dama y caballero -->
+    <symbol id="ico-dama-caballero" viewBox="0 0 130 104">
+      <circle cx="38" cy="14" r="9" fill="currentColor"/>
+      <path d="M38 26c-9 0-14 7-16 16l-8 52c8 5 40 5 48 0l-8-52c-2-9-7-16-16-16z" fill="currentColor" opacity=".85"/>
+      <circle cx="92" cy="14" r="9" fill="currentColor"/>
+      <path d="M92 26c-11 0-18 6-18 16v50h36V42c0-10-7-16-18-16z" fill="currentColor" opacity=".85"/>
+      <path d="M92 26l-8 14 8 10 8-10z" fill="#FFFFFF" opacity=".9"/>
+      <path d="M86 92v10M98 92v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Sobre -->
+    <symbol id="ico-sobre" viewBox="0 0 130 96">
+      <rect x="6" y="12" width="118" height="76" rx="4" fill="url(#gradAzulClaro)" stroke="#7FA4D2" stroke-width="2"/>
+      <path d="M6 16l59 42 59-42" fill="none" stroke="#5E80B4" stroke-width="2.2"/>
+      <path d="M6 84l44-32M124 84L80 52" fill="none" stroke="#7FA4D2" stroke-width="1.6" opacity=".7"/>
+      <circle cx="65" cy="56" r="8" fill="#3E5C8C"/>
+    </symbol>
+
+    <!-- Pin de ubicacion -->
+    <symbol id="ico-pin" viewBox="0 0 48 64">
+      <path d="M24 3C13.5 3 5 11.5 5 22c0 14 19 39 19 39s19-25 19-39C43 11.5 34.5 3 24 3z" fill="none" stroke="currentColor" stroke-width="2.4"/>
+      <circle cx="24" cy="22" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/>
+    </symbol>
+
+    <!-- Corazon -->
+    <symbol id="ico-corazon" viewBox="0 0 24 24">
+      <path d="M12 21C4.6 15.9 2 12.5 2 9a5 5 0 0 1 10-2.2A5 5 0 0 1 22 9c0 3.5-2.6 6.9-10 12z"/>
+    </symbol>
+
+    <!-- Rama floral -->
+    <symbol id="ico-rama" viewBox="0 0 120 120">
+      <path d="M14 112C34 92 52 66 62 34" fill="none" stroke="#9DBBDE" stroke-width="2"/>
+      <ellipse cx="34" cy="86" rx="13" ry="6" fill="#BCD5EC" transform="rotate(-38 34 86)"/>
+      <ellipse cx="46" cy="66" rx="12" ry="5.5" fill="#A9C6E6" transform="rotate(-42 46 66)"/>
+      <ellipse cx="55" cy="46" rx="11" ry="5" fill="#BCD5EC" transform="rotate(-48 55 46)"/>
+      <ellipse cx="24" cy="98" rx="11" ry="5" fill="#D3E3F3" transform="rotate(-30 24 98)"/>
+      <g fill="#8CAFD8" opacity=".9">
+        <circle cx="64" cy="28" r="7"/><circle cx="76" cy="20" r="5"/><circle cx="58" cy="16" r="4.4"/>
+      </g>
+      <g fill="#E9F1FA">
+        <circle cx="64" cy="28" r="2.6"/><circle cx="76" cy="20" r="1.9"/>
+      </g>
+    </symbol>
+
+    <!-- Chevron -->
+    <symbol id="ico-chevron" viewBox="0 0 24 14">
+      <path d="M2 2l10 10L22 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- Barra de progreso de lectura -->
+<div class="progreso" aria-hidden="true"><span id="progresoBarra"></span></div>
+
+<!-- ====================================================================
+     PORTADA — se abre al tocar el boton
+     ==================================================================== -->
+<div class="portada" id="portada">
+  <div class="portada__hoja portada__hoja--arriba"></div>
+  <div class="portada__hoja portada__hoja--abajo"></div>
+  <div class="portada__centro">
+    <svg class="portada__tiara"><use href="#ico-tiara"/></svg>
+    <p class="portada__intro" id="portadaIntro">Te invito a mis</p>
+    <p class="portada__quince">XV</p>
+    <h1 class="portada__nombre" id="portadaNombre">Loren</h1>
+    <span class="portada__linea"></span>
+    <button class="boton boton--abrir" id="btnAbrir">
+      <svg class="boton__corazon"><use href="#ico-corazon"/></svg>
+      <span id="btnAbrirTexto">Abrir invitación</span>
+    </button>
+    <p class="portada__nota">Con música · sube el volumen</p>
+  </div>
+</div>
+
+<!-- Petalos flotantes -->
+<div class="petalos" id="petalos" aria-hidden="true"></div>
+
+<!-- ====================================================================
+     INVITACION
+     ==================================================================== -->
+<main class="invitacion" id="invitacion">
+
+  <!-- ---------------- HERO ---------------- -->
+  <header class="hero">
+    <svg class="hero__lazo" id="heroLazo"><use href="#ico-lazo"/></svg>
+    <div class="hero__titulo">
+      <svg class="hero__tiara"><use href="#ico-tiara"/></svg>
+      <p class="hero__mis">Mis</p>
+      <p class="hero__num">15</p>
+      <p class="hero__quince">Quince</p>
+    </div>
+    <h2 class="hero__nombre" id="heroNombre">Loren Briceño</h2>
+    <svg class="hero__vestido" id="heroVestido"><use href="#ico-vestido"/></svg>
+    <div class="hero__cue" id="heroCue">
+      <span>desliza</span>
+      <svg><use href="#ico-chevron"/></svg>
+    </div>
+  </header>
+
+  <!-- ---------------- MUSICA ---------------- -->
+  <section class="seccion seccion--musica reveal">
+    <p class="musica__aviso">Presiona el <svg class="musica__corazon"><use href="#ico-corazon"/></svg> para reproducir la música</p>
+    <div class="ecualizador" id="ecualizador"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </section>
+
+  <!-- ---------------- CUENTA REGRESIVA ---------------- -->
+  <section class="cuenta">
+    <p class="cuenta__titulo">Faltan</p>
+    <div class="cuenta__reloj" id="reloj">
+      <div class="cuenta__caja"><span class="cuenta__num" id="cDias">00</span><span class="cuenta__lbl">días</span></div>
+      <span class="cuenta__sep">:</span>
+      <div class="cuenta__caja"><span class="cuenta__num" id="cHoras">00</span><span class="cuenta__lbl">horas</span></div>
+      <span class="cuenta__sep">:</span>
+      <div class="cuenta__caja"><span class="cuenta__num" id="cMin">00</span><span class="cuenta__lbl">minutos</span></div>
+      <span class="cuenta__sep">:</span>
+      <div class="cuenta__caja"><span class="cuenta__num" id="cSeg">00</span><span class="cuenta__lbl">segundos</span></div>
+    </div>
+  </section>
+
+  <!-- ---------------- RESERVA ESTE DIA ---------------- -->
+  <section class="seccion seccion--calendario">
+    <h3 class="titulo reveal">Reserva este día</h3>
+    <p class="script script--mes reveal" id="calMes">Septiembre</p>
+    <div class="calendario reveal" id="calendario"></div>
+    <div class="fechaGrande reveal">
+      <span class="fechaGrande__dia" id="fDiaSemana">Sábado</span>
+      <span class="fechaGrande__num" id="fNumero">27</span>
+      <span class="fechaGrande__mes" id="fMes">Sept.</span>
+    </div>
+    <p class="fechaGrande__hora reveal" id="fHora">7:00 PM</p>
+    <button class="boton boton--linea reveal" id="btnCalendario">Agregar a mi calendario</button>
+  </section>
+
+  <!-- ---------------- PADRES ---------------- -->
+  <section class="seccion seccion--padres">
+    <svg class="rama rama--izq" aria-hidden="true"><use href="#ico-rama"/></svg>
+    <h3 class="titulo reveal">Mis padres</h3>
+    <div class="nombres reveal" id="listaPadres"></div>
+    <div class="bloquePadrinos" id="bloquePadrinos" hidden>
+      <h3 class="titulo reveal">Mis padrinos</h3>
+      <div class="nombres reveal" id="listaPadrinos"></div>
+    </div>
+  </section>
+
+  <!-- ---------------- CARTA ---------------- -->
+  <section class="seccion seccion--carta">
+    <article class="carta reveal">
+      <svg class="carta__rama carta__rama--a" aria-hidden="true"><use href="#ico-rama"/></svg>
+      <svg class="carta__rama carta__rama--b" aria-hidden="true"><use href="#ico-rama"/></svg>
+      <div class="carta__texto" id="cartaTexto"></div>
+      <p class="script carta__firma" id="cartaFirma">Con cariño, mamá y papá</p>
+    </article>
+  </section>
+
+  <!-- ---------------- LUGAR ---------------- -->
+  <section class="seccion seccion--lugar">
+    <h3 class="titulo reveal">Lugar</h3>
+    <svg class="icono icono--pin reveal"><use href="#ico-pin"/></svg>
+    <p class="lugar__nombre reveal" id="lugarNombre">Salón de eventos</p>
+    <p class="lugar__dir reveal" id="lugarDir">Dirección por confirmar</p>
+    <div class="mapa reveal" id="mapaCaja"><iframe id="mapaFrame" title="Mapa del lugar" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+    <a class="boton boton--solido reveal" id="btnMapa" target="_blank" rel="noopener">Ver ubicación</a>
+  </section>
+
+  <!-- ---------------- ITINERARIO ---------------- -->
+  <section class="seccion seccion--itinerario" id="seccionItinerario">
+    <h3 class="titulo reveal">Programa</h3>
+    <ol class="linea" id="lineaTiempo"></ol>
+  </section>
+
+  <!-- ---------------- VESTIMENTA ---------------- -->
+  <section class="seccion seccion--vestimenta">
+    <div class="tarjeta reveal">
+      <h3 class="titulo titulo--chico">Código de vestimenta</h3>
+      <svg class="icono icono--traje"><use href="#ico-dama-caballero"/></svg>
+      <p class="script script--etiqueta" id="vestEtiqueta">Formal</p>
+      <p class="parrafo parrafo--italica" id="vestTexto"></p>
+      <div class="muestras" id="muestras" aria-label="Colores reservados para la quinceañera"></div>
+      <p class="muestras__pie">Colores reservados para la quinceañera</p>
+    </div>
+  </section>
+
+  <!-- ---------------- LLUVIA DE SOBRES ---------------- -->
+  <section class="seccion seccion--sobres">
+    <div class="tarjeta reveal">
+      <h3 class="titulo titulo--chico" id="sobresTitulo">Lluvia de sobres</h3>
+      <svg class="icono icono--sobre" id="iconoSobre"><use href="#ico-sobre"/></svg>
+      <p class="parrafo parrafo--italica" id="sobresTexto"></p>
+      <p class="parrafo parrafo--italica parrafo--cierre" id="sobresCierre"></p>
+    </div>
+  </section>
+
+  <!-- ---------------- RSVP ---------------- -->
+  <section class="seccion seccion--rsvp" id="seccionRsvp">
+    <h3 class="titulo reveal">Confirma tu asistencia</h3>
+    <p class="parrafo reveal" id="rsvpTexto"></p>
+    <form class="rsvp reveal" id="rsvpForm" autocomplete="off">
+      <label class="campo">
+        <span>Tu nombre</span>
+        <input type="text" id="rsvpNombre" placeholder="Nombre y apellido" required>
+      </label>
+      <label class="campo">
+        <span>¿Cuántos asistirán?</span>
+        <select id="rsvpCantidad">
+          <option value="1">1 persona</option>
+          <option value="2">2 personas</option>
+          <option value="3">3 personas</option>
+          <option value="4">4 personas</option>
+          <option value="5">5 o más</option>
+        </select>
+      </label>
+      <div class="campo">
+        <span>¿Nos acompañas?</span>
+        <div class="radios">
+          <input type="radio" name="asiste" id="asisteSi" value="si" checked><label for="asisteSi">Sí, ahí estaré</label>
+          <input type="radio" name="asiste" id="asisteNo" value="no"><label for="asisteNo">No podré</label>
+        </div>
+      </div>
+      <button type="submit" class="boton boton--solido boton--ancho">Enviar por WhatsApp</button>
+    </form>
+  </section>
+
+  <!-- ---------------- FOTOS ---------------- -->
+  <section class="seccion seccion--fotos" id="seccionFotos">
+    <div class="tarjeta tarjeta--fotos reveal">
+      <h3 class="titulo titulo--chico">Comparte tus fotos</h3>
+      <p class="parrafo parrafo--italica" id="fotosTexto"></p>
+      <a class="boton boton--linea" id="btnFotos" target="_blank" rel="noopener">Subir mis fotos</a>
+      <p class="aviso" id="fotosPendiente">Sección lista — falta conectar el enlace de subida</p>
+    </div>
+  </section>
+
+  <!-- ---------------- CIERRE ---------------- -->
+  <footer class="cierre">
+    <svg class="cierre__lazo"><use href="#ico-lazo"/></svg>
+    <p class="script cierre__texto" id="cierreTexto">¡Los esperamos!</p>
+    <p class="cierre__nombre" id="cierreNombre">Loren Briceño · XV</p>
+  </footer>
+</main>
+
+<!-- Boton flotante de musica -->
+<button class="btnMusica" id="btnMusica" aria-label="Reproducir música" hidden>
+  <span class="btnMusica__anillo"></span>
+  <svg class="btnMusica__icono"><use href="#ico-corazon"/></svg>
+</button>
+<audio id="audio" loop preload="none"></audio>
+
+<canvas id="confeti" aria-hidden="true"></canvas>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

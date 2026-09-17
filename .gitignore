@@ -1,0 +1,15 @@
+# Archivos del sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Por si mas adelante se agrega alguna herramienta
+node_modules/
+dist/
+.env
+.env.local
