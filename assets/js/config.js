@@ -47,19 +47,20 @@ window.CONFIG = {
 
   /* ---- Itinerario (deja [] para ocultar la seccion) ------------------- */
   itinerario: [
-    { hora: '7:00 PM', titulo: 'Recepción',   detalle: 'Bienvenida a los invitados' },
-    { hora: '7:30 PM', titulo: 'Ceremonia',   detalle: 'Entrada de la quinceañera' },
-    { hora: '8:15 PM', titulo: 'Vals',        detalle: 'Baile con papá y chambelanes' },
-    { hora: '9:00 PM', titulo: 'Cena',        detalle: 'Servida en mesa' },
-    { hora: '10:00 PM', titulo: 'Fiesta',     detalle: '¡A bailar toda la noche!' }
+    { hora: '5:30 PM', titulo: 'Recepción',   detalle: 'Bienvenida a los invitados' },
+    { hora: '6:00 PM', titulo: 'Ceremonia',   detalle: 'Entrada de la quinceañera' },
+    { hora: '7:00 PM', titulo: 'Vals',        detalle: 'Baile con papá y chambelanes' },
+    { hora: '8:00 PM', titulo: 'Cena',        detalle: 'Servida en mesa' },
+    { hora: '9:00 PM', titulo: 'Pool Party',  detalle: 'Traer traje especial para piscina' }
   ],
 
   /* ---- Codigo de vestimenta ------------------------------------------ */
   vestimenta: {
     etiqueta: 'Formal',
-    texto: 'Para las damas sugerimos vestido largo. Por favor abstenerse de usar cualquier tono de rojo, ya que es un color reservado para la quinceañera. Los caballeros por favor opten por traje.',
-    /* Colores que se piden evitar, se muestran como muestras tachadas */
-    coloresReservados: ['#A8C4E0', '#6E8FC0', '#3E5C8C', '#243E66']
+    texto: 'Por favor abstenerse de usar cualquier tono de rojo, ya que es un color reservado para la quinceañera.',
+    /* Colores que se piden evitar, se muestran como muestras tachadas.
+       Deben coincidir con el color que menciona el texto de arriba. */
+    coloresReservados: ['#F0B4B4', '#D96A6A', '#A83232', '#6E1B1B']
   },
 
   /* ---- Lluvia de sobres ----------------------------------------------- */
@@ -83,7 +84,7 @@ window.CONFIG = {
   musica: {
     activo: true,
     archivo: 'assets/audio/cancion.mp3',  // <-- PENDIENTE: poner el mp3 ahi
-    titulo: 'Canción de Loren'
+    titulo: 'Canción de Lindsey'
   },
 
   /* ---- Seccion de fotos de los invitados (la dejamos preparada) ------- */
