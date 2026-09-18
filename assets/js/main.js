@@ -121,8 +121,8 @@
     var sinEnlace = 0;
 
     $('fotosDestinos').innerHTML = destinos.map(function (d, i) {
-      var esFormulario = d.tipo === 'cloudinary';
-      var listo = esFormulario ? cloudinaryListo() : !!d.enlace;
+      var esFormulario = d.tipo === 'drive';
+      var listo = esFormulario ? driveListo() : !!d.enlace;
       if (!listo) sinEnlace++;
 
       var etiqueta = esFormulario ? 'button' : 'a';
@@ -180,11 +180,15 @@
   }
 
   /* ======================================================================
-     1b. SUBIDA DE FOTOS A CLOUDINARY
+     1b. SUBIDA DE FOTOS A GOOGLE DRIVE
      ----------------------------------------------------------------------
-     Las fotos viajan del celular del invitado directo a Cloudinary. No
-     pasan por ningun servidor nuestro, por eso no hace falta contratar
-     nada ni hay algo que se pueda caer.
+     Las fotos viajan del celular del invitado a un script de Google
+     publicado como aplicacion web, que las guarda en una carpeta de Drive.
+     No pasan por ningun servidor nuestro, por eso no hay nada que
+     contratar ni nada que se pueda caer.
+
+     El invitado no necesita cuenta de Google: el script corre con los
+     permisos de quien lo publico.
 
      Antes de enviarlas se encogen en el propio celular: una foto de 3 MB
      queda en unos 400 KB sin que se note la diferencia en pantalla. Sube
@@ -194,15 +198,15 @@
 
   var elegidas = [];
 
-  function cloudinaryListo() {
-    var c = C.fotos && C.fotos.cloudinary;
-    return !!(c && c.cloudName && c.uploadPreset);
+  function driveListo() {
+    var d = C.fotos && C.fotos.drive;
+    return !!(d && d.urlScript);
   }
 
   function prepararSubida() {
-    if (!C.fotos || !C.fotos.activo || !cloudinaryListo()) return;
+    if (!C.fotos || !C.fotos.activo || !driveListo()) return;
 
-    var cfg = C.fotos.cloudinary;
+    var cfg = C.fotos.drive;
     $('subidaLimite').textContent = 'Hasta ' + cfg.maxArchivos + ' fotos a la vez';
 
     $('subidaElegir').addEventListener('click', function () {
@@ -244,7 +248,7 @@
      (pasa con algunos HEIC de iPhone en Android), devuelve el archivo tal
      cual: preferimos que suba pesada a que no suba. */
   function encoger(archivo) {
-    var cfg = C.fotos.cloudinary;
+    var cfg = C.fotos.drive;
 
     return new Promise(function (listo) {
       if (!/^image\//.test(archivo.type)) return listo(archivo);
@@ -272,37 +276,75 @@
     });
   }
 
-  function subirUna(archivo, nombreInvitado, alProgresar) {
-    var cfg = C.fotos.cloudinary;
-
-    return encoger(archivo).then(function (listo) {
-      return new Promise(function (resolver, rechazar) {
-        var datos = new FormData();
-        datos.append('file', listo, archivo.name);
-        datos.append('upload_preset', cfg.uploadPreset);
-        if (nombreInvitado) {
-          datos.append('context', 'invitado=' + nombreInvitado.replace(/[|=]/g, ' '));
-        }
-
-        var peticion = new XMLHttpRequest();
-        peticion.open('POST',
-          'https://api.cloudinary.com/v1_1/' + cfg.cloudName + '/image/upload');
-
-        peticion.upload.onprogress = function (e) {
-          if (e.lengthComputable) alProgresar(e.loaded / e.total);
-        };
-        peticion.onload = function () {
-          if (peticion.status >= 200 && peticion.status < 300) {
-            alProgresar(1);
-            resolver();
-          } else {
-            rechazar(new Error('Cloudinary respondió ' + peticion.status));
-          }
-        };
-        peticion.onerror = function () { rechazar(new Error('Sin conexión')); };
-        peticion.send(datos);
-      });
+  /* Convierte el archivo a texto base64, que es como viaja hasta el script
+     de Google. Apps Script no sabe leer archivos binarios directamente. */
+  function aBase64(blob) {
+    return new Promise(function (listo, falla) {
+      var lector = new FileReader();
+      lector.onload = function () {
+        var s = String(lector.result);            // "data:image/jpeg;base64,AAAA"
+        var coma = s.indexOf(',');
+        var puntoYcoma = s.indexOf(';');
+        listo({
+          datos: s.slice(coma + 1),
+          tipo: (coma > 0 && puntoYcoma > 5) ? s.slice(5, puntoYcoma) : 'image/jpeg'
+        });
+      };
+      lector.onerror = function () { falla(new Error('No se pudo leer el archivo')); };
+      lector.readAsDataURL(blob);
     });
+  }
+
+  function subirUna(archivo, nombreInvitado, alProgresar) {
+    var cfg = C.fotos.drive;
+
+    return encoger(archivo)
+      .then(function (comprimido) {
+        if (comprimido.size > cfg.pesoMaximoMB * 1024 * 1024) {
+          throw new Error('Pesa más de ' + cfg.pesoMaximoMB + ' MB');
+        }
+        return comprimido;
+      })
+      .then(aBase64)
+      .then(function (contenido) {
+        return new Promise(function (resolver, rechazar) {
+          /* Se manda como formulario clasico y no como JSON a proposito:
+             con JSON el navegador hace una peticion previa de permiso
+             (preflight) que Apps Script no sabe responder, y la subida
+             falla por CORS. Asi no hay peticion previa. */
+          var cuerpo = new URLSearchParams();
+          cuerpo.set('archivo', contenido.datos);
+          cuerpo.set('tipo', contenido.tipo);
+          cuerpo.set('nombreArchivo', archivo.name || 'foto.jpg');
+          if (nombreInvitado) cuerpo.set('invitado', nombreInvitado);
+
+          var peticion = new XMLHttpRequest();
+          peticion.open('POST', cfg.urlScript);
+          peticion.setRequestHeader('Content-Type',
+            'application/x-www-form-urlencoded;charset=UTF-8');
+
+          peticion.upload.onprogress = function (e) {
+            if (e.lengthComputable) alProgresar(e.loaded / e.total);
+          };
+
+          peticion.onload = function () {
+            if (peticion.status < 200 || peticion.status >= 300) {
+              return rechazar(new Error('Google respondió ' + peticion.status));
+            }
+            /* Apps Script contesta 200 incluso cuando algo salio mal por
+               dentro, asi que hay que mirar el contenido de la respuesta. */
+            var r;
+            try { r = JSON.parse(peticion.responseText); }
+            catch (e) { return rechazar(new Error('Respuesta inesperada')); }
+
+            if (r && r.ok) { alProgresar(1); resolver(); }
+            else { rechazar(new Error((r && r.error) || 'Rechazada por el script')); }
+          };
+
+          peticion.onerror = function () { rechazar(new Error('Sin conexión')); };
+          peticion.send(cuerpo.toString());
+        });
+      });
   }
 
   function enviarTodas() {
@@ -316,7 +358,8 @@
     boton.textContent = 'Enviando…';
     estado.hidden = true;
 
-    var fallaron = 0;
+    var fallidas = [];
+    var total = elegidas.length;
 
     /* Una por una y no todas juntas: en el internet de un salón, veinte
        subidas en paralelo se estorban entre ellas y terminan más lento. */
@@ -326,7 +369,7 @@
         return subirUna(archivo, nombre, function (p) {
           if (barra) barra.style.width = Math.round(p * 100) + '%';
         }).catch(function (e) {
-          fallaron++;
+          fallidas.push(archivo);
           var fila = $('subidaLista').querySelector('[data-i="' + i + '"]');
           if (fila) fila.classList.add('lista__fila--error');
           console.warn('[XV] No se pudo subir', archivo.name, e);
@@ -335,21 +378,45 @@
     }, Promise.resolve());
 
     cadena.then(function () {
-      var enviadas = elegidas.length - fallaron;
-      estado.hidden = false;
-      estado.className = 'subida__estado' + (fallaron ? ' subida__estado--aviso' : ' subida__estado--bien');
-      estado.textContent = fallaron
-        ? '¡Gracias! Se enviaron ' + enviadas + '. ' + fallaron +
-          ' no pudieron subir, puedes intentarlo de nuevo.'
-        : '¡Gracias! ' + (enviadas === 1 ? 'Tu foto quedó guardada.'
-                                         : 'Tus ' + enviadas + ' fotos quedaron guardadas.');
-
-      elegidas = [];
-      $('subidaArchivos').value = '';
+      var enviadas = total - fallidas.length;
       boton.disabled = false;
-      boton.hidden = true;
-      $('subidaLista').innerHTML = '';
+
+      if (!fallidas.length) {
+        elegidas = [];
+        $('subidaArchivos').value = '';
+        $('subidaLista').innerHTML = '';
+        boton.hidden = true;
+        mostrarEstado('bien', '¡Gracias! ' + (enviadas === 1
+          ? 'Tu foto quedó guardada.'
+          : 'Tus ' + enviadas + ' fotos quedaron guardadas.'));
+        return;
+      }
+
+      /* Las que fallaron se quedan elegidas para que el invitado pueda
+         reintentar de un toque, sin volver a buscarlas en su galería. */
+      elegidas = fallidas;
+      pintarElegidas();
+      boton.textContent = fallidas.length === 1
+        ? 'Reintentar 1 foto'
+        : 'Reintentar ' + fallidas.length + ' fotos';
+
+      if (enviadas === 0) {
+        mostrarEstado('aviso', fallidas.length === 1
+          ? 'No se pudo enviar la foto. Revisa tu conexión y vuelve a intentarlo.'
+          : 'No se pudo enviar ninguna. Revisa tu conexión y vuelve a intentarlo.');
+      } else {
+        mostrarEstado('aviso', '¡Gracias! Se enviaron ' + enviadas + '. ' +
+          (fallidas.length === 1 ? 'Una quedó pendiente' : fallidas.length + ' quedaron pendientes') +
+          ', puedes reintentarla' + (fallidas.length === 1 ? '' : 's') + '.');
+      }
     });
+  }
+
+  function mostrarEstado(tipo, texto) {
+    var estado = $('subidaEstado');
+    estado.className = 'subida__estado subida__estado--' + tipo;
+    estado.textContent = texto;
+    estado.hidden = false;
   }
 
   /* ======================================================================

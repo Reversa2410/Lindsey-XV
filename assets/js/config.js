@@ -110,8 +110,8 @@ window.CONFIG = {
 
     destinos: [
       {
-        /* tipo 'cloudinary' abre el formulario dentro de la misma pagina */
-        tipo: 'cloudinary',
+        /* tipo 'drive' abre el formulario dentro de la misma pagina */
+        tipo: 'drive',
         icono: 'camara',
         etiqueta: 'Subir fotos',
         nota: 'Elige varias a la vez, sin crear cuenta'
@@ -126,21 +126,20 @@ window.CONFIG = {
       }
     ],
 
-    /* ---- Cuenta de Cloudinary ----------------------------------------
-       Los dos datos salen del panel de Cloudinary:
-         cloudName    -> Dashboard, arriba ("Cloud name")
-         uploadPreset -> Settings > Upload > Upload presets
-                         Tiene que estar en modo "Unsigned".
-       Mientras esten vacios, el boton de fotos se muestra apagado.
+    /* ---- Carpeta de Google Drive --------------------------------------
+       Las fotos caen en una carpeta de Drive tuya, a traves de un script
+       de Google publicado como aplicacion web. Se eligio Drive porque
+       Cloudinary no presta servicio en Nicaragua.
 
-       El preset es una llave de una sola puerta: solo permite SUBIR a la
-       carpeta configurada. No deja borrar, ni ver lo de otros, ni tocar
-       el resto de la cuenta. Si alguna vez se abusa de el, se apaga desde
-       el panel en un clic y se crea otro.
+       El invitado NO necesita cuenta de Google: el script corre con tus
+       permisos, asi que es tu cuenta la que guarda el archivo.
+
+       El paso a paso para publicarlo esta en google-apps-script/LEEME.md
+       Mientras urlScript este vacio, el boton de fotos se ve apagado.
        ------------------------------------------------------------------- */
-    cloudinary: {
-      cloudName: '',        // <-- PENDIENTE: pegar aqui el Cloud name
-      uploadPreset: '',     // <-- PENDIENTE: pegar aqui el nombre del preset
+    drive: {
+      /* URL que da Google al publicar el script. Termina en /exec */
+      urlScript: '',        // <-- PENDIENTE
 
       /* Las fotos se encogen en el celular ANTES de enviarse. Se siguen
          viendo perfectas y pesan unas siete veces menos, asi que suben
@@ -148,7 +147,7 @@ window.CONFIG = {
       anchoMaximo: 2000,    // pixeles del lado mas largo
       calidad: 0.82,        // 0 a 1
       maxArchivos: 15,      // cuantas fotos puede mandar cada invitado de una vez
-      pesoMaximoMB: 25      // tope por archivo antes de comprimir
+      pesoMaximoMB: 25      // tope por archivo, ya comprimido
     }
   },
 

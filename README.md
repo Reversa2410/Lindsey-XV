@@ -89,9 +89,23 @@ Los datos son de muestra, salvo el nombre. La fecha del **sábado 27 de marzo de
 
 ## Sobre la sección de fotos
 
-Está construida y en su lugar, pero el botón está desactivado hasta que se defina
-dónde se guardarán las fotos. La idea es que los invitados suban desde la misma
-invitación, sin crear cuenta ni instalar nada, escaneando un QR en las mesas.
+Son dos destinos separados. No por el espacio total, sino por el **límite por
+archivo**: un video de celular de dos minutos pesa lo mismo que unas 150 fotos y
+casi todos los servicios gratuitos lo rechazan por tamaño aunque quede espacio
+de sobra.
 
-Queda pendiente elegir el servicio de almacenamiento. Cuando esté, solo hay que
-pegar el enlace en `config.js` y la sección se activa sola.
+| | Destino | Estado |
+|---|---|---|
+| **Fotos** | Formulario dentro de la invitación → Google Drive | Falta publicar el script |
+| **Videos** | Enlace externo (OneDrive) | Falta el enlace |
+
+Se eligió Google Drive porque **Cloudinary no presta servicio en Nicaragua**.
+Drive es gratis, son 15 GB, no pide tarjeta, y el invitado no necesita cuenta de
+Google: el script corre con los permisos de quien lo publicó.
+
+El paso a paso está en [`google-apps-script/LEEME.md`](google-apps-script/LEEME.md).
+
+Las fotos se encogen en el propio celular antes de enviarse: una de 3 MB queda en
+unos 400 KB, sin diferencia visible. Suben siete veces más rápido, que con el
+internet de un salón lleno es la diferencia entre que la gente participe o se
+rinda a la mitad.
