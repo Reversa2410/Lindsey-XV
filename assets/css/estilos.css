@@ -615,6 +615,88 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   padding:8px 12px; border-radius:var(--radio);
 }
 
+/* -------------------------------------------------------------- GALERIA */
+.seccion--galeria{background:var(--papel-2)}
+.seccion--galeria[hidden]{display:none !important}
+
+.galeria{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
+  margin:26px 0 20px;
+}
+.galeria__foto{
+  position:relative; aspect-ratio:1; padding:0; overflow:hidden;
+  border:1px solid var(--tono-200); border-radius:var(--radio);
+  background:var(--tono-100); cursor:pointer;
+  opacity:0; transform:scale(.94);
+  transition:opacity .6s var(--curva), transform .5s var(--curva),
+             box-shadow .35s, border-color .35s;
+  transition-delay:var(--d,0ms);
+}
+.galeria__foto--lista{opacity:1; transform:none}
+.galeria__foto img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .5s var(--curva);
+}
+.galeria__foto:hover{border-color:var(--oro); box-shadow:0 8px 20px rgba(123,30,58,.16)}
+.galeria__foto:hover img{transform:scale(1.06)}
+
+.galeria__estado{
+  margin:26px 0 0; font-size:.94rem; font-style:italic; color:var(--tinta-suave);
+}
+.galeria__estado[hidden]{display:none !important}
+
+/* ---------------------------------------------------------------- VISOR */
+.visor{
+  position:fixed; inset:0; z-index:120;
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+  gap:4px; padding:16px;
+  background:rgba(48,10,22,.94); backdrop-filter:blur(6px);
+  animation:aparecerVisor .3s ease;
+}
+.visor[hidden]{display:none !important}
+@keyframes aparecerVisor{from{opacity:0}to{opacity:1}}
+
+.visor__marco{margin:0; display:flex; flex-direction:column; align-items:center; gap:12px; min-width:0}
+.visor__marco img{
+  max-width:100%; max-height:76vh; object-fit:contain;
+  border-radius:var(--radio); box-shadow:0 20px 60px rgba(0,0,0,.5);
+  animation:entrarFoto .35s var(--curva);
+}
+@keyframes entrarFoto{from{opacity:0; transform:scale(.97)}to{opacity:1; transform:none}}
+
+.visor__pie{
+  font-size:.78rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--tono-300); text-align:center;
+}
+.visor__cerrar{
+  position:absolute; top:12px; right:14px; z-index:2;
+  width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08); color:#fff; font-size:1.7rem; line-height:1;
+  display:grid; place-items:center; transition:background .3s, transform .3s;
+}
+.visor__cerrar:hover{background:rgba(255,255,255,.2); transform:rotate(90deg)}
+
+.visor__flecha{
+  width:42px; height:60px; flex:none;
+  border:0; background:transparent; color:#fff; font-size:2.4rem; line-height:1;
+  opacity:.65; transition:opacity .3s, transform .3s;
+}
+.visor__flecha:hover{opacity:1}
+.visor__flecha--izq:hover{transform:translateX(-3px)}
+.visor__flecha--der:hover{transform:translateX(3px)}
+
+@media (max-width:420px){
+  .visor{grid-template-columns:1fr; padding:12px}
+  .visor__flecha{
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:rgba(0,0,0,.3); border-radius:50%; width:38px; height:38px;
+    font-size:1.8rem;
+  }
+  .visor__flecha--izq{left:8px}
+  .visor__flecha--der{right:8px}
+  .visor__flecha--izq:hover,.visor__flecha--der:hover{transform:translateY(-50%)}
+}
+
 /* -------------------------------------------------------------- CIERRE */
 .cierre{
   position:relative; padding:56px 28px 66px; text-align:center; overflow:hidden;

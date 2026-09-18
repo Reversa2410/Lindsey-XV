@@ -90,6 +90,41 @@ Guarda, recarga la página y el botón **Subir fotos** se enciende solo.
 
 ---
 
+## Paso 6 — La galería (decidir si moderas)
+
+La invitación muestra un álbum con lo que los invitados van subiendo. Lo que se
+ve ahí lo decide **el script**, no la página.
+
+En la línea `ID_CARPETA_GALERIA` del script tienes dos opciones:
+
+**Dejarla vacía.** Todo lo que suban aparece en el álbum al instante. Es lo más
+vistoso durante la fiesta, pero recuerda que el enlace de la invitación es
+público: si alguien sube algo inapropiado, se ve de inmediato.
+
+**Poner el ID de una segunda carpeta.** Crea otra carpeta, por ejemplo
+*Publicadas*, pega su ID ahí, y el álbum mostrará solo lo que tú muevas a ella.
+Moderar se vuelve arrastrar fotos de una carpeta a otra en Drive, sin tocar
+código.
+
+```js
+const ID_CARPETA_GALERIA = '1x2Y3z...';   // solo se ve lo que muevas aquí
+```
+
+> Recomendado poner la segunda carpeta. Alguien de la familia puede ir pasando
+> las fotos desde el celular durante la noche, y el álbum crece igual.
+
+## Comprobar la galería
+
+Abre la URL del script añadiendo `?accion=listar`:
+
+```
+https://script.google.com/macros/s/AKfy.../exec?accion=listar
+```
+
+Debe devolver la lista de fotos en formato JSON. Si responde
+`{"ok":true,"mensaje":"Receptor activo"}` en vez de la lista, es que **falta
+crear una nueva versión de la implementación** (ver la sección de abajo).
+
 ## Comprobar que funciona
 
 Abre la URL del script en el navegador. Debe responder:

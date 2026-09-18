@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&display=swap" rel="stylesheet">
 <!-- El ?v= obliga al navegador a bajar la version nueva en vez de usar
      la que tenga guardada. Subir el numero al cambiar estilos o logica. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=2">
+<link rel="stylesheet" href="assets/css/estilos.css?v=3">
 </head>
 <body class="bloqueado">
 
@@ -362,6 +362,15 @@
     </div>
   </section>
 
+  <!-- ---------------- GALERÍA ---------------- -->
+  <section class="seccion seccion--galeria" id="seccionGaleria" hidden>
+    <h3 class="titulo reveal" id="galeriaTitulo">Álbum de la noche</h3>
+    <p class="parrafo parrafo--italica reveal" id="galeriaTexto"></p>
+    <div class="galeria" id="galeria"></div>
+    <p class="galeria__estado" id="galeriaEstado">Cargando el álbum…</p>
+    <button type="button" class="boton boton--linea" id="galeriaMas" hidden>Ver más fotos</button>
+  </section>
+
   <!-- ---------------- CIERRE ---------------- -->
   <footer class="cierre">
     <svg class="cierre__lazo"><use href="#ico-lazo"/></svg>
@@ -377,9 +386,20 @@
 </button>
 <audio id="audio" loop preload="none"></audio>
 
+<!-- Visor de fotos a pantalla completa -->
+<div class="visor" id="visor" hidden>
+  <button class="visor__cerrar" id="visorCerrar" aria-label="Cerrar">&times;</button>
+  <button class="visor__flecha visor__flecha--izq" id="visorAnterior" aria-label="Anterior">&#8249;</button>
+  <figure class="visor__marco">
+    <img id="visorImagen" alt="">
+    <figcaption class="visor__pie" id="visorPie"></figcaption>
+  </figure>
+  <button class="visor__flecha visor__flecha--der" id="visorSiguiente" aria-label="Siguiente">&#8250;</button>
+</div>
+
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=2"></script>
-<script src="assets/js/main.js?v=2"></script>
+<script src="assets/js/config.js?v=3"></script>
+<script src="assets/js/main.js?v=3"></script>
 </body>
 </html>

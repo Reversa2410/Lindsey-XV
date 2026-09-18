@@ -430,6 +430,169 @@
   }
 
   /* ======================================================================
+     1c. GALERIA
+     ----------------------------------------------------------------------
+     El script solo manda los datos de cada foto, no las imagenes. Las
+     imagenes se le piden despues directamente a Drive, que las sirve ya
+     redimensionadas al tamaño que se le pida. Asi la miniatura de la
+     rejilla pesa poco y la grande solo se descarga si alguien la abre.
+     ====================================================================== */
+
+  var galeriaFotos = [];
+  var galeriaMostradas = 0;
+  var visorIndice = 0;
+
+  /* Drive sirve la misma foto a cualquier ancho; se le pide el que hace
+     falta en cada sitio en vez de bajar siempre la original.
+     La plantilla se puede cambiar desde config (galeria.baseMiniatura),
+     pero normalmente no hace falta tocarla. */
+  var BASE_MINIATURA = 'https://drive.google.com/thumbnail?id={id}&sz=w{ancho}';
+
+  function urlFoto(id, ancho) {
+    var base = (C.fotos.galeria && C.fotos.galeria.baseMiniatura) || BASE_MINIATURA;
+    return base.replace('{id}', encodeURIComponent(id)).replace('{ancho}', ancho);
+  }
+
+  function prepararGaleria() {
+    var g = C.fotos && C.fotos.galeria;
+    if (!g || !g.activa || !driveListo()) return;
+
+    $('seccionGaleria').hidden = false;
+    $('galeriaTitulo').textContent = g.titulo;
+    $('galeriaTexto').textContent = g.texto;
+
+    $('galeriaMas').addEventListener('click', function () {
+      pintarGaleria(galeriaMostradas + g.porPagina);
+    });
+
+    prepararVisor();
+    cargarGaleria();
+
+    if (g.refrescarCada > 0) {
+      setInterval(cargarGaleria, g.refrescarCada * 1000);
+    }
+  }
+
+  function cargarGaleria() {
+    var g = C.fotos.galeria;
+    var url = C.fotos.drive.urlScript + '?accion=listar&max=' + g.maximo;
+
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.ok) throw new Error((d && d.error) || 'respuesta inesperada');
+
+        galeriaFotos = d.fotos || [];
+        if (!galeriaFotos.length) {
+          $('galeria').innerHTML = '';
+          $('galeriaEstado').hidden = false;
+          $('galeriaEstado').textContent =
+            'Todavía no hay fotos. ¡Sé el primero en compartir una!';
+          $('galeriaMas').hidden = true;
+          return;
+        }
+        $('galeriaEstado').hidden = true;
+        pintarGaleria(Math.max(galeriaMostradas, g.porPagina));
+      })
+      .catch(function (e) {
+        console.warn('[XV] No se pudo cargar la galería', e);
+        /* Si ya hay fotos en pantalla no se borran por un fallo de red:
+           mejor dejar lo que se ve que vaciar el álbum. */
+        if (!galeriaFotos.length) {
+          $('galeriaEstado').hidden = false;
+          $('galeriaEstado').textContent = 'No se pudo cargar el álbum ahora mismo.';
+        }
+      });
+  }
+
+  function pintarGaleria(cuantas) {
+    var visibles = Math.min(cuantas, galeriaFotos.length);
+    galeriaMostradas = visibles;
+
+    $('galeria').innerHTML = galeriaFotos.slice(0, visibles).map(function (f, i) {
+      var de = f.invitado ? 'Foto de ' + escapar(f.invitado) : 'Foto del evento';
+      return '<button type="button" class="galeria__foto" data-i="' + i + '" ' +
+             'style="--d:' + ((i % 12) * 45) + 'ms">' +
+               '<img src="' + urlFoto(f.id, 400) + '" alt="' + de + '" ' +
+               'loading="lazy" decoding="async">' +
+             '</button>';
+    }).join('');
+
+    $('galeriaMas').hidden = visibles >= galeriaFotos.length;
+
+    Array.prototype.forEach.call(
+      $('galeria').querySelectorAll('.galeria__foto'),
+      function (boton) {
+        boton.addEventListener('click', function () {
+          abrirVisor(parseInt(boton.getAttribute('data-i'), 10));
+        });
+        /* Si Drive tarda o falla con una foto, se quita el hueco vacío
+           en vez de dejar el icono de imagen rota. */
+        var img = boton.querySelector('img');
+        img.addEventListener('error', function () { boton.remove(); });
+        img.addEventListener('load', function () { boton.classList.add('galeria__foto--lista'); });
+      }
+    );
+  }
+
+  /* --------------------------- visor a pantalla completa --------------- */
+  function prepararVisor() {
+    $('visorCerrar').addEventListener('click', cerrarVisor);
+    $('visorAnterior').addEventListener('click', function () { moverVisor(-1); });
+    $('visorSiguiente').addEventListener('click', function () { moverVisor(1); });
+
+    $('visor').addEventListener('click', function (e) {
+      if (e.target === $('visor')) cerrarVisor();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if ($('visor').hidden) return;
+      if (e.key === 'Escape') cerrarVisor();
+      if (e.key === 'ArrowLeft') moverVisor(-1);
+      if (e.key === 'ArrowRight') moverVisor(1);
+    });
+
+    /* Deslizar con el dedo, que es como se va a usar de verdad */
+    var inicioX = null;
+    $('visor').addEventListener('touchstart', function (e) {
+      inicioX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    $('visor').addEventListener('touchend', function (e) {
+      if (inicioX === null) return;
+      var avance = e.changedTouches[0].clientX - inicioX;
+      if (Math.abs(avance) > 50) moverVisor(avance < 0 ? 1 : -1);
+      inicioX = null;
+    }, { passive: true });
+  }
+
+  function abrirVisor(i) {
+    visorIndice = i;
+    mostrarEnVisor();
+    $('visor').hidden = false;
+    document.body.classList.add('bloqueado');
+  }
+
+  function cerrarVisor() {
+    $('visor').hidden = true;
+    document.body.classList.remove('bloqueado');
+  }
+
+  function moverVisor(paso) {
+    var total = Math.min(galeriaMostradas, galeriaFotos.length);
+    visorIndice = (visorIndice + paso + total) % total;   // da la vuelta
+    mostrarEnVisor();
+  }
+
+  function mostrarEnVisor() {
+    var f = galeriaFotos[visorIndice];
+    if (!f) return;
+    $('visorImagen').src = urlFoto(f.id, 1600);
+    $('visorImagen').alt = f.invitado ? 'Foto de ' + f.invitado : 'Foto del evento';
+    $('visorPie').textContent = (f.invitado ? f.invitado + ' · ' : '') +
+      (visorIndice + 1) + ' de ' + Math.min(galeriaMostradas, galeriaFotos.length);
+  }
+
+  /* ======================================================================
      2. CALENDARIO DEL MES
      ====================================================================== */
   function pintarCalendario() {
@@ -785,6 +948,7 @@
   function iniciar() {
     pintarDatos();
     prepararSubida();
+    prepararGaleria();
     pintarCalendario();
     arrancarReloj();
     observarReveals();

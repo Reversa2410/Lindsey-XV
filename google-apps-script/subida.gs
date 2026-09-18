@@ -18,6 +18,14 @@
    drive.google.com/drive/folders/ESTO_DE_AQUI                                */
 const ID_CARPETA = 'PEGA_AQUI_EL_ID_DE_LA_CARPETA';
 
+/* Carpeta que ALIMENTA LA GALERIA de la invitacion.
+   - Si la dejas vacia, la galeria muestra todo lo que suban, al instante.
+   - Si pones aqui el ID de una segunda carpeta, la galeria muestra solo lo
+     que tu muevas a ella. Es la forma mas simple de moderar: arrastras en
+     Drive las fotos que quieres que se vean, y listo.
+   Recomendado ponerla: el enlace de la invitacion es publico.             */
+const ID_CARPETA_GALERIA = '';
+
 /* Tope por archivo ya comprimido, como red de seguridad. */
 const MAX_MB = 25;
 
@@ -55,6 +63,16 @@ function doPost(e) {
       archivo.setDescription('Subido por: ' + p.invitado);
     }
 
+    /* Para que la galeria pueda mostrar la miniatura, el archivo tiene que
+       ser visible con enlace. Va en try aparte: si la cuenta tiene el
+       compartir restringido, la foto igual queda guardada y no se pierde;
+       solo no se veria en la galeria. */
+    try {
+      archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (errCompartir) {
+      Logger.log('No se pudo compartir: ' + errCompartir);
+    }
+
     return responder({ ok: true, id: archivo.getId() });
 
   } catch (err) {
@@ -66,11 +84,53 @@ function doPost(e) {
 
 
 /**
- * Abrir la URL del script en el navegador cae aquí.
- * Sirve para comprobar de un vistazo que quedó bien publicado.
+ * Atiende dos cosas:
+ *   - sin parámetros: comprobar que el script quedó bien publicado
+ *   - ?accion=listar : la lista de fotos que muestra la galería
  */
-function doGet() {
+function doGet(e) {
+  const accion = (e && e.parameter && e.parameter.accion) || '';
+  if (accion === 'listar') return listarFotos(e);
   return responder({ ok: true, mensaje: 'Receptor activo' });
+}
+
+
+/**
+ * Devuelve las fotos de la carpeta de galería, de la más nueva a la más
+ * vieja. Solo manda datos, no las imágenes: la invitación las pide después
+ * directamente a Drive, que es mucho más rápido que pasarlas por aquí.
+ */
+function listarFotos(e) {
+  try {
+    const pedidas = parseInt((e && e.parameter && e.parameter.max) || '60', 10);
+    const max = Math.min(isNaN(pedidas) ? 60 : pedidas, 200);
+
+    const carpeta = DriveApp.getFolderById(ID_CARPETA_GALERIA || ID_CARPETA);
+    const archivos = carpeta.getFiles();
+    const fotos = [];
+
+    while (archivos.hasNext()) {
+      const f = archivos.next();
+      if (TIPOS_OK.indexOf(f.getMimeType()) === -1) continue;
+      fotos.push({
+        id: f.getId(),
+        invitado: (f.getDescription() || '').replace('Subido por: ', ''),
+        fecha: f.getDateCreated().getTime()
+      });
+    }
+
+    fotos.sort(function (a, b) { return b.fecha - a.fecha; });
+
+    return responder({
+      ok: true,
+      total: fotos.length,
+      moderada: !!ID_CARPETA_GALERIA,
+      fotos: fotos.slice(0, max)
+    });
+
+  } catch (err) {
+    return responder({ ok: false, error: String(err) });
+  }
 }
 
 
