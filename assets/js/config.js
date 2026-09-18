@@ -148,6 +148,26 @@ window.CONFIG = {
       calidad: 0.82,        // 0 a 1
       maxArchivos: 15,      // cuantas fotos puede mandar cada invitado de una vez
       pesoMaximoMB: 25      // tope por archivo, ya comprimido
+    },
+
+    /* ---- Galeria de fotos ---------------------------------------------
+       Muestra en la invitacion lo que los invitados van subiendo.
+       Usa el mismo script de Drive, asi que no hay nada mas que configurar.
+
+       QUE SE VE aqui lo decide el script, no esta pagina: si en el script
+       llenaste ID_CARPETA_GALERIA, solo se ve lo que muevas a esa carpeta;
+       si lo dejaste vacio, se ve todo lo que suban, al instante.
+       ------------------------------------------------------------------- */
+    galeria: {
+      activa: true,
+      titulo: 'Álbum de la noche',
+      texto: 'Las fotos que los invitados van compartiendo.',
+      porPagina: 24,        // cuantas se cargan de golpe
+      maximo: 200,          // tope que se le pide al script
+
+      /* Segundos entre recargas automaticas, para que la galeria se vea
+         crecer durante la fiesta. 0 = no recargar sola. */
+      refrescarCada: 0
     }
   },
 
