@@ -445,7 +445,13 @@
   /* Drive sirve la misma foto a cualquier ancho; se le pide el que hace
      falta en cada sitio en vez de bajar siempre la original.
      La plantilla se puede cambiar desde config (galeria.baseMiniatura),
-     pero normalmente no hace falta tocarla. */
+     pero normalmente no hace falta tocarla.
+
+     IMPORTANTE: las <img> que usen esta URL necesitan el atributo
+     referrerpolicy="no-referrer". Drive rechaza la peticion si el navegador
+     le manda de que pagina viene, y la foto no carga. Desde curl si
+     funciona, porque curl no manda esa cabecera, asi que es un fallo que
+     engaña: parece un problema de permisos y no lo es. */
   var BASE_MINIATURA = 'https://drive.google.com/thumbnail?id={id}&sz=w{ancho}';
 
   function urlFoto(id, ancho) {
@@ -514,7 +520,7 @@
       return '<button type="button" class="galeria__foto" data-i="' + i + '" ' +
              'style="--d:' + ((i % 12) * 45) + 'ms">' +
                '<img src="' + urlFoto(f.id, 400) + '" alt="' + de + '" ' +
-               'loading="lazy" decoding="async">' +
+               'loading="lazy" decoding="async" referrerpolicy="no-referrer">' +
              '</button>';
     }).join('');
 
@@ -526,13 +532,28 @@
         boton.addEventListener('click', function () {
           abrirVisor(parseInt(boton.getAttribute('data-i'), 10));
         });
-        /* Si Drive tarda o falla con una foto, se quita el hueco vacío
-           en vez de dejar el icono de imagen rota. */
         var img = boton.querySelector('img');
+        var idx = parseInt(boton.getAttribute('data-i'), 10);
+        var intentos = 0;
+
+        /* Drive limita cuántas fotos sirve a la vez, así que cuando se
+           cargan muchas de golpe algunas fallan sin motivo real. Por eso
+           se reintenta antes de rendirse: un fallo pasajero no puede
+           borrar una foto del álbum para siempre.
+           El parámetro extra evita que el navegador reutilice el fallo
+           que ya guardó en caché. */
         img.addEventListener('error', function () {
+          intentos++;
+          if (intentos <= 3) {
+            setTimeout(function () {
+              img.src = urlFoto(galeriaFotos[idx].id, 400) + '&r=' + intentos;
+            }, 700 * intentos);
+            return;
+          }
           boton.remove();
           avisarSiQuedoVacia();
         });
+
         img.addEventListener('load', function () {
           boton.classList.add('galeria__foto--lista');
         });
