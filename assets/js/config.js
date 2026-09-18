@@ -110,18 +110,46 @@ window.CONFIG = {
 
     destinos: [
       {
+        /* tipo 'cloudinary' abre el formulario dentro de la misma pagina */
+        tipo: 'cloudinary',
         icono: 'camara',
         etiqueta: 'Subir fotos',
-        nota: 'Imágenes · hasta 10 MB cada una',
-        enlace: 'https://ejemplo.com/fotos-lindsey'    // ficticio
+        nota: 'Elige varias a la vez, sin crear cuenta'
       },
       {
+        /* tipo 'enlace' manda al invitado a otro sitio (OneDrive, Dropbox...) */
+        tipo: 'enlace',
         icono: 'video',
         etiqueta: 'Subir videos',
         nota: 'Videos · archivos grandes, sin apuro',
-        enlace: 'https://ejemplo.com/videos-lindsey'   // ficticio
+        enlace: 'https://ejemplo.com/videos-lindsey'   // <-- PENDIENTE (ficticio)
       }
-    ]
+    ],
+
+    /* ---- Cuenta de Cloudinary ----------------------------------------
+       Los dos datos salen del panel de Cloudinary:
+         cloudName    -> Dashboard, arriba ("Cloud name")
+         uploadPreset -> Settings > Upload > Upload presets
+                         Tiene que estar en modo "Unsigned".
+       Mientras esten vacios, el boton de fotos se muestra apagado.
+
+       El preset es una llave de una sola puerta: solo permite SUBIR a la
+       carpeta configurada. No deja borrar, ni ver lo de otros, ni tocar
+       el resto de la cuenta. Si alguna vez se abusa de el, se apaga desde
+       el panel en un clic y se crea otro.
+       ------------------------------------------------------------------- */
+    cloudinary: {
+      cloudName: '',        // <-- PENDIENTE: pegar aqui el Cloud name
+      uploadPreset: '',     // <-- PENDIENTE: pegar aqui el nombre del preset
+
+      /* Las fotos se encogen en el celular ANTES de enviarse. Se siguen
+         viendo perfectas y pesan unas siete veces menos, asi que suben
+         mucho mas rapido y caben muchisimas mas. */
+      anchoMaximo: 2000,    // pixeles del lado mas largo
+      calidad: 0.82,        // 0 a 1
+      maxArchivos: 15,      // cuantas fotos puede mandar cada invitado de una vez
+      pesoMaximoMB: 25      // tope por archivo antes de comprimir
+    }
   },
 
   /* ---- Textos varios -------------------------------------------------- */

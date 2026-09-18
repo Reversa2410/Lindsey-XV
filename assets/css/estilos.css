@@ -47,6 +47,11 @@
 
 *,*::before,*::after{box-sizing:border-box}
 
+/* El atributo hidden tiene que ganarle a cualquier display de clase.
+   Sin esto, un .boton[hidden] se sigue viendo, porque .boton{display:flex}
+   pisa al display:none que el navegador le da a [hidden]. */
+[hidden]{display:none !important}
+
 html{scroll-behavior:smooth}
 
 body{
@@ -541,6 +546,57 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   opacity:.5; cursor:default; border-style:dashed;
 }
 .destino--apagado:hover{transform:none; box-shadow:none; background:#fff}
+
+/* ----------------------------------------------- FORMULARIO DE SUBIDA */
+.subida{display:grid; gap:16px; margin-top:20px; text-align:left}
+.subida[hidden]{display:none}
+.campo--subida > span i{font-style:italic; text-transform:none; letter-spacing:0; opacity:.8}
+
+.soltar{
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  padding:26px 18px; width:100%;
+  border:1.5px dashed var(--oro); border-radius:var(--radio);
+  background:var(--tono-50); color:var(--tono-800);
+  transition:background .3s, border-color .3s, transform .3s var(--curva);
+}
+.soltar:hover{background:var(--tono-100); transform:translateY(-2px)}
+.soltar__icono{width:34px; height:26px; color:var(--tono-700)}
+.soltar__texto{
+  font-family:var(--display); font-size:.96rem; letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.soltar__nota{font-size:.8rem; font-style:italic; color:var(--tinta-suave)}
+
+.lista{list-style:none; margin:0; padding:0; display:grid; gap:8px}
+.lista__fila{
+  display:grid; grid-template-columns:1fr auto; gap:4px 10px; align-items:center;
+  padding:9px 12px; border:1px solid var(--tono-200); border-radius:var(--radio);
+  background:#fff;
+}
+.lista__nombre{
+  font-size:.86rem; color:var(--tinta);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.lista__peso{font-size:.76rem; color:var(--tinta-suave); font-variant-numeric:tabular-nums}
+.lista__barra{
+  grid-column:1 / -1; height:3px; border-radius:2px;
+  background:var(--tono-200); overflow:hidden;
+}
+.lista__barra i{
+  display:block; height:100%; width:0%;
+  background:linear-gradient(90deg,var(--oro-claro),var(--oro));
+  transition:width .25s linear;
+}
+.lista__fila--error{border-color:#C7503F; background:#FDF3F1}
+.lista__fila--error .lista__barra i{background:#C7503F}
+
+.subida__estado{
+  margin:0; padding:12px 14px; border-radius:var(--radio);
+  font-size:.92rem; font-style:italic; text-align:center;
+}
+.subida__estado[hidden]{display:none}
+.subida__estado--bien{background:var(--tono-100); color:var(--tono-800); border:1px solid var(--oro)}
+.subida__estado--aviso{background:#FCF6EA; color:#9C7740; border:1px dashed #DEC49A}
 .aviso{
   margin:14px 0 0; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
   color:#9C7740; background:#FCF6EA; border:1px dashed #DEC49A;

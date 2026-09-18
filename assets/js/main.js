@@ -120,20 +120,40 @@
     var destinos = C.fotos.destinos || [];
     var sinEnlace = 0;
 
-    $('fotosDestinos').innerHTML = destinos.map(function (d) {
-      var listo = !!d.enlace;
+    $('fotosDestinos').innerHTML = destinos.map(function (d, i) {
+      var esFormulario = d.tipo === 'cloudinary';
+      var listo = esFormulario ? cloudinaryListo() : !!d.enlace;
       if (!listo) sinEnlace++;
 
-      return '<a class="destino' + (listo ? '' : ' destino--apagado') + '"' +
-             (listo ? ' href="' + escapar(d.enlace) + '" target="_blank" rel="noopener"' : '') + '>' +
+      var etiqueta = esFormulario ? 'button' : 'a';
+      var atributos = '';
+      if (listo && esFormulario) {
+        atributos = ' type="button" data-abre-subida="1"';
+      } else if (listo) {
+        atributos = ' href="' + escapar(d.enlace) + '" target="_blank" rel="noopener"';
+      } else if (esFormulario) {
+        atributos = ' type="button" disabled';
+      }
+
+      return '<' + etiqueta + ' class="destino' + (listo ? '' : ' destino--apagado') + '"' +
+             atributos + '>' +
                '<svg class="destino__icono"><use href="#ico-' + escapar(d.icono) + '"/></svg>' +
                '<span class="destino__texto">' +
                  '<span class="destino__etiqueta">' + escapar(d.etiqueta) + '</span>' +
                  '<span class="destino__nota">' + escapar(d.nota) + '</span>' +
                '</span>' +
                '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>' +
-             '</a>';
+             '</' + etiqueta + '>';
     }).join('');
+
+    var abre = $('fotosDestinos').querySelector('[data-abre-subida]');
+    if (abre) {
+      abre.addEventListener('click', function () {
+        var panel = $('subida');
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+    }
 
     var aviso = $('fotosPendiente');
     if (C.fotos.demo) {
@@ -156,6 +176,179 @@
   function escapar(t) {
     return String(t).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  /* ======================================================================
+     1b. SUBIDA DE FOTOS A CLOUDINARY
+     ----------------------------------------------------------------------
+     Las fotos viajan del celular del invitado directo a Cloudinary. No
+     pasan por ningun servidor nuestro, por eso no hace falta contratar
+     nada ni hay algo que se pueda caer.
+
+     Antes de enviarlas se encogen en el propio celular: una foto de 3 MB
+     queda en unos 400 KB sin que se note la diferencia en pantalla. Sube
+     siete veces mas rapido, que con el internet de un salon lleno es la
+     diferencia entre que la gente participe o se rinda a la mitad.
+     ====================================================================== */
+
+  var elegidas = [];
+
+  function cloudinaryListo() {
+    var c = C.fotos && C.fotos.cloudinary;
+    return !!(c && c.cloudName && c.uploadPreset);
+  }
+
+  function prepararSubida() {
+    if (!C.fotos || !C.fotos.activo || !cloudinaryListo()) return;
+
+    var cfg = C.fotos.cloudinary;
+    $('subidaLimite').textContent = 'Hasta ' + cfg.maxArchivos + ' fotos a la vez';
+
+    $('subidaElegir').addEventListener('click', function () {
+      $('subidaArchivos').click();
+    });
+
+    $('subidaArchivos').addEventListener('change', function (e) {
+      elegidas = Array.prototype.slice.call(e.target.files).slice(0, cfg.maxArchivos);
+      pintarElegidas();
+    });
+
+    $('subidaEnviar').addEventListener('click', enviarTodas);
+  }
+
+  function pintarElegidas() {
+    var lista = $('subidaLista');
+
+    lista.innerHTML = elegidas.map(function (f, i) {
+      return '<li class="lista__fila" data-i="' + i + '">' +
+               '<span class="lista__nombre">' + escapar(f.name) + '</span>' +
+               '<span class="lista__peso">' + pesoLegible(f.size) + '</span>' +
+               '<span class="lista__barra"><i></i></span>' +
+             '</li>';
+    }).join('');
+
+    $('subidaEnviar').hidden = elegidas.length === 0;
+    $('subidaEnviar').textContent = elegidas.length === 1
+      ? 'Enviar 1 foto'
+      : 'Enviar ' + elegidas.length + ' fotos';
+    $('subidaEstado').hidden = true;
+  }
+
+  function pesoLegible(bytes) {
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  /* Redimensiona la foto en el navegador. Si el formato no se puede leer
+     (pasa con algunos HEIC de iPhone en Android), devuelve el archivo tal
+     cual: preferimos que suba pesada a que no suba. */
+  function encoger(archivo) {
+    var cfg = C.fotos.cloudinary;
+
+    return new Promise(function (listo) {
+      if (!/^image\//.test(archivo.type)) return listo(archivo);
+
+      var url = URL.createObjectURL(archivo);
+      var img = new Image();
+
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var escala = Math.min(1, cfg.anchoMaximo / Math.max(img.width, img.height));
+        if (escala === 1 && archivo.size < 900 * 1024) return listo(archivo);
+
+        var lienzo = document.createElement('canvas');
+        lienzo.width = Math.round(img.width * escala);
+        lienzo.height = Math.round(img.height * escala);
+        lienzo.getContext('2d').drawImage(img, 0, 0, lienzo.width, lienzo.height);
+
+        lienzo.toBlob(function (blob) {
+          listo(blob && blob.size < archivo.size ? blob : archivo);
+        }, 'image/jpeg', cfg.calidad);
+      };
+
+      img.onerror = function () { URL.revokeObjectURL(url); listo(archivo); };
+      img.src = url;
+    });
+  }
+
+  function subirUna(archivo, nombreInvitado, alProgresar) {
+    var cfg = C.fotos.cloudinary;
+
+    return encoger(archivo).then(function (listo) {
+      return new Promise(function (resolver, rechazar) {
+        var datos = new FormData();
+        datos.append('file', listo, archivo.name);
+        datos.append('upload_preset', cfg.uploadPreset);
+        if (nombreInvitado) {
+          datos.append('context', 'invitado=' + nombreInvitado.replace(/[|=]/g, ' '));
+        }
+
+        var peticion = new XMLHttpRequest();
+        peticion.open('POST',
+          'https://api.cloudinary.com/v1_1/' + cfg.cloudName + '/image/upload');
+
+        peticion.upload.onprogress = function (e) {
+          if (e.lengthComputable) alProgresar(e.loaded / e.total);
+        };
+        peticion.onload = function () {
+          if (peticion.status >= 200 && peticion.status < 300) {
+            alProgresar(1);
+            resolver();
+          } else {
+            rechazar(new Error('Cloudinary respondió ' + peticion.status));
+          }
+        };
+        peticion.onerror = function () { rechazar(new Error('Sin conexión')); };
+        peticion.send(datos);
+      });
+    });
+  }
+
+  function enviarTodas() {
+    if (!elegidas.length) return;
+
+    var boton = $('subidaEnviar');
+    var estado = $('subidaEstado');
+    var nombre = $('subidaNombre').value.trim();
+
+    boton.disabled = true;
+    boton.textContent = 'Enviando…';
+    estado.hidden = true;
+
+    var fallaron = 0;
+
+    /* Una por una y no todas juntas: en el internet de un salón, veinte
+       subidas en paralelo se estorban entre ellas y terminan más lento. */
+    var cadena = elegidas.reduce(function (previa, archivo, i) {
+      return previa.then(function () {
+        var barra = $('subidaLista').querySelector('[data-i="' + i + '"] i');
+        return subirUna(archivo, nombre, function (p) {
+          if (barra) barra.style.width = Math.round(p * 100) + '%';
+        }).catch(function (e) {
+          fallaron++;
+          var fila = $('subidaLista').querySelector('[data-i="' + i + '"]');
+          if (fila) fila.classList.add('lista__fila--error');
+          console.warn('[XV] No se pudo subir', archivo.name, e);
+        });
+      });
+    }, Promise.resolve());
+
+    cadena.then(function () {
+      var enviadas = elegidas.length - fallaron;
+      estado.hidden = false;
+      estado.className = 'subida__estado' + (fallaron ? ' subida__estado--aviso' : ' subida__estado--bien');
+      estado.textContent = fallaron
+        ? '¡Gracias! Se enviaron ' + enviadas + '. ' + fallaron +
+          ' no pudieron subir, puedes intentarlo de nuevo.'
+        : '¡Gracias! ' + (enviadas === 1 ? 'Tu foto quedó guardada.'
+                                         : 'Tus ' + enviadas + ' fotos quedaron guardadas.');
+
+      elegidas = [];
+      $('subidaArchivos').value = '';
+      boton.disabled = false;
+      boton.hidden = true;
+      $('subidaLista').innerHTML = '';
     });
   }
 
@@ -514,6 +707,7 @@
      ====================================================================== */
   function iniciar() {
     pintarDatos();
+    prepararSubida();
     pintarCalendario();
     arrancarReloj();
     observarReveals();

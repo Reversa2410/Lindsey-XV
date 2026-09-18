@@ -332,6 +332,30 @@
       <h3 class="titulo titulo--chico" id="fotosTitulo">Comparte tus fotos</h3>
       <p class="parrafo parrafo--italica" id="fotosTexto"></p>
       <div class="destinos" id="fotosDestinos"></div>
+
+      <!-- Formulario de subida a Cloudinary -->
+      <div class="subida" id="subida" hidden>
+        <label class="campo campo--subida">
+          <span>Tu nombre <i>(para saber quién la tomó)</i></span>
+          <input type="text" id="subidaNombre" placeholder="Nombre y apellido" autocomplete="name">
+        </label>
+
+        <input type="file" id="subidaArchivos" accept="image/*" multiple hidden>
+        <button type="button" class="soltar" id="subidaElegir">
+          <svg class="soltar__icono"><use href="#ico-camara"/></svg>
+          <span class="soltar__texto">Toca para elegir tus fotos</span>
+          <span class="soltar__nota" id="subidaLimite"></span>
+        </button>
+
+        <ul class="lista" id="subidaLista"></ul>
+
+        <button type="button" class="boton boton--solido boton--ancho" id="subidaEnviar" hidden>
+          Enviar fotos
+        </button>
+
+        <p class="subida__estado" id="subidaEstado" hidden></p>
+      </div>
+
       <p class="aviso" id="fotosPendiente">Sección lista — falta conectar el enlace de subida</p>
     </div>
   </section>
