@@ -102,24 +102,48 @@
       $('seccionRsvp').style.display = 'none';
     }
 
-    /* --- Fotos --- */
+    /* --- Fotos y videos --- */
     if (C.fotos && C.fotos.activo) {
-      $('fotosTexto').textContent = C.fotos.texto;
-      if (C.fotos.enlace) {
-        $('btnFotos').href = C.fotos.enlace;
-        if (C.fotos.demo) {
-          $('fotosPendiente').textContent =
-            'Enlace de muestra — se activará antes del evento';
-        } else {
-          $('fotosPendiente').style.display = 'none';
-        }
-      } else {
-        $('btnFotos').removeAttribute('href');
-        $('btnFotos').style.opacity = '.45';
-        $('btnFotos').style.pointerEvents = 'none';
-      }
+      pintarFotos();
     } else {
       $('seccionFotos').style.display = 'none';
+    }
+  }
+
+  /* Dibuja los destinos de subida (uno para fotos, otro para videos).
+     Un destino sin enlace se muestra apagado y no se puede tocar, para
+     que se note que falta conectarlo en vez de llevar a una pagina rota. */
+  function pintarFotos() {
+    $('fotosTitulo').textContent = C.fotos.titulo;
+    $('fotosTexto').textContent = C.fotos.texto;
+
+    var destinos = C.fotos.destinos || [];
+    var sinEnlace = 0;
+
+    $('fotosDestinos').innerHTML = destinos.map(function (d) {
+      var listo = !!d.enlace;
+      if (!listo) sinEnlace++;
+
+      return '<a class="destino' + (listo ? '' : ' destino--apagado') + '"' +
+             (listo ? ' href="' + escapar(d.enlace) + '" target="_blank" rel="noopener"' : '') + '>' +
+               '<svg class="destino__icono"><use href="#ico-' + escapar(d.icono) + '"/></svg>' +
+               '<span class="destino__texto">' +
+                 '<span class="destino__etiqueta">' + escapar(d.etiqueta) + '</span>' +
+                 '<span class="destino__nota">' + escapar(d.nota) + '</span>' +
+               '</span>' +
+               '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>' +
+             '</a>';
+    }).join('');
+
+    var aviso = $('fotosPendiente');
+    if (C.fotos.demo) {
+      aviso.textContent = 'Enlaces de muestra — se activarán antes del evento';
+    } else if (sinEnlace) {
+      aviso.textContent = sinEnlace === 1
+        ? 'Falta conectar uno de los enlaces'
+        : 'Faltan conectar los enlaces de subida';
+    } else {
+      aviso.style.display = 'none';
     }
   }
 

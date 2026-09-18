@@ -512,7 +512,35 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 }
 
 /* --------------------------------------------------------------- FOTOS */
-.tarjeta--fotos .boton{margin-top:20px}
+.destinos{display:grid; gap:12px; margin:24px 0 4px; text-align:left}
+.destino{
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px; border:1px solid var(--oro); border-radius:var(--radio);
+  background:#fff; text-decoration:none; color:var(--tono-800);
+  transition:transform .35s var(--curva), box-shadow .35s var(--curva), background .35s;
+}
+.destino:hover{
+  transform:translateY(-2px); background:var(--tono-50);
+  box-shadow:0 10px 24px rgba(123,30,58,.13);
+}
+.destino:hover .destino__flecha{transform:translateX(4px)}
+.destino__icono{
+  flex:none; width:32px; height:24px; color:var(--tono-700);
+}
+.destino__texto{display:flex; flex-direction:column; gap:3px; flex:1; min-width:0}
+.destino__etiqueta{
+  font-family:var(--display); font-size:.98rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--tono-800);
+}
+.destino__nota{font-size:.84rem; font-style:italic; color:var(--tinta-suave)}
+.destino__flecha{
+  flex:none; width:16px; height:16px; color:var(--oro);
+  transition:transform .35s var(--curva);
+}
+.destino--apagado{
+  opacity:.5; cursor:default; border-style:dashed;
+}
+.destino--apagado:hover{transform:none; box-shadow:none; background:#fff}
 .aviso{
   margin:14px 0 0; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
   color:#9C7740; background:#FCF6EA; border:1px dashed #DEC49A;

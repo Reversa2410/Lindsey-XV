@@ -129,6 +129,25 @@
       </g>
     </symbol>
 
+    <!-- Camara de fotos -->
+    <symbol id="ico-camara" viewBox="0 0 32 24">
+      <path d="M4 7h4.6l2-3.2h10.8L23.4 7H28a2 2 0 0 1 2 2v10.4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="16" cy="13.6" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="25.6" cy="10.2" r="1" fill="currentColor"/>
+    </symbol>
+
+    <!-- Camara de video -->
+    <symbol id="ico-video" viewBox="0 0 32 24">
+      <rect x="2" y="5.2" width="19.4" height="13.6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M21.4 11.2 29.4 6.6v10.8l-8-4.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- Flecha -->
+    <symbol id="ico-flecha" viewBox="0 0 16 16">
+      <path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
     <!-- Chevron -->
     <symbol id="ico-chevron" viewBox="0 0 24 14">
       <path d="M2 2l10 10L22 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -310,9 +329,9 @@
   <!-- ---------------- FOTOS ---------------- -->
   <section class="seccion seccion--fotos" id="seccionFotos">
     <div class="tarjeta tarjeta--fotos reveal">
-      <h3 class="titulo titulo--chico">Comparte tus fotos</h3>
+      <h3 class="titulo titulo--chico" id="fotosTitulo">Comparte tus fotos</h3>
       <p class="parrafo parrafo--italica" id="fotosTexto"></p>
-      <a class="boton boton--linea" id="btnFotos" target="_blank" rel="noopener">Subir mis fotos</a>
+      <div class="destinos" id="fotosDestinos"></div>
       <p class="aviso" id="fotosPendiente">Sección lista — falta conectar el enlace de subida</p>
     </div>
   </section>

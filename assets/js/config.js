@@ -87,16 +87,41 @@ window.CONFIG = {
     titulo: 'Canción de Lindsey'
   },
 
-  /* ---- Seccion de fotos de los invitados (la dejamos preparada) ------- */
+  /* ---- Fotos y videos de los invitados --------------------------------
+     Son dos destinos separados a proposito. La razon no es el espacio
+     total sino el LIMITE POR ARCHIVO: un video de celular de dos minutos
+     pesa lo mismo que unas 150 fotos, y casi todos los servicios gratuitos
+     lo rechazan por tamaño aunque quede espacio de sobra.
+     Separarlos permite darle a cada tipo de archivo el servicio que mejor
+     le queda, y evita que tres videos se coman el espacio de todo el album.
+
+     ATENCION: repositorio PUBLICO. Un enlace de subida abierto deja que
+     cualquiera suba lo que quiera. Los enlaces reales NO van aqui; se
+     ponen al final, fuera del repositorio.
+     --------------------------------------------------------------------- */
   fotos: {
     activo: true,
-    /* ATENCION: enlace INVENTADO, solo para que el cliente vea la seccion.
-       El enlace real de subida no va en un repositorio publico: cualquiera
-       podria subir lo que quiera al album. */
-    enlace: 'https://ejemplo.com/fotos-lindsey',   // ficticio
-    /* En true, la pagina avisa que el enlace todavia es de muestra */
+    titulo: 'Comparte tus fotos y videos',
+    texto: 'Ayúdanos a guardar cada momento de esta noche. Sube lo que capturaste y forma parte del álbum de Lindsey.',
+
+    /* En true, la pagina avisa que los enlaces todavia son de muestra.
+       Ponlo en false cuando los enlaces reales ya esten puestos. */
     demo: true,
-    texto: 'Ayúdanos a guardar cada momento de esta noche. Escanea, sube tus fotos y forma parte del álbum de Lindsey.'
+
+    destinos: [
+      {
+        icono: 'camara',
+        etiqueta: 'Subir fotos',
+        nota: 'Imágenes · hasta 10 MB cada una',
+        enlace: 'https://ejemplo.com/fotos-lindsey'    // ficticio
+      },
+      {
+        icono: 'video',
+        etiqueta: 'Subir videos',
+        nota: 'Videos · archivos grandes, sin apuro',
+        enlace: 'https://ejemplo.com/videos-lindsey'   // ficticio
+      }
+    ]
   },
 
   /* ---- Textos varios -------------------------------------------------- */
