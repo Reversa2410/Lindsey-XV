@@ -587,8 +587,20 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   background:linear-gradient(90deg,var(--oro-claro),var(--oro));
   transition:width .25s linear;
 }
+/* Mientras sube, la barra se mueve sola: no sabemos el porcentaje real
+   porque medirlo por bytes rompe la subida (ver el comentario en main.js). */
+.lista__fila--subiendo .lista__barra i{
+  width:40%; animation:subiendo 1.1s ease-in-out infinite;
+}
+@keyframes subiendo{
+  0%{margin-left:-40%} 100%{margin-left:100%}
+}
+.lista__fila--lista{border-color:var(--oro); background:var(--tono-50)}
+.lista__fila--lista .lista__barra i{width:100% !important; animation:none; margin-left:0}
 .lista__fila--error{border-color:#C7503F; background:#FDF3F1}
-.lista__fila--error .lista__barra i{background:#C7503F}
+.lista__fila--error .lista__barra i{
+  width:100% !important; animation:none; margin-left:0; background:#C7503F;
+}
 
 .subida__estado{
   margin:0; padding:12px 14px; border-radius:var(--radio);

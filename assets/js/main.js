@@ -295,7 +295,23 @@
     });
   }
 
-  function subirUna(archivo, nombreInvitado, alProgresar) {
+  /* OJO, esto tiene truco y es facil de romper sin darse cuenta:
+
+     1) El archivo se manda como formulario clasico, NO como JSON. Con JSON
+        el navegador pide permiso previo al servidor (una peticion OPTIONS,
+        el llamado "preflight") y Apps Script no sabe responderla, asi que
+        la subida falla por CORS.
+
+     2) Por la misma razon se usa fetch y NO XMLHttpRequest con barra de
+        progreso por bytes. Registrar un escucha en xhr.upload tambien
+        convierte la peticion en "no simple" y dispara el mismo preflight.
+        Dicho de otro modo: poner la barra de progreso detallada ROMPE la
+        subida. El progreso se muestra por foto completada, no por bytes.
+
+     Si alguna vez hay que tocar esta funcion, probarla contra el script de
+     Google de verdad. Un servidor de prueba local si responde OPTIONS, asi
+     que el problema no aparece hasta que ya es tarde. */
+  function subirUna(archivo, nombreInvitado) {
     var cfg = C.fotos.drive;
 
     return encoger(archivo)
@@ -307,43 +323,29 @@
       })
       .then(aBase64)
       .then(function (contenido) {
-        return new Promise(function (resolver, rechazar) {
-          /* Se manda como formulario clasico y no como JSON a proposito:
-             con JSON el navegador hace una peticion previa de permiso
-             (preflight) que Apps Script no sabe responder, y la subida
-             falla por CORS. Asi no hay peticion previa. */
-          var cuerpo = new URLSearchParams();
-          cuerpo.set('archivo', contenido.datos);
-          cuerpo.set('tipo', contenido.tipo);
-          cuerpo.set('nombreArchivo', archivo.name || 'foto.jpg');
-          if (nombreInvitado) cuerpo.set('invitado', nombreInvitado);
+        var cuerpo = new URLSearchParams();
+        cuerpo.set('archivo', contenido.datos);
+        cuerpo.set('tipo', contenido.tipo);
+        cuerpo.set('nombreArchivo', archivo.name || 'foto.jpg');
+        if (nombreInvitado) cuerpo.set('invitado', nombreInvitado);
 
-          var peticion = new XMLHttpRequest();
-          peticion.open('POST', cfg.urlScript);
-          peticion.setRequestHeader('Content-Type',
-            'application/x-www-form-urlencoded;charset=UTF-8');
-
-          peticion.upload.onprogress = function (e) {
-            if (e.lengthComputable) alProgresar(e.loaded / e.total);
-          };
-
-          peticion.onload = function () {
-            if (peticion.status < 200 || peticion.status >= 300) {
-              return rechazar(new Error('Google respondió ' + peticion.status));
-            }
-            /* Apps Script contesta 200 incluso cuando algo salio mal por
-               dentro, asi que hay que mirar el contenido de la respuesta. */
-            var r;
-            try { r = JSON.parse(peticion.responseText); }
-            catch (e) { return rechazar(new Error('Respuesta inesperada')); }
-
-            if (r && r.ok) { alProgresar(1); resolver(); }
-            else { rechazar(new Error((r && r.error) || 'Rechazada por el script')); }
-          };
-
-          peticion.onerror = function () { rechazar(new Error('Sin conexión')); };
-          peticion.send(cuerpo.toString());
+        return fetch(cfg.urlScript, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: cuerpo.toString()
         });
+      })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Google respondió ' + r.status);
+        return r.text();
+      })
+      .then(function (texto) {
+        /* Apps Script contesta 200 incluso cuando algo salio mal por
+           dentro, asi que hay que mirar el contenido de la respuesta. */
+        var r;
+        try { r = JSON.parse(texto); }
+        catch (e) { throw new Error('Respuesta inesperada'); }
+        if (!r || !r.ok) throw new Error((r && r.error) || 'Rechazada por el script');
       });
   }
 
@@ -365,13 +367,21 @@
        subidas en paralelo se estorban entre ellas y terminan más lento. */
     var cadena = elegidas.reduce(function (previa, archivo, i) {
       return previa.then(function () {
-        var barra = $('subidaLista').querySelector('[data-i="' + i + '"] i');
-        return subirUna(archivo, nombre, function (p) {
-          if (barra) barra.style.width = Math.round(p * 100) + '%';
+        var fila = $('subidaLista').querySelector('[data-i="' + i + '"]');
+        if (fila) fila.classList.add('lista__fila--subiendo');
+        boton.textContent = 'Enviando ' + (i + 1) + ' de ' + total + '…';
+
+        return subirUna(archivo, nombre).then(function () {
+          if (fila) {
+            fila.classList.remove('lista__fila--subiendo');
+            fila.classList.add('lista__fila--lista');
+          }
         }).catch(function (e) {
           fallidas.push(archivo);
-          var fila = $('subidaLista').querySelector('[data-i="' + i + '"]');
-          if (fila) fila.classList.add('lista__fila--error');
+          if (fila) {
+            fila.classList.remove('lista__fila--subiendo');
+            fila.classList.add('lista__fila--error');
+          }
           console.warn('[XV] No se pudo subir', archivo.name, e);
         });
       });
