@@ -139,7 +139,7 @@ window.CONFIG = {
        ------------------------------------------------------------------- */
     drive: {
       /* URL que da Google al publicar el script. Termina en /exec */
-      urlScript: '',        // <-- PENDIENTE
+      urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',        // <-- PENDIENTE
 
       /* Las fotos se encogen en el celular ANTES de enviarse. Se siguen
          viendo perfectas y pesan unas siete veces menos, asi que suben
