@@ -60,7 +60,7 @@ window.CONFIG = {
     texto: 'Por favor abstenerse de usar cualquier tono de rojo, ya que es un color reservado para la quinceañera.',
     /* Colores que se piden evitar, se muestran como muestras tachadas.
        Deben coincidir con el color que menciona el texto de arriba. */
-    coloresReservados: ['#F0B4B4', '#D96A6A', '#A83232', '#6E1B1B']
+    coloresReservados: ['#F4CCD8', '#DB98AE', '#A83258', '#7B1E3A']
   },
 
   /* ---- Lluvia de sobres ----------------------------------------------- */

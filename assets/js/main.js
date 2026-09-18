@@ -418,7 +418,7 @@
     var ctx = lienzo.getContext('2d');
     var piezas = [];
     var animando = false;
-    var colores = ['#A9C6E6', '#C8DCF0', '#FFFFFF', '#8CAFD8', '#E7D9EC'];
+    var colores = ['#F4CCD8', '#F9E0E8', '#FFFFFF', '#DB98AE', '#E7D2AE', '#C5A06A'];
 
     function medir() {
       lienzo.width = window.innerWidth;
