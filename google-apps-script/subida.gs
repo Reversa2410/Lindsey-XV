@@ -180,3 +180,36 @@ function probarCarpeta() {
   const carpeta = DriveApp.getFolderById(ID_CARPETA);
   Logger.log('Carpeta encontrada: ' + carpeta.getName());
 }
+
+
+/**
+ * Repara las fotos que se subieron ANTES de que el script compartiera
+ * automáticamente: sin ese permiso, la galería no puede mostrarlas.
+ *
+ * Ejecútala una sola vez desde el editor. Es segura de repetir: si una
+ * foto ya está compartida, la vuelve a dejar igual.
+ */
+function compartirTodas() {
+  const carpetas = [ID_CARPETA];
+  if (ID_CARPETA_GALERIA) carpetas.push(ID_CARPETA_GALERIA);
+
+  let arregladas = 0;
+  let fallidas = 0;
+
+  carpetas.forEach(function (id) {
+    const archivos = DriveApp.getFolderById(id).getFiles();
+    while (archivos.hasNext()) {
+      const f = archivos.next();
+      if (TIPOS_OK.indexOf(f.getMimeType()) === -1) continue;
+      try {
+        f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        arregladas++;
+      } catch (err) {
+        fallidas++;
+        Logger.log('No se pudo compartir ' + f.getName() + ': ' + err);
+      }
+    }
+  });
+
+  Logger.log('Listo. Compartidas: ' + arregladas + ' | Con problema: ' + fallidas);
+}

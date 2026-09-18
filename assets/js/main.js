@@ -529,10 +529,32 @@
         /* Si Drive tarda o falla con una foto, se quita el hueco vacío
            en vez de dejar el icono de imagen rota. */
         var img = boton.querySelector('img');
-        img.addEventListener('error', function () { boton.remove(); });
-        img.addEventListener('load', function () { boton.classList.add('galeria__foto--lista'); });
+        img.addEventListener('error', function () {
+          boton.remove();
+          avisarSiQuedoVacia();
+        });
+        img.addEventListener('load', function () {
+          boton.classList.add('galeria__foto--lista');
+        });
       }
     );
+  }
+
+  /* Si el script dijo que hay fotos pero ninguna se pudo mostrar, casi
+     siempre es que a los archivos les falta el permiso de "visible con
+     enlace". Sin este aviso la galería se quedaría en blanco sin explicar
+     nada, que es lo peor para saber qué está pasando. */
+  function avisarSiQuedoVacia() {
+    if (!galeriaFotos.length) return;
+    if ($('galeria').children.length > 0) return;
+
+    $('galeriaEstado').hidden = false;
+    $('galeriaEstado').textContent =
+      'Hay ' + galeriaFotos.length + ' foto' + (galeriaFotos.length === 1 ? '' : 's') +
+      ' en el álbum, pero no se pudieron mostrar. Revisa que estén compartidas.';
+    $('galeriaMas').hidden = true;
+    console.warn('[XV] La galería recibió fotos pero ninguna cargó. ' +
+      'Ejecuta compartirTodas() en el script de Google.');
   }
 
   /* --------------------------- visor a pantalla completa --------------- */
