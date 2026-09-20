@@ -615,9 +615,42 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   padding:8px 12px; border-radius:var(--radio);
 }
 
+/* ------------------------------------------------- PAGINA DEL ALBUM
+   galeria.html reusa la misma hoja de papel de la invitacion, para que
+   se sienta la misma pieza y no otra pagina distinta.
+   ------------------------------------------------------------------------ */
+.invitacion--album{min-height:100vh; display:flex; flex-direction:column}
+.invitacion--album .seccion--galeria{flex:1}
+
+.album__cabecera{
+  position:relative; overflow:hidden;
+  padding:54px 30px 6px; text-align:center;
+  background:linear-gradient(#FFFCFD,var(--papel-2));
+}
+.album__tiara{width:76px; height:34px; color:var(--oro); margin:0 auto 16px}
+
+.cierre--album{padding:40px 28px 48px}
+.cierre--album .cierre__lazo{width:86px; height:74px; margin-bottom:6px}
+
+/* El enlace que va a la otra pagina (subir fotos / ver album). Se separa
+   de la rejilla y lleva el filete dorado para que se lea como "ir a" y no
+   como una foto mas. */
+.destino--album{
+  width:100%; margin-top:30px; text-align:left; border-color:var(--oro);
+  background:linear-gradient(#fff,var(--tono-50));
+}
+.destino--album .destino__icono{color:var(--oro-oscuro)}
+
+/* Cuando la tarjeta despliega el formulario aqui mismo, en vez de llevar a
+   otro sitio, la punta es un chevron que gira: dice "esto se abre", no
+   "esto te lleva". */
+.destino__flecha--abre{width:16px; height:10px}
+.destino:hover .destino__flecha--abre{transform:none}
+.destino--abierto .destino__flecha--abre,
+.destino--abierto:hover .destino__flecha--abre{transform:rotate(180deg)}
+
 /* -------------------------------------------------------------- GALERIA */
 .seccion--galeria{background:var(--papel-2)}
-.seccion--galeria[hidden]{display:none !important}
 
 .galeria{
   display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
@@ -709,17 +742,34 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   color:var(--tinta-suave);
 }
 
-/* -------------------------------------------------------- BOTON MUSICA */
-.btnMusica{
-  position:fixed; right:16px; bottom:18px; z-index:80;
+/* --------------------------------------------------- BOTONES FLOTANTES
+   La musica, el album y el "volver" comparten la misma pastilla redonda:
+   una sola forma que el invitado aprende una vez y reconoce en las dos
+   paginas. Cada uno solo pone su altura y su icono.
+   ------------------------------------------------------------------------ */
+.btnFlotante{
+  position:fixed; right:16px; z-index:80;
   width:52px; height:52px; border-radius:50%; border:1px solid var(--tono-200);
   background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
   display:grid; place-items:center; box-shadow:0 8px 24px rgba(123,30,58,.16);
+  color:var(--tono-700); text-decoration:none;
   opacity:0; transform:translateY(14px) scale(.9);
-  transition:opacity .6s var(--curva), transform .6s var(--curva);
+  transition:opacity .6s var(--curva), transform .6s var(--curva),
+             border-color .35s, background .35s;
 }
-.btnMusica[hidden]{display:none}
-body.abierta .btnMusica{opacity:1; transform:none}
+body.abierta .btnFlotante{opacity:1; transform:none}
+.btnFlotante:hover{border-color:var(--oro); background:#fff}
+.btnFlotante__icono{width:22px; height:18px; color:#C0587A; transition:color .3s}
+.btnFlotante:hover .btnFlotante__icono{color:var(--tono-700)}
+/* La misma flecha del resto de la pagina, girada para que apunte atras */
+.btnFlotante__icono--volver{width:20px; height:20px; transform:rotate(180deg)}
+
+/* Encima del de musica, para no taparlo */
+.btnGaleria{bottom:80px}
+.btnFlotante--volver{bottom:18px}
+
+/* -------------------------------------------------------- BOTON MUSICA */
+.btnMusica{bottom:18px}
 .btnMusica__icono{width:20px; height:20px; fill:#C0587A; transition:fill .3s, transform .3s}
 body.sonando .btnMusica__icono{fill:#A83258; animation:latir 1.6s ease-in-out infinite}
 .btnMusica__anillo{
@@ -751,7 +801,12 @@ body.sonando .btnMusica__anillo{animation:pulsoAnillo 2.2s ease-out infinite; op
     border:1px solid rgba(168,50,88,.18);
   }
   .seccion{padding:76px 44px}
-  .btnMusica{right:calc(50% - 240px - 74px); bottom:36px}
+  /* Descontando el margen de la hoja, para que no sobre scroll */
+  .invitacion--album{min-height:calc(100vh - 68px)}
+  /* Pegados al borde de la hoja, no al de la pantalla */
+  .btnFlotante{right:calc(50% - 240px - 74px)}
+  .btnMusica,.btnFlotante--volver{bottom:36px}
+  .btnGaleria{bottom:98px}
 }
 @media (max-width:400px){
   .seccion{padding:54px 22px}

@@ -151,7 +151,9 @@ window.CONFIG = {
     },
 
     /* ---- Galeria de fotos ---------------------------------------------
-       Muestra en la invitacion lo que los invitados van subiendo.
+       Vive en su propia pagina (galeria.html) y muestra lo que los
+       invitados van subiendo. Se llega a ella por el boton flotante de la
+       camara y por el enlace de la seccion de fotos.
        Usa el mismo script de Drive, asi que no hay nada mas que configurar.
 
        QUE SE VE aqui lo decide el script, no esta pagina: si en el script
@@ -162,6 +164,10 @@ window.CONFIG = {
       activa: true,
       titulo: 'Álbum de la noche',
       texto: 'Las fotos que los invitados van compartiendo.',
+
+      /* Texto chico del enlace que lleva al album desde la invitacion */
+      notaEnlace: 'Mira las fotos que ya compartieron',
+
       porPagina: 24,        // cuantas se cargan de golpe
       maximo: 200,          // tope que se le pide al script
 

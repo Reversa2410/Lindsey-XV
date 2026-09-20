@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#A83258">
+<title>Álbum · Lindsey Larios</title>
+<meta name="description" content="Álbum de fotos de los quince años de Lindsey Larios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&display=swap" rel="stylesheet">
+<!-- El ?v= obliga al navegador a bajar la version nueva en vez de usar
+     la que tenga guardada. Subir el numero al cambiar estilos o logica. -->
+<link rel="stylesheet" href="assets/css/estilos.css?v=8">
+</head>
+<!-- "abierta" desde el principio: aqui no hay portada que abrir, la pagina
+     se entra directo desde el boton de la invitacion. -->
+<body class="abierta">
+
+<!-- ====================================================================
+     ILUSTRACIONES (las mismas de la invitacion, solo las que se usan)
+     ==================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gradRosa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#FADCE5"/>
+      <stop offset="55%" stop-color="#DB98AE"/>
+      <stop offset="100%" stop-color="#A83258"/>
+    </linearGradient>
+    <linearGradient id="gradRosaClaro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#FDF0F4"/>
+      <stop offset="100%" stop-color="#E6B3C3"/>
+    </linearGradient>
+
+    <!-- Lazo -->
+    <symbol id="ico-lazo" viewBox="0 0 200 170">
+      <path d="M92 70C78 104 64 128 40 152l20 8c24-26 38-52 44-82z" fill="url(#gradRosaClaro)" opacity=".85"/>
+      <path d="M108 70c14 34 28 58 52 82l-20 8c-24-26-38-52-44-82z" fill="url(#gradRosaClaro)" opacity=".85"/>
+      <path d="M100 62C62 12 18 24 28 60c8 28 48 26 72 2z" fill="url(#gradRosa)" opacity=".92"/>
+      <path d="M100 62c38-50 82-38 72-2-8 28-48 26-72 2z" fill="url(#gradRosa)" opacity=".92"/>
+      <path d="M100 62C62 12 18 24 28 60c8 28 48 26 72 2z" fill="none" stroke="#A83258" stroke-width="1.6" opacity=".55"/>
+      <path d="M100 62c38-50 82-38 72-2-8 28-48 26-72 2z" fill="none" stroke="#A83258" stroke-width="1.6" opacity=".55"/>
+      <ellipse cx="100" cy="64" rx="12" ry="14" fill="#DB98AE"/>
+      <ellipse cx="100" cy="64" rx="12" ry="14" fill="none" stroke="#A83258" stroke-width="1.4" opacity=".6"/>
+    </symbol>
+
+    <!-- Tiara -->
+    <symbol id="ico-tiara" viewBox="0 0 140 62">
+      <path d="M8 52 L30 16 L46 42 L70 6 L94 42 L110 16 L132 52" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M6 52h128" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="30" cy="14" r="3.4" fill="currentColor"/>
+      <circle cx="70" cy="5"  r="4"   fill="currentColor"/>
+      <circle cx="110" cy="14" r="3.4" fill="currentColor"/>
+      <circle cx="46" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
+      <circle cx="94" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
+    </symbol>
+
+    <!-- Rama floral -->
+    <symbol id="ico-rama" viewBox="0 0 120 120">
+      <path d="M14 112C34 92 52 66 62 34" fill="none" stroke="#DB98AE" stroke-width="2"/>
+      <ellipse cx="34" cy="86" rx="13" ry="6" fill="#F4CCD8" transform="rotate(-38 34 86)"/>
+      <ellipse cx="46" cy="66" rx="12" ry="5.5" fill="#E6B3C3" transform="rotate(-42 46 66)"/>
+      <ellipse cx="55" cy="46" rx="11" ry="5" fill="#F4CCD8" transform="rotate(-48 55 46)"/>
+      <ellipse cx="24" cy="98" rx="11" ry="5" fill="#F9E0E8" transform="rotate(-30 24 98)"/>
+      <g fill="#DB98AE" opacity=".9">
+        <circle cx="64" cy="28" r="7"/><circle cx="76" cy="20" r="5"/><circle cx="58" cy="16" r="4.4"/>
+      </g>
+      <g fill="#FEF7F9">
+        <circle cx="64" cy="28" r="2.6"/><circle cx="76" cy="20" r="1.9"/>
+      </g>
+    </symbol>
+
+    <!-- Camara de fotos -->
+    <symbol id="ico-camara" viewBox="0 0 32 24">
+      <path d="M4 7h4.6l2-3.2h10.8L23.4 7H28a2 2 0 0 1 2 2v10.4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="16" cy="13.6" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="25.6" cy="10.2" r="1" fill="currentColor"/>
+    </symbol>
+
+    <!-- Flecha -->
+    <symbol id="ico-flecha" viewBox="0 0 16 16">
+      <path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- Chevron -->
+    <symbol id="ico-chevron" viewBox="0 0 24 14">
+      <path d="M2 2l10 10L22 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- Petalos flotantes -->
+<div class="petalos" id="petalos" aria-hidden="true"></div>
+
+<!-- ====================================================================
+     ALBUM
+     ==================================================================== -->
+<main class="invitacion invitacion--album">
+
+  <header class="album__cabecera">
+    <svg class="rama rama--izq" aria-hidden="true"><use href="#ico-rama"/></svg>
+    <svg class="album__tiara"><use href="#ico-tiara"/></svg>
+    <h1 class="titulo" id="galeriaTitulo">Álbum de la noche</h1>
+    <p class="parrafo parrafo--italica" id="galeriaTexto"></p>
+  </header>
+
+  <section class="seccion seccion--galeria">
+    <div class="galeria" id="galeria"></div>
+    <p class="galeria__estado" id="galeriaEstado">Cargando el álbum…</p>
+    <button type="button" class="boton boton--linea" id="galeriaMas" hidden>Ver más fotos</button>
+
+    <!-- Se sube desde aquí mismo, sin volver a la invitación: el que está
+         viendo el álbum es justo el que quiere agregar la suya. -->
+    <button type="button" class="destino destino--album" id="tarjetaSubir" hidden>
+      <svg class="destino__icono"><use href="#ico-camara"/></svg>
+      <span class="destino__texto">
+        <span class="destino__etiqueta">Sube tus fotos</span>
+        <span class="destino__nota">Agrega las tuyas al álbum</span>
+      </span>
+      <svg class="destino__flecha destino__flecha--abre"><use href="#ico-chevron"/></svg>
+    </button>
+
+    <!-- Mismo formulario que el de la invitación: lo arma assets/js/subida.js -->
+    <div class="subida" id="subida" hidden>
+      <label class="campo campo--subida">
+        <span>Tu nombre <i>(para saber quién la tomó)</i></span>
+        <input type="text" id="subidaNombre" placeholder="Nombre y apellido" autocomplete="name">
+      </label>
+
+      <input type="file" id="subidaArchivos" accept="image/*" multiple hidden>
+      <button type="button" class="soltar" id="subidaElegir">
+        <svg class="soltar__icono"><use href="#ico-camara"/></svg>
+        <span class="soltar__texto">Toca para elegir tus fotos</span>
+        <span class="soltar__nota" id="subidaLimite"></span>
+      </button>
+
+      <ul class="lista" id="subidaLista"></ul>
+
+      <button type="button" class="boton boton--solido boton--ancho" id="subidaEnviar" hidden>
+        Enviar fotos
+      </button>
+
+      <p class="subida__estado" id="subidaEstado" hidden></p>
+    </div>
+  </section>
+
+  <footer class="cierre cierre--album">
+    <svg class="cierre__lazo"><use href="#ico-lazo"/></svg>
+    <p class="cierre__nombre" id="albumNombre">Lindsey Larios · XV</p>
+  </footer>
+</main>
+
+<!-- Boton flotante para regresar a la invitacion -->
+<a class="btnFlotante btnFlotante--volver" href="index.html" aria-label="Volver a la invitación" title="Volver a la invitación">
+  <svg class="btnFlotante__icono btnFlotante__icono--volver"><use href="#ico-flecha"/></svg>
+</a>
+
+<!-- Visor de fotos a pantalla completa -->
+<div class="visor" id="visor" hidden>
+  <button class="visor__cerrar" id="visorCerrar" aria-label="Cerrar">&times;</button>
+  <button class="visor__flecha visor__flecha--izq" id="visorAnterior" aria-label="Anterior">&#8249;</button>
+  <figure class="visor__marco">
+    <!-- no-referrer es obligatorio: Drive rechaza la imagen si el navegador
+         le dice desde qué página se pide (ver el comentario en galeria.js) -->
+    <img id="visorImagen" alt="" referrerpolicy="no-referrer">
+    <figcaption class="visor__pie" id="visorPie"></figcaption>
+  </figure>
+  <button class="visor__flecha visor__flecha--der" id="visorSiguiente" aria-label="Siguiente">&#8250;</button>
+</div>
+
+<script src="assets/js/config.js?v=8"></script>
+<script src="assets/js/subida.js?v=8"></script>
+<script src="assets/js/galeria.js?v=8"></script>
+</body>
+</html>

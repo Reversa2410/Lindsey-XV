@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&display=swap" rel="stylesheet">
 <!-- El ?v= obliga al navegador a bajar la version nueva en vez de usar
      la que tenga guardada. Subir el numero al cambiar estilos o logica. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=6">
+<link rel="stylesheet" href="assets/css/estilos.css?v=8">
 </head>
 <body class="bloqueado">
 
@@ -362,14 +362,8 @@
     </div>
   </section>
 
-  <!-- ---------------- GALERÍA ---------------- -->
-  <section class="seccion seccion--galeria" id="seccionGaleria" hidden>
-    <h3 class="titulo reveal" id="galeriaTitulo">Álbum de la noche</h3>
-    <p class="parrafo parrafo--italica reveal" id="galeriaTexto"></p>
-    <div class="galeria" id="galeria"></div>
-    <p class="galeria__estado" id="galeriaEstado">Cargando el álbum…</p>
-    <button type="button" class="boton boton--linea" id="galeriaMas" hidden>Ver más fotos</button>
-  </section>
+  <!-- La galería vive en su propia página: galeria.html. Aquí solo se llega
+       a ella, por el botón flotante y por el enlace de la sección de fotos. -->
 
   <!-- ---------------- CIERRE ---------------- -->
   <footer class="cierre">
@@ -379,29 +373,23 @@
   </footer>
 </main>
 
-<!-- Boton flotante de musica -->
-<button class="btnMusica" id="btnMusica" aria-label="Reproducir música" hidden>
+<!-- Botones flotantes: musica y album.
+     El del album se enciende desde main.js, solo si hay album que mostrar. -->
+<a class="btnFlotante btnGaleria" id="btnGaleria" href="galeria.html"
+   aria-label="Ver el álbum de fotos" title="Ver el álbum de fotos" hidden>
+  <svg class="btnFlotante__icono"><use href="#ico-camara"/></svg>
+</a>
+
+<button class="btnFlotante btnMusica" id="btnMusica" aria-label="Reproducir música" hidden>
   <span class="btnMusica__anillo"></span>
   <svg class="btnMusica__icono"><use href="#ico-corazon"/></svg>
 </button>
 <audio id="audio" loop preload="none"></audio>
 
-<!-- Visor de fotos a pantalla completa -->
-<div class="visor" id="visor" hidden>
-  <button class="visor__cerrar" id="visorCerrar" aria-label="Cerrar">&times;</button>
-  <button class="visor__flecha visor__flecha--izq" id="visorAnterior" aria-label="Anterior">&#8249;</button>
-  <figure class="visor__marco">
-    <!-- no-referrer es obligatorio: Drive rechaza la imagen si el navegador
-         le dice desde qué página se pide (ver el comentario en main.js) -->
-    <img id="visorImagen" alt="" referrerpolicy="no-referrer">
-    <figcaption class="visor__pie" id="visorPie"></figcaption>
-  </figure>
-  <button class="visor__flecha visor__flecha--der" id="visorSiguiente" aria-label="Siguiente">&#8250;</button>
-</div>
-
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=6"></script>
-<script src="assets/js/main.js?v=6"></script>
+<script src="assets/js/config.js?v=8"></script>
+<script src="assets/js/subida.js?v=8"></script>
+<script src="assets/js/main.js?v=8"></script>
 </body>
 </html>

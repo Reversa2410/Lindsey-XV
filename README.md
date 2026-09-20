@@ -41,19 +41,42 @@ el CSS para cambiar nombres, textos o fechas.
 ## Estructura
 
 ```
-index.html              estructura + ilustraciones SVG propias
-assets/css/estilos.css  diseño y animaciones
+index.html              la invitación: estructura + ilustraciones SVG propias
+galeria.html            el álbum de fotos, en su propia página
+assets/css/estilos.css  diseño y animaciones (de las dos páginas)
 assets/js/config.js     <-- los datos del evento
-assets/js/main.js       lógica
+assets/js/main.js       lógica de la invitación
+assets/js/galeria.js    lógica del álbum
+assets/js/subida.js     el formulario de subir fotos, que usan las dos
 assets/audio/           aquí va la canción
 .claude/launch.json     configuración del servidor local
 ```
 
+Son dos páginas y no una sola. El álbum crece durante la fiesta y se mira
+muchas veces seguidas: mezclarlo con la invitación obligaba a bajar por toda
+la carta y el programa cada vez. Aparte carga solo cuando alguien lo pide, así
+que quien únicamente quiere ver la fecha no se descarga decenas de fotos.
+
 ## Secciones
 
-Portada que se abre · Hero · Cuenta regresiva · Reserva este día (calendario) ·
-Padres · Carta · Lugar con mapa · Programa · Código de vestimenta ·
-Lluvia de sobres · Confirmación por WhatsApp · Subir fotos · Cierre.
+**`index.html`** — Portada que se abre · Hero · Cuenta regresiva · Reserva este
+día (calendario) · Padres · Carta · Lugar con mapa · Programa · Código de
+vestimenta · Lluvia de sobres · Confirmación por WhatsApp · Subir fotos ·
+Cierre.
+
+**`galeria.html`** — El álbum con las fotos que suben los invitados, con visor
+a pantalla completa.
+
+Se llega al álbum por dos caminos: el botón flotante de la cámara (encima del
+de la música, en las dos páginas siempre a la vista) y la tarjeta **Álbum de la
+noche** que sale junto a los enlaces de subir. Los dos aparecen solo cuando el
+script de Drive ya está publicado; sin él no habría nada que mostrar.
+
+**Desde el álbum también se sube.** El que está mirando las fotos es justo el
+que quiere agregar la suya, así que la tarjeta *Sube tus fotos* despliega ahí
+mismo el formulario en vez de mandarlo de vuelta a la invitación. Es el mismo
+código (`subida.js`) en los dos sitios, no una copia. Al terminar, el álbum se
+vuelve a pedir solo, así que la foto recién mandada aparece sin recargar.
 
 ## Lo que hace que no sea un Canva
 
@@ -66,6 +89,8 @@ Lluvia de sobres · Confirmación por WhatsApp · Subir fotos · Cierre.
 - Mapa embebido del lugar.
 - Pétalos flotantes y lluvia final al llegar al cierre.
 - Barra de progreso de lectura y reproductor de música flotante.
+- Al volver del álbum no se repite la portada: la invitación recuerda, solo
+  durante esa visita, que ya estaba abierta.
 - Respeta `prefers-reduced-motion` para quien tenga las animaciones desactivadas.
 
 Todas las ilustraciones (el lazo, la tiara, la quinceañera, el sobre, las ramas)

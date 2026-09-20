@@ -120,7 +120,7 @@
     var destinos = C.fotos.destinos || [];
     var sinEnlace = 0;
 
-    $('fotosDestinos').innerHTML = destinos.map(function (d, i) {
+    var html = destinos.map(function (d, i) {
       var esFormulario = d.tipo === 'drive';
       var listo = esFormulario ? driveListo() : !!d.enlace;
       if (!listo) sinEnlace++;
@@ -145,6 +145,22 @@
                '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>' +
              '</' + etiqueta + '>';
     }).join('');
+
+    /* El album se ofrece como un destino mas, junto a los de subir: es
+       donde la gente lo va a buscar despues de mandar sus fotos. */
+    if (galeriaLista()) {
+      var g = C.fotos.galeria;
+      html += '<a class="destino destino--album" href="galeria.html">' +
+                '<svg class="destino__icono"><use href="#ico-camara"/></svg>' +
+                '<span class="destino__texto">' +
+                  '<span class="destino__etiqueta">' + escapar(g.titulo) + '</span>' +
+                  '<span class="destino__nota">' + escapar(g.notaEnlace) + '</span>' +
+                '</span>' +
+                '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>' +
+              '</a>';
+    }
+
+    $('fotosDestinos').innerHTML = html;
 
     var abre = $('fotosDestinos').querySelector('[data-abre-subida]');
     if (abre) {
@@ -180,459 +196,41 @@
   }
 
   /* ======================================================================
-     1b. SUBIDA DE FOTOS A GOOGLE DRIVE
+     1b. SUBIDA DE FOTOS
      ----------------------------------------------------------------------
-     Las fotos viajan del celular del invitado a un script de Google
-     publicado como aplicacion web, que las guarda en una carpeta de Drive.
-     No pasan por ningun servidor nuestro, por eso no hay nada que
-     contratar ni nada que se pueda caer.
-
-     El invitado no necesita cuenta de Google: el script corre con los
-     permisos de quien lo publico.
-
-     Antes de enviarlas se encogen en el propio celular: una foto de 3 MB
-     queda en unos 400 KB sin que se note la diferencia en pantalla. Sube
-     siete veces mas rapido, que con el internet de un salon lleno es la
-     diferencia entre que la gente participe o se rinda a la mitad.
+     El formulario vive en assets/js/subida.js, porque se sube igual desde
+     aqui que desde el album y el codigo no puede ser de una sola pagina.
      ====================================================================== */
-
-  var elegidas = [];
+  var Subida = window.XVSubida;
 
   function driveListo() {
-    var d = C.fotos && C.fotos.drive;
-    return !!(d && d.urlScript);
+    return !!(Subida && Subida.driveListo());
   }
 
-  function prepararSubida() {
-    if (!C.fotos || !C.fotos.activo || !driveListo()) return;
-
-    var cfg = C.fotos.drive;
-    $('subidaLimite').textContent = 'Hasta ' + cfg.maxArchivos + ' fotos a la vez';
-
-    $('subidaElegir').addEventListener('click', function () {
-      $('subidaArchivos').click();
-    });
-
-    $('subidaArchivos').addEventListener('change', function (e) {
-      elegidas = Array.prototype.slice.call(e.target.files).slice(0, cfg.maxArchivos);
-      pintarElegidas();
-    });
-
-    $('subidaEnviar').addEventListener('click', enviarTodas);
-  }
-
-  function pintarElegidas() {
-    var lista = $('subidaLista');
-
-    lista.innerHTML = elegidas.map(function (f, i) {
-      return '<li class="lista__fila" data-i="' + i + '">' +
-               '<span class="lista__nombre">' + escapar(f.name) + '</span>' +
-               '<span class="lista__peso">' + pesoLegible(f.size) + '</span>' +
-               '<span class="lista__barra"><i></i></span>' +
-             '</li>';
-    }).join('');
-
-    $('subidaEnviar').hidden = elegidas.length === 0;
-    $('subidaEnviar').textContent = elegidas.length === 1
-      ? 'Enviar 1 foto'
-      : 'Enviar ' + elegidas.length + ' fotos';
-    $('subidaEstado').hidden = true;
-  }
-
-  function pesoLegible(bytes) {
-    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
-    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
-  }
-
-  /* Redimensiona la foto en el navegador. Si el formato no se puede leer
-     (pasa con algunos HEIC de iPhone en Android), devuelve el archivo tal
-     cual: preferimos que suba pesada a que no suba. */
-  function encoger(archivo) {
-    var cfg = C.fotos.drive;
-
-    return new Promise(function (listo) {
-      if (!/^image\//.test(archivo.type)) return listo(archivo);
-
-      var url = URL.createObjectURL(archivo);
-      var img = new Image();
-
-      img.onload = function () {
-        URL.revokeObjectURL(url);
-        var escala = Math.min(1, cfg.anchoMaximo / Math.max(img.width, img.height));
-        if (escala === 1 && archivo.size < 900 * 1024) return listo(archivo);
-
-        var lienzo = document.createElement('canvas');
-        lienzo.width = Math.round(img.width * escala);
-        lienzo.height = Math.round(img.height * escala);
-        lienzo.getContext('2d').drawImage(img, 0, 0, lienzo.width, lienzo.height);
-
-        lienzo.toBlob(function (blob) {
-          listo(blob && blob.size < archivo.size ? blob : archivo);
-        }, 'image/jpeg', cfg.calidad);
-      };
-
-      img.onerror = function () { URL.revokeObjectURL(url); listo(archivo); };
-      img.src = url;
-    });
-  }
-
-  /* Convierte el archivo a texto base64, que es como viaja hasta el script
-     de Google. Apps Script no sabe leer archivos binarios directamente. */
-  function aBase64(blob) {
-    return new Promise(function (listo, falla) {
-      var lector = new FileReader();
-      lector.onload = function () {
-        var s = String(lector.result);            // "data:image/jpeg;base64,AAAA"
-        var coma = s.indexOf(',');
-        var puntoYcoma = s.indexOf(';');
-        listo({
-          datos: s.slice(coma + 1),
-          tipo: (coma > 0 && puntoYcoma > 5) ? s.slice(5, puntoYcoma) : 'image/jpeg'
-        });
-      };
-      lector.onerror = function () { falla(new Error('No se pudo leer el archivo')); };
-      lector.readAsDataURL(blob);
-    });
-  }
-
-  /* OJO, esto tiene truco y es facil de romper sin darse cuenta:
-
-     1) El archivo se manda como formulario clasico, NO como JSON. Con JSON
-        el navegador pide permiso previo al servidor (una peticion OPTIONS,
-        el llamado "preflight") y Apps Script no sabe responderla, asi que
-        la subida falla por CORS.
-
-     2) Por la misma razon se usa fetch y NO XMLHttpRequest con barra de
-        progreso por bytes. Registrar un escucha en xhr.upload tambien
-        convierte la peticion en "no simple" y dispara el mismo preflight.
-        Dicho de otro modo: poner la barra de progreso detallada ROMPE la
-        subida. El progreso se muestra por foto completada, no por bytes.
-
-     Si alguna vez hay que tocar esta funcion, probarla contra el script de
-     Google de verdad. Un servidor de prueba local si responde OPTIONS, asi
-     que el problema no aparece hasta que ya es tarde. */
-  function subirUna(archivo, nombreInvitado) {
-    var cfg = C.fotos.drive;
-
-    return encoger(archivo)
-      .then(function (comprimido) {
-        if (comprimido.size > cfg.pesoMaximoMB * 1024 * 1024) {
-          throw new Error('Pesa más de ' + cfg.pesoMaximoMB + ' MB');
-        }
-        return comprimido;
-      })
-      .then(aBase64)
-      .then(function (contenido) {
-        var cuerpo = new URLSearchParams();
-        cuerpo.set('archivo', contenido.datos);
-        cuerpo.set('tipo', contenido.tipo);
-        cuerpo.set('nombreArchivo', archivo.name || 'foto.jpg');
-        if (nombreInvitado) cuerpo.set('invitado', nombreInvitado);
-
-        return fetch(cfg.urlScript, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body: cuerpo.toString()
-        });
-      })
-      .then(function (r) {
-        if (!r.ok) throw new Error('Google respondió ' + r.status);
-        return r.text();
-      })
-      .then(function (texto) {
-        /* Apps Script contesta 200 incluso cuando algo salio mal por
-           dentro, asi que hay que mirar el contenido de la respuesta. */
-        var r;
-        try { r = JSON.parse(texto); }
-        catch (e) { throw new Error('Respuesta inesperada'); }
-        if (!r || !r.ok) throw new Error((r && r.error) || 'Rechazada por el script');
-      });
-  }
-
-  function enviarTodas() {
-    if (!elegidas.length) return;
-
-    var boton = $('subidaEnviar');
-    var estado = $('subidaEstado');
-    var nombre = $('subidaNombre').value.trim();
-
-    boton.disabled = true;
-    boton.textContent = 'Enviando…';
-    estado.hidden = true;
-
-    var fallidas = [];
-    var total = elegidas.length;
-
-    /* Una por una y no todas juntas: en el internet de un salón, veinte
-       subidas en paralelo se estorban entre ellas y terminan más lento. */
-    var cadena = elegidas.reduce(function (previa, archivo, i) {
-      return previa.then(function () {
-        var fila = $('subidaLista').querySelector('[data-i="' + i + '"]');
-        if (fila) fila.classList.add('lista__fila--subiendo');
-        boton.textContent = 'Enviando ' + (i + 1) + ' de ' + total + '…';
-
-        return subirUna(archivo, nombre).then(function () {
-          if (fila) {
-            fila.classList.remove('lista__fila--subiendo');
-            fila.classList.add('lista__fila--lista');
-          }
-        }).catch(function (e) {
-          fallidas.push(archivo);
-          if (fila) {
-            fila.classList.remove('lista__fila--subiendo');
-            fila.classList.add('lista__fila--error');
-          }
-          console.warn('[XV] No se pudo subir', archivo.name, e);
-        });
-      });
-    }, Promise.resolve());
-
-    cadena.then(function () {
-      var enviadas = total - fallidas.length;
-      boton.disabled = false;
-
-      if (!fallidas.length) {
-        elegidas = [];
-        $('subidaArchivos').value = '';
-        $('subidaLista').innerHTML = '';
-        boton.hidden = true;
-        mostrarEstado('bien', '¡Gracias! ' + (enviadas === 1
-          ? 'Tu foto quedó guardada.'
-          : 'Tus ' + enviadas + ' fotos quedaron guardadas.'));
-        return;
-      }
-
-      /* Las que fallaron se quedan elegidas para que el invitado pueda
-         reintentar de un toque, sin volver a buscarlas en su galería. */
-      elegidas = fallidas;
-      pintarElegidas();
-      boton.textContent = fallidas.length === 1
-        ? 'Reintentar 1 foto'
-        : 'Reintentar ' + fallidas.length + ' fotos';
-
-      if (enviadas === 0) {
-        mostrarEstado('aviso', fallidas.length === 1
-          ? 'No se pudo enviar la foto. Revisa tu conexión y vuelve a intentarlo.'
-          : 'No se pudo enviar ninguna. Revisa tu conexión y vuelve a intentarlo.');
-      } else {
-        mostrarEstado('aviso', '¡Gracias! Se enviaron ' + enviadas + '. ' +
-          (fallidas.length === 1 ? 'Una quedó pendiente' : fallidas.length + ' quedaron pendientes') +
-          ', puedes reintentarla' + (fallidas.length === 1 ? '' : 's') + '.');
-      }
-    });
-  }
-
-  function mostrarEstado(tipo, texto) {
-    var estado = $('subidaEstado');
-    estado.className = 'subida__estado subida__estado--' + tipo;
-    estado.textContent = texto;
-    estado.hidden = false;
+  /* El album se enseña solo cuando de verdad hay de donde sacar las fotos.
+     Sin script publicado, la pagina de la galeria no tendria nada que
+     mostrar, asi que es mejor no anunciarla todavia. */
+  function galeriaLista() {
+    var g = C.fotos && C.fotos.galeria;
+    return !!(g && g.activa && driveListo());
   }
 
   /* ======================================================================
-     1c. GALERIA
+     1c. ACCESO AL ALBUM
      ----------------------------------------------------------------------
-     El script solo manda los datos de cada foto, no las imagenes. Las
-     imagenes se le piden despues directamente a Drive, que las sirve ya
-     redimensionadas al tamaño que se le pida. Asi la miniatura de la
-     rejilla pesa poco y la grande solo se descarga si alguien la abre.
+     La galeria ya no vive aqui: tiene su propia pagina (galeria.html), con
+     su propia logica en assets/js/galeria.js. Desde la invitacion solo se
+     enciende el boton flotante que lleva hasta ella, y solo si hay de
+     verdad un album que mostrar.
      ====================================================================== */
+  function prepararBotonGaleria() {
+    if (!galeriaLista()) return;
 
-  var galeriaFotos = [];
-  var galeriaMostradas = 0;
-  var visorIndice = 0;
-
-  /* Drive sirve la misma foto a cualquier ancho; se le pide el que hace
-     falta en cada sitio en vez de bajar siempre la original.
-     La plantilla se puede cambiar desde config (galeria.baseMiniatura),
-     pero normalmente no hace falta tocarla.
-
-     IMPORTANTE: las <img> que usen esta URL necesitan el atributo
-     referrerpolicy="no-referrer". Drive rechaza la peticion si el navegador
-     le manda de que pagina viene, y la foto no carga. Desde curl si
-     funciona, porque curl no manda esa cabecera, asi que es un fallo que
-     engaña: parece un problema de permisos y no lo es. */
-  var BASE_MINIATURA = 'https://drive.google.com/thumbnail?id={id}&sz=w{ancho}';
-
-  function urlFoto(id, ancho) {
-    var base = (C.fotos.galeria && C.fotos.galeria.baseMiniatura) || BASE_MINIATURA;
-    return base.replace('{id}', encodeURIComponent(id)).replace('{ancho}', ancho);
-  }
-
-  function prepararGaleria() {
-    var g = C.fotos && C.fotos.galeria;
-    if (!g || !g.activa || !driveListo()) return;
-
-    $('seccionGaleria').hidden = false;
-    $('galeriaTitulo').textContent = g.titulo;
-    $('galeriaTexto').textContent = g.texto;
-
-    $('galeriaMas').addEventListener('click', function () {
-      pintarGaleria(galeriaMostradas + g.porPagina);
-    });
-
-    prepararVisor();
-    cargarGaleria();
-
-    if (g.refrescarCada > 0) {
-      setInterval(cargarGaleria, g.refrescarCada * 1000);
-    }
-  }
-
-  function cargarGaleria() {
     var g = C.fotos.galeria;
-    var url = C.fotos.drive.urlScript + '?accion=listar&max=' + g.maximo;
-
-    fetch(url)
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (!d || !d.ok) throw new Error((d && d.error) || 'respuesta inesperada');
-
-        galeriaFotos = d.fotos || [];
-        if (!galeriaFotos.length) {
-          $('galeria').innerHTML = '';
-          $('galeriaEstado').hidden = false;
-          $('galeriaEstado').textContent =
-            'Todavía no hay fotos. ¡Sé el primero en compartir una!';
-          $('galeriaMas').hidden = true;
-          return;
-        }
-        $('galeriaEstado').hidden = true;
-        pintarGaleria(Math.max(galeriaMostradas, g.porPagina));
-      })
-      .catch(function (e) {
-        console.warn('[XV] No se pudo cargar la galería', e);
-        /* Si ya hay fotos en pantalla no se borran por un fallo de red:
-           mejor dejar lo que se ve que vaciar el álbum. */
-        if (!galeriaFotos.length) {
-          $('galeriaEstado').hidden = false;
-          $('galeriaEstado').textContent = 'No se pudo cargar el álbum ahora mismo.';
-        }
-      });
-  }
-
-  function pintarGaleria(cuantas) {
-    var visibles = Math.min(cuantas, galeriaFotos.length);
-    galeriaMostradas = visibles;
-
-    $('galeria').innerHTML = galeriaFotos.slice(0, visibles).map(function (f, i) {
-      var de = f.invitado ? 'Foto de ' + escapar(f.invitado) : 'Foto del evento';
-      return '<button type="button" class="galeria__foto" data-i="' + i + '" ' +
-             'style="--d:' + ((i % 12) * 45) + 'ms">' +
-               '<img src="' + urlFoto(f.id, 400) + '" alt="' + de + '" ' +
-               'loading="lazy" decoding="async" referrerpolicy="no-referrer">' +
-             '</button>';
-    }).join('');
-
-    $('galeriaMas').hidden = visibles >= galeriaFotos.length;
-
-    Array.prototype.forEach.call(
-      $('galeria').querySelectorAll('.galeria__foto'),
-      function (boton) {
-        boton.addEventListener('click', function () {
-          abrirVisor(parseInt(boton.getAttribute('data-i'), 10));
-        });
-        var img = boton.querySelector('img');
-        var idx = parseInt(boton.getAttribute('data-i'), 10);
-        var intentos = 0;
-
-        /* Drive limita cuántas fotos sirve a la vez, así que cuando se
-           cargan muchas de golpe algunas fallan sin motivo real. Por eso
-           se reintenta antes de rendirse: un fallo pasajero no puede
-           borrar una foto del álbum para siempre.
-           El parámetro extra evita que el navegador reutilice el fallo
-           que ya guardó en caché. */
-        img.addEventListener('error', function () {
-          intentos++;
-          if (intentos <= 3) {
-            setTimeout(function () {
-              img.src = urlFoto(galeriaFotos[idx].id, 400) + '&r=' + intentos;
-            }, 700 * intentos);
-            return;
-          }
-          boton.remove();
-          avisarSiQuedoVacia();
-        });
-
-        img.addEventListener('load', function () {
-          boton.classList.add('galeria__foto--lista');
-        });
-      }
-    );
-  }
-
-  /* Si el script dijo que hay fotos pero ninguna se pudo mostrar, casi
-     siempre es que a los archivos les falta el permiso de "visible con
-     enlace". Sin este aviso la galería se quedaría en blanco sin explicar
-     nada, que es lo peor para saber qué está pasando. */
-  function avisarSiQuedoVacia() {
-    if (!galeriaFotos.length) return;
-    if ($('galeria').children.length > 0) return;
-
-    $('galeriaEstado').hidden = false;
-    $('galeriaEstado').textContent =
-      'Hay ' + galeriaFotos.length + ' foto' + (galeriaFotos.length === 1 ? '' : 's') +
-      ' en el álbum, pero no se pudieron mostrar. Revisa que estén compartidas.';
-    $('galeriaMas').hidden = true;
-    console.warn('[XV] La galería recibió fotos pero ninguna cargó. ' +
-      'Ejecuta compartirTodas() en el script de Google.');
-  }
-
-  /* --------------------------- visor a pantalla completa --------------- */
-  function prepararVisor() {
-    $('visorCerrar').addEventListener('click', cerrarVisor);
-    $('visorAnterior').addEventListener('click', function () { moverVisor(-1); });
-    $('visorSiguiente').addEventListener('click', function () { moverVisor(1); });
-
-    $('visor').addEventListener('click', function (e) {
-      if (e.target === $('visor')) cerrarVisor();
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if ($('visor').hidden) return;
-      if (e.key === 'Escape') cerrarVisor();
-      if (e.key === 'ArrowLeft') moverVisor(-1);
-      if (e.key === 'ArrowRight') moverVisor(1);
-    });
-
-    /* Deslizar con el dedo, que es como se va a usar de verdad */
-    var inicioX = null;
-    $('visor').addEventListener('touchstart', function (e) {
-      inicioX = e.changedTouches[0].clientX;
-    }, { passive: true });
-    $('visor').addEventListener('touchend', function (e) {
-      if (inicioX === null) return;
-      var avance = e.changedTouches[0].clientX - inicioX;
-      if (Math.abs(avance) > 50) moverVisor(avance < 0 ? 1 : -1);
-      inicioX = null;
-    }, { passive: true });
-  }
-
-  function abrirVisor(i) {
-    visorIndice = i;
-    mostrarEnVisor();
-    $('visor').hidden = false;
-    document.body.classList.add('bloqueado');
-  }
-
-  function cerrarVisor() {
-    $('visor').hidden = true;
-    document.body.classList.remove('bloqueado');
-  }
-
-  function moverVisor(paso) {
-    var total = Math.min(galeriaMostradas, galeriaFotos.length);
-    visorIndice = (visorIndice + paso + total) % total;   // da la vuelta
-    mostrarEnVisor();
-  }
-
-  function mostrarEnVisor() {
-    var f = galeriaFotos[visorIndice];
-    if (!f) return;
-    $('visorImagen').src = urlFoto(f.id, 1600);
-    $('visorImagen').alt = f.invitado ? 'Foto de ' + f.invitado : 'Foto del evento';
-    $('visorPie').textContent = (f.invitado ? f.invitado + ' · ' : '') +
-      (visorIndice + 1) + ' de ' + Math.min(galeriaMostradas, galeriaFotos.length);
+    var boton = $('btnGaleria');
+    boton.hidden = false;
+    boton.setAttribute('aria-label', 'Ver ' + g.titulo);
+    boton.title = 'Ver ' + g.titulo;
   }
 
   /* ======================================================================
@@ -787,6 +385,7 @@
       p.then(function () {
         document.body.classList.add('sonando');
         btnMusica.setAttribute('aria-label', 'Pausar música');
+        recordar(LLAVE_SONANDO, true);
       }).catch(function () {
         document.body.classList.remove('sonando');
       });
@@ -797,17 +396,37 @@
     audio.pause();
     document.body.classList.remove('sonando');
     btnMusica.setAttribute('aria-label', 'Reproducir música');
+    recordar(LLAVE_SONANDO, false);
   }
 
   /* ======================================================================
      7. APERTURA DE LA PORTADA
      ====================================================================== */
+  /* Se recuerda en sessionStorage y no en localStorage a proposito: vale
+     para esta visita, no para siempre. Quien vuelva otro dia merece ver la
+     portada abrirse otra vez, que es la mejor parte. */
+  var LLAVE_ABIERTA = 'xv-abierta';
+  var LLAVE_SONANDO = 'xv-sonando';
+
+  function recordar(llave, valor) {
+    try { sessionStorage.setItem(llave, valor ? '1' : '0'); } catch (e) { /* modo privado */ }
+  }
+
+  function recordado(llave) {
+    try { return sessionStorage.getItem(llave) === '1'; } catch (e) { return false; }
+  }
+
   function prepararPortada() {
+    /* Al volver del album la invitacion ya estaba abierta: repetir la
+       portada se sentiria un paso atras, asi que se entra directo. */
+    if (recordado(LLAVE_ABIERTA)) { entrarSinPortada(); return; }
+
     $('btnAbrir').addEventListener('click', function () {
       var portada = $('portada');
       portada.classList.add('abriendo');
       document.body.classList.remove('bloqueado');
       document.body.classList.add('abierta');
+      recordar(LLAVE_ABIERTA, true);
 
       /* El clic del usuario desbloquea el audio en el navegador */
       if (C.musica && C.musica.activo) reproducir();
@@ -815,6 +434,31 @@
       setTimeout(function () { portada.style.display = 'none'; }, 1500);
       window.scrollTo({ top: 0 });
     }, { once: true });
+  }
+
+  function entrarSinPortada() {
+    $('portada').style.display = 'none';
+    document.body.classList.remove('bloqueado');
+    document.body.classList.add('abierta');
+
+    /* Si la musica venia sonando se intenta retomarla. Puede que el
+       navegador lo rechace por no haber un toque todavia en esta pagina;
+       en ese caso reproducir() lo deja pasar en silencio y el invitado la
+       enciende con el boton, como siempre. */
+    if (C.musica && C.musica.activo && recordado(LLAVE_SONANDO)) reproducir();
+
+    /* El navegador intenta saltar al ancla nada mas cargar, cuando el
+       cuerpo todavia esta bloqueado, asi que el salto se pierde. Se
+       repite aqui, ya con la invitacion abierta. */
+    var destino = null;
+    try { destino = location.hash && document.querySelector(location.hash); }
+    catch (e) { destino = null; }
+
+    if (destino) {
+      requestAnimationFrame(function () {
+        destino.scrollIntoView({ block: 'start' });
+      });
+    }
   }
 
   /* ======================================================================
@@ -990,8 +634,8 @@
      ====================================================================== */
   function iniciar() {
     pintarDatos();
-    prepararSubida();
-    prepararGaleria();
+    Subida.preparar();
+    prepararBotonGaleria();
     pintarCalendario();
     arrancarReloj();
     observarReveals();
