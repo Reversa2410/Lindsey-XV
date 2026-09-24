@@ -30,7 +30,7 @@
     $('portadaIntro').textContent = C.textos.portadaSuperior;
     $('portadaNombre').textContent = C.nombre;
     $('btnAbrirTexto').textContent = C.textos.botonAbrir;
-    $('heroNombre').textContent = nombreCompleto;
+    pintarHero();
     $('cierreTexto').textContent = C.textos.cierre;
     $('cierreNombre').textContent = nombreCompleto + ' · XV';
 
@@ -231,6 +231,38 @@
     boton.hidden = false;
     boton.setAttribute('aria-label', 'Ver ' + g.titulo);
     boton.title = 'Ver ' + g.titulo;
+  }
+
+  /* ----------------------------------------------------------------------
+     El lienzo del hero: la composicion del diseño de Canva.
+     La fecha y la direccion salen de la misma config que el resto de la
+     pagina, asi que cambiar CONFIG.fecha mueve tambien lo que dice aqui.
+     ---------------------------------------------------------------------- */
+  function pintarHero() {
+    var H = C.hero || {};
+
+    if (H.lienzo) $('heroLienzo').style.setProperty('--lienzo', H.lienzo);
+
+    var marco = $('heroMarco');
+    if (H.marco) marco.src = H.marco; else marco.hidden = true;
+
+    $('heroNombre').textContent = C.nombre;
+    $('heroDia').textContent = DIAS[FECHA_EVENTO.getDay()];
+    $('heroFecha').textContent = F.dia + ' de ' + MESES[F.mes - 1].toLowerCase();
+    $('heroLugar').textContent = C.lugar.direccion;
+
+    /* Sin foto real todavia? Entonces va la ilustracion en el arco. */
+    var foto = $('heroFoto');
+    if (H.foto) {
+      foto.src = H.foto;
+      foto.alt = H.fotoAlt || '';
+    } else {
+      foto.hidden = true;
+      /* Ojo: es un <svg>, y la propiedad .hidden solo existe en los
+         elementos HTML. En un SVG hay que quitar el ATRIBUTO a mano o se
+         queda invisible para siempre. */
+      $('heroDibujo').removeAttribute('hidden');
+    }
   }
 
   /* ======================================================================
@@ -529,8 +561,7 @@
      10. PARALLAX SUAVE + BARRA DE PROGRESO
      ====================================================================== */
   function prepararScroll() {
-    var lazo = $('heroLazo');
-    var vestido = $('heroVestido');
+    var marco = $('heroMarco');
     var barra = $('progresoBarra');
     var pendiente = false;
 
@@ -539,9 +570,12 @@
       var alto = document.documentElement.scrollHeight - window.innerHeight;
       barra.style.width = (alto > 0 ? (y / alto) * 100 : 0) + '%';
 
-      if (!menosMovimiento && y < window.innerHeight * 1.2) {
-        if (lazo) lazo.style.transform = 'translateY(' + (y * 0.18) + 'px)';
-        if (vestido) vestido.style.transform = 'translateY(' + (y * -0.07) + 'px)';
+      /* Parallax: el marco floral baja mas despacio que la pagina. Le sobra
+         un 4% de alto justo para esto, por eso no deja huecos. */
+      if (!menosMovimiento && marco && y < window.innerHeight * 1.2) {
+        var tope = marco.offsetHeight * 0.02;
+        var corr = Math.max(-tope, Math.min(tope, y * 0.08));
+        marco.style.transform = 'translateY(' + corr + 'px)';
       }
       pendiente = false;
     }

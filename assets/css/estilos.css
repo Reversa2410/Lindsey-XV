@@ -39,6 +39,17 @@
   --display:'Italiana', 'Cormorant Garamond', Georgia, serif;
   --script:'Parisienne', 'Segoe Script', cursive;
 
+  /* --- Lo del lienzo del hero ---
+     Son los valores sacados del PNG del diseño de Canva, no derivados de
+     la paleta de arriba. Van aparte a proposito: si el diseño cambia, se
+     cambian estos cinco y no se toca nada mas. El rosa es mas vivo que el
+     --tono-500 y el oro mas apagado que el --oro, por eso no se reusan. */
+  --rosa-lienzo:#E48895;
+  --oro-lienzo:#CEC4AE;
+  --crema:#FDFAF7;
+  --gala:'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --firma:'Style Script', 'Parisienne', 'Segoe Script', cursive;
+
   --ancho:480px;
   --radio:4px;
   --sombra:0 24px 70px rgba(123,30,58,.15);
@@ -230,61 +241,103 @@ body.abierta .invitacion{opacity:1}
 .parrafo--cierre{margin-top:16px; color:var(--tono-600)}
 .icono{color:var(--tono-500); margin:0 auto 14px}
 
-/* ----------------------------------------------------------------- HERO */
-.hero{
-  position:relative; padding:52px 26px 30px; overflow:hidden;
-  background:linear-gradient(#FFFFFF 0%, #FDF4F7 60%, #FAE8EF 100%);
-}
-.hero__lazo{
-  position:absolute; top:10px; left:-30px; width:52%; max-width:230px;
-  height:auto; aspect-ratio:200/170;
-  opacity:0; transform:rotate(-8deg);
-  animation:entrarLazo 1.6s var(--curva) .5s forwards;
-}
-@keyframes entrarLazo{to{opacity:.95; transform:rotate(0deg)}}
+/* ----------------------------------------------------------------- HERO
+   Es la composicion hecha en Canva, rehecha en HTML.
 
-.hero__titulo{
-  position:relative; z-index:2; width:60%; max-width:280px;
-  margin-left:auto; text-align:right; padding-right:4px;
+   El lienzo tiene la MISMA proporcion que el original (943x2000) y el
+   marco floral lo llena entero. Todo lo que va encima se coloca con un
+   top en % de ese lienzo y se mide en cqw (porcentaje del ancho del
+   lienzo), asi que la composicion escala como una sola pieza: en un
+   celular de 360px y en la columna de 480px se ve identica, solo mas
+   chica o mas grande. Las cifras raras (11.15%, 7.75cqw...) salen de
+   medir el PNG del diseño, no son a ojo.
+   ------------------------------------------------------------------------ */
+.hero{
+  position:relative; padding-bottom:16px;
+  background:var(--crema);
 }
-.hero__tiara{
-  width:58px; height:26px; color:var(--oro); margin-left:auto; margin-bottom:2px;
-  opacity:0; animation:subirSuave .9s var(--curva) .9s forwards;
+
+.lienzo{
+  position:relative; width:100%;
+  aspect-ratio:var(--lienzo, 943 / 2000);
+  /* container-type habilita las unidades cqw de aqui adentro */
+  container-type:inline-size;
+  overflow:hidden; background:var(--crema);
 }
-.hero__mis{
-  display:inline-block; margin:0; vertical-align:super;
-  font-family:var(--display); font-size:clamp(1.05rem,5vw,1.5rem); letter-spacing:.14em;
-  color:var(--tono-700); text-transform:uppercase;
-  opacity:0; animation:subirSuave .9s var(--curva) 1s forwards;
+
+/* El marco va un poco mas alto que el lienzo para que le sobre recorrido
+   y pueda moverse con el scroll sin dejar huecos arriba ni abajo. */
+.lienzo__marco{
+  position:absolute; left:0; top:-2%; width:100%; height:104%;
+  object-fit:cover; z-index:0; pointer-events:none;
 }
-.hero__num{
-  display:inline-block; margin:0 0 0 8px;
-  font-family:var(--display); font-size:clamp(2.8rem,14vw,4.4rem); line-height:.88;
-  color:var(--tono-600);
-  opacity:0; animation:subirSuave 1s var(--curva) 1.05s forwards;
+
+.lienzo__mis,.lienzo__xv,.lienzo__nombre,
+.lienzo__dia,.lienzo__fecha,.lienzo__lugar{
+  position:absolute; left:0; right:0; z-index:1;
+  margin:0; text-align:center; line-height:1;
+  color:var(--rosa-lienzo); font-family:var(--gala); font-weight:400;
 }
-.hero__quince{
-  margin:-2px 0 0; font-family:var(--display);
-  font-size:clamp(1.5rem,7.4vw,2.4rem); letter-spacing:.08em;
-  color:var(--tono-700); text-transform:uppercase; line-height:1;
-  opacity:0; animation:subirSuave 1s var(--curva) 1.15s forwards;
+
+/* El diseño lleva la serif abierta con tracking. El padding-left no es
+   un capricho: letter-spacing tambien agrega el espacio DESPUES de la
+   ultima letra, y eso corre el texto media pisada hacia la izquierda al
+   centrarlo. Un padding del mismo tamaño lo devuelve a su sitio. */
+.lienzo__mis,.lienzo__xv,.lienzo__dia,.lienzo__fecha,.lienzo__lugar{
+  letter-spacing:.1em; padding-left:.1em;
 }
-.hero__nombre{
-  position:relative; z-index:3; margin:18px 0 0;
-  font-family:var(--script); font-weight:400;
-  font-size:clamp(2rem,10.5vw,3.2rem); line-height:1.08; color:var(--tono-600);
-  text-align:center; word-break:normal;
-  opacity:0; animation:subirSuave 1.1s var(--curva) 1.35s forwards;
+.lienzo__mis   {top:11.65%; font-size:6.83cqw;  font-style:italic}
+.lienzo__xv    {top:15.65%; font-size:15.87cqw; letter-spacing:.367em; padding-left:.367em}
+.lienzo__nombre{top:22.90%; font-size:19.92cqw; font-family:var(--firma);
+                line-height:1.25; text-transform:lowercase}
+.lienzo__dia   {top:67.40%; font-size:7.83cqw;  font-style:italic}
+.lienzo__fecha {top:73.10%; font-size:8.74cqw;  font-style:italic}
+/* La direccion se ancla por ABAJO, no por arriba. El diseño de Canva la
+   tenia en dos renglones cortos, pero la direccion real sale de config.js
+   y puede ser mas larga. Anclada asi, un tercer renglon crece hacia el
+   hueco que queda sobre ella en vez de meterse encima del filete. */
+.lienzo__lugar {
+  top:auto; bottom:16.45%;
+  font-size:3.86cqw; font-style:italic; line-height:1.13;
+  padding:0 16cqw; padding-left:calc(16cqw + .1em);
+  text-wrap:balance;
 }
-.hero__vestido{
-  width:62%; max-width:240px; height:auto; aspect-ratio:220/330; margin:4px auto 0;
-  opacity:0; animation:subirSuave 1.4s var(--curva) 1.5s forwards;
+
+/* --- El arco de la foto ---
+   El radio de arriba es exactamente la mitad del ancho, que es lo que
+   convierte las dos esquinas en un semicirculo perfecto. */
+.arco{
+  --arco:51.5cqw;          /* ancho total, borde incluido */
+  --filo:3.1cqw;           /* grosor del borde rosa       */
+  position:absolute; top:35.05%; left:50%; transform:translateX(-50%);
+  z-index:1; margin:0; padding:var(--filo);
+  width:var(--arco); aspect-ratio:486 / 599;
+  background:var(--rosa-lienzo);
+  border-radius:calc(var(--arco) / 2) calc(var(--arco) / 2) .9cqw .9cqw;
 }
+.arco__interior{
+  --hueco:calc(var(--arco) - var(--filo) * 2);
+  width:100%; height:100%; overflow:hidden;
+  border-radius:calc(var(--hueco) / 2) calc(var(--hueco) / 2) .5cqw .5cqw;
+  background:#D9DEE3;
+  display:grid; place-items:end center;
+}
+.arco__foto{width:100%; height:100%; object-fit:cover}
+/* La ilustracion se mide por el ALTO, no por el ancho: asi entra entera
+   en el arco en vez de salirse por arriba y quedar sin cabeza. */
+.arco__dibujo{height:92%; width:auto; aspect-ratio:220/330}
+
+.lienzo__filete{
+  position:absolute; top:84.90%; left:0; right:0; z-index:1;
+  width:65.6cqw; height:auto; aspect-ratio:320/40;
+  margin-inline:auto; color:var(--oro-lienzo);
+}
+
 .hero__cue{
   display:flex; flex-direction:column; align-items:center; gap:6px;
   font-size:.68rem; letter-spacing:.34em; text-transform:uppercase;
-  color:var(--tinta-suave); padding-bottom:8px;
-  opacity:0; animation:subirSuave .8s ease 2.2s forwards;
+  color:var(--tinta-suave);
+  opacity:0; animation:subirSuave .8s ease 1.4s forwards;
 }
 .hero__cue svg{width:18px;height:11px;color:var(--tono-500);animation:rebote 1.9s ease-in-out infinite}
 @keyframes rebote{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}

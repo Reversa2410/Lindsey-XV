@@ -8,10 +8,10 @@
 <meta name="description" content="Invitación digital a los quince años de Lindsey Larios.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Style+Script&display=swap" rel="stylesheet">
 <!-- El ?v= obliga al navegador a bajar la version nueva en vez de usar
      la que tenga guardada. Subir el numero al cambiar estilos o logica. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=8">
+<link rel="stylesheet" href="assets/css/estilos.css?v=10">
 </head>
 <body class="bloqueado">
 
@@ -150,6 +150,23 @@
       <path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
 
+    <!-- Filete dorado: la linea con el adorno de cuatro lazos del diseño -->
+    <symbol id="ico-filete" viewBox="0 0 320 40">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M5 20h119M196 20h119"/>
+        <path d="M137 20h20M163 20h20"/>
+        <circle cx="130" cy="20" r="3.4"/>
+        <circle cx="190" cy="20" r="3.4"/>
+        <path d="M160 19c-9-5-9-16 0-16s9 11 0 16Z"/>
+        <path d="M160 21c-9 5-9 16 0 16s9-11 0-16Z"/>
+        <path d="M159 20c-5-7-18-7-18 0s13 7 18 0Z"/>
+        <path d="M161 20c5-7 18-7 18 0s-13 7-18 0Z"/>
+      </g>
+      <path d="M160 16.4 163.6 20 160 23.6 156.4 20Z" fill="currentColor"/>
+      <circle cx="5" cy="20" r="2" fill="currentColor"/>
+      <circle cx="315" cy="20" r="2" fill="currentColor"/>
+    </symbol>
+
     <!-- Chevron -->
     <symbol id="ico-chevron" viewBox="0 0 24 14">
       <path d="M2 2l10 10L22 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -188,17 +205,33 @@
      ==================================================================== -->
 <main class="invitacion" id="invitacion">
 
-  <!-- ---------------- HERO ---------------- -->
+  <!-- ---------------- HERO ----------------
+       Reproduce el diseño hecho en Canva. El lienzo tiene la misma
+       proporcion que el original (943x2000) y todo lo que va encima se
+       coloca en porcentajes de ese lienzo, asi que la composicion entera
+       escala sin deformarse en cualquier pantalla.
+       ------------------------------------------------------------------ -->
   <header class="hero">
-    <svg class="hero__lazo" id="heroLazo"><use href="#ico-lazo"/></svg>
-    <div class="hero__titulo">
-      <svg class="hero__tiara"><use href="#ico-tiara"/></svg>
-      <p class="hero__mis">Mis</p>
-      <p class="hero__num">15</p>
-      <p class="hero__quince">Quince</p>
+    <div class="lienzo" id="heroLienzo">
+      <img class="lienzo__marco" id="heroMarco" src="" alt="" aria-hidden="true">
+
+      <p class="lienzo__mis">Mis</p>
+      <p class="lienzo__xv">XV</p>
+      <h2 class="lienzo__nombre" id="heroNombre">Lindsey</h2>
+
+      <figure class="arco">
+        <div class="arco__interior">
+          <img class="arco__foto" id="heroFoto" src="" alt="">
+          <svg class="arco__dibujo" id="heroDibujo" hidden><use href="#ico-vestido"/></svg>
+        </div>
+      </figure>
+
+      <p class="lienzo__dia" id="heroDia">Viernes</p>
+      <p class="lienzo__fecha" id="heroFecha">11 de diciembre</p>
+      <p class="lienzo__lugar" id="heroLugar">Dirección por confirmar</p>
+      <svg class="lienzo__filete" aria-hidden="true"><use href="#ico-filete"/></svg>
     </div>
-    <h2 class="hero__nombre" id="heroNombre">Lindsey Larios</h2>
-    <svg class="hero__vestido" id="heroVestido"><use href="#ico-vestido"/></svg>
+
     <div class="hero__cue" id="heroCue">
       <span>desliza</span>
       <svg><use href="#ico-chevron"/></svg>
@@ -388,8 +421,8 @@
 
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=8"></script>
-<script src="assets/js/subida.js?v=8"></script>
-<script src="assets/js/main.js?v=8"></script>
+<script src="assets/js/config.js?v=10"></script>
+<script src="assets/js/subida.js?v=10"></script>
+<script src="assets/js/main.js?v=10"></script>
 </body>
 </html>

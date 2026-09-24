@@ -17,6 +17,11 @@ dos minutos en reflejar los cambios.
 > valores reales no deben escribirse aquí: el historial de git los conservaría
 > para siempre aunque después se borren.
 
+> **La foto del arco es de muestra.** Es la que venía en el diseño de Canva,
+> o sea una foto de banco. Hay que reemplazarla por la foto real de Lindsey
+> antes de publicar; mientras tanto sirve para ver la composición armada. Si
+> se deja `hero.foto` vacío, en su lugar sale la ilustración SVG.
+
 ## Cómo verla
 
 ```bash
@@ -48,6 +53,7 @@ assets/js/config.js     <-- los datos del evento
 assets/js/main.js       lógica de la invitación
 assets/js/galeria.js    lógica del álbum
 assets/js/subida.js     el formulario de subir fotos, que usan las dos
+assets/img/             el marco floral y la foto del arco
 assets/audio/           aquí va la canción
 .claude/launch.json     configuración del servidor local
 ```
@@ -59,7 +65,7 @@ que quien únicamente quiere ver la fecha no se descarga decenas de fotos.
 
 ## Secciones
 
-**`index.html`** — Portada que se abre · Hero · Cuenta regresiva · Reserva este
+**`index.html`** — Portada que se abre · Portada de adentro · Cuenta regresiva · Reserva este
 día (calendario) · Padres · Carta · Lugar con mapa · Programa · Código de
 vestimenta · Lluvia de sobres · Confirmación por WhatsApp · Subir fotos ·
 Cierre.
@@ -77,6 +83,34 @@ que quiere agregar la suya, así que la tarjeta *Sube tus fotos* despliega ahí
 mismo el formulario en vez de mandarlo de vuelta a la invitación. Es el mismo
 código (`subida.js`) en los dos sitios, no una copia. Al terminar, el álbum se
 vuelve a pedir solo, así que la foto recién mandada aparece sin recargar.
+
+## La portada de adentro
+
+Lo primero que aparece al abrir la invitación es el diseño que se hizo en
+Canva, rehecho en HTML: el marco de acuarela, el nombre en cursiva, la foto
+dentro del arco rosa, la fecha y el filete dorado.
+
+No es una captura de pantalla. El lienzo guarda la misma proporción que el
+original (943×2000) y todo lo que va encima se coloca en porcentajes de ese
+lienzo, así que la composición escala como una sola pieza: en un celular de
+360 px y en la columna de 480 px se ve idéntica, solo más chica o más grande.
+Las medidas no son a ojo, salieron de medir el PNG del diseño.
+
+Que sea HTML y no imagen es lo que permite que **la fecha y la dirección
+salgan de `config.js`**, las mismas que usa el resto de la página. Cambiar
+`fecha` mueve a la vez la cuenta regresiva, el calendario, el `.ics` y lo que
+dice la portada. Una captura habría que rehacerla en Canva cada vez.
+
+La dirección se ancla por abajo en vez de por arriba, porque la real puede
+ser más larga que la del diseño: si necesita un tercer renglón, crece hacia
+el hueco que tiene encima y no se mete sobre el filete.
+
+| Qué | Dónde |
+|---|---|
+| Marco floral | `assets/img/marco-floral.webp` (el PNG de Canva, 1.9 MB → 82 KB) |
+| Foto del arco | `assets/img/foto-muestra.webp` — **de muestra**, ver abajo |
+| Tipografías | Playfair Display (serif) y Style Script (la firma) |
+| Posiciones y tamaños | `assets/css/estilos.css`, bloque HERO |
 
 ## Lo que hace que no sea un Canva
 
@@ -99,13 +133,13 @@ de imágenes externas.
 
 ## Estado actual
 
-Los datos son de muestra, salvo el nombre. La fecha del **sábado 27 de marzo de
-2027** está puesta solo para que la cuenta regresiva se vea funcionando.
+Los datos son de muestra, salvo el nombre y la fecha (**viernes 11 de
+diciembre de 2026**).
 
 | Qué falta | Dónde |
 |---|---|
 | Canción de fondo | poner el mp3 en `assets/audio/cancion.mp3` |
-| Fecha real del evento | `config.js` → `fecha` |
+| **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
 | Nombres de los padres | `config.js` → `padres` |
 | Texto real de la carta | `config.js` → `carta` |
 | Dirección y enlace de Google Maps | `config.js` → `lugar` |

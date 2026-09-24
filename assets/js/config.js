@@ -16,6 +16,25 @@ window.CONFIG = {
   /* Formato: AÑO, MES(1-12), DIA, HORA(0-23), MINUTO                      */
   fecha: { anio: 2026, mes: 12, dia: 11, hora: 17, minuto: 0 },
 
+  /* ---- La portada de adentro -----------------------------------------
+     Es lo primero que se ve al abrir la invitacion: el diseño de Canva,
+     rehecho en HTML. El lienzo mide 943x2000 y todo lo de encima se
+     coloca en proporcion a ese ancho, asi que escala solo.              */
+  hero: {
+    /* Marco floral. Es el PNG exportado de Canva, pasado a WebP:
+       de 1.9 MB a 82 KB sin diferencia visible. */
+    marco: 'assets/img/marco-floral.webp',
+    lienzo: '943 / 2000',
+
+    /* Foto dentro del arco.
+       PENDIENTE: la que esta puesta es la del mockup de Canva, o sea una
+       foto de banco, solo de muestra. Hay que cambiarla por la foto real
+       de Lindsey antes de publicar. Si se deja en '' se ve en su lugar la
+       ilustracion SVG de la quinceañera. */
+    foto: 'assets/img/foto-muestra.webp',
+    fotoAlt: 'Lindsey el día de sus quince años'
+  },
+
   /* ---- Los papas ------------------------------------------------------ */
   padres: ['Guillermo Larios', 'Hacknier Ruiz'],
 
