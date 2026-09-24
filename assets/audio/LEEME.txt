@@ -1,1 +1,92 @@
-Aqui va la cancion de fondo, con el nombre cancion.mp3 (o cambia la ruta en assets/js/config.js)
+LA CANCION DE FONDO
+===================
+
+Ya esta puesta:  cancion.mp3
+(la ruta se cambia en assets/js/config.js -> musica.archivo)
+
+  58.4 segundos | 128 kbps CBR | estereo 44.1 kHz | 913 KB
+
+
+QUE SE LE HIZO
+--------------
+Llego ya recortada a 63 segundos, que es lo que mas importa para que
+cargue rapido. Lo que le sobraba era el final.
+
+Mirando la onda, el final del archivo original era asi:
+
+    hasta 57.8 s   la cancion, a nivel pleno
+    57.8 - 58.3 s  su propio fade-out, limpio
+    58.3 - 58.4 s  silencio
+    58.4 - 59.3 s  un TIMBRE a 0 dBFS, mas fuerte que la cancion misma;
+                   lo dejo el conversor online, no es parte del tema
+    59.3 - 62.4 s  la cola del timbre apagandose y 2.5 s de silencio
+
+Como la cancion suena en bucle, ese timbre y ese silencio se escuchaban
+en cada vuelta: parecia que la musica se cortaba y despues sonaba una
+campanita.
+
+Se corto en 58.38 s, justo en el silencio que hay entre el fade propio
+de la cancion y el timbre. Asi se va todo lo que sobraba y el fade queda
+intacto, que es lo que hace que el bucle no chasquee al volver a empezar.
+
+    duracion   62.48 s -> 58.38 s
+    tamaño        977 KB ->  913 KB
+
+El corte es a nivel de fotogramas MP3, SIN volver a comprimir: no se
+pierde nada de calidad. De paso se actualizo la cabecera "Info" del
+archivo, que lleva la cuenta de fotogramas y bytes; si se recorta y no se
+actualiza, el archivo queda anunciando una duracion que ya no tiene.
+
+El arranque no se toco: ya subia a nivel pleno en medio segundo.
+El original sin recortar sigue en la carpeta de Descargas.
+
+
+POR QUE SIGUE SIENDO .mp3 Y NO SE PASO A .m4a
+---------------------------------------------
+Porque ya venia comprimida a 128 kbps. Volver a comprimir algo que ya
+perdio calidad la hace perder otra vez, y se ganaban unos 300 KB: no
+compensa. El .m4a conviene cuando se parte de un archivo original
+(un CD, un wav, un mp3 de 320), no de uno ya apretado.
+
+El mp3 ademas se puede empezar a tocar desde el primer fotograma, asi
+que no tiene el problema del indice al final que sufre el mp4.
+
+
+SI ALGUN DIA SE CAMBIA LA CANCION
+---------------------------------
+Partiendo de un archivo de buena calidad, con ffmpeg:
+
+    winget install Gyan.FFmpeg
+
+    ffmpeg -ss 00:00:45 -t 00:01:30 -i "original.mp3" ^
+           -ac 1 -c:a aac -b:a 96k ^
+           -af "afade=t=in:st=0:d=2,afade=t=out:st=86:d=4" ^
+           -movflags +faststart ^
+           assets/audio/cancion.m4a
+
+  -ss / -t            recorta; es lo que mas pesa para que cargue rapido
+  -ac 1               mono, pesa la mitad y nadie lo nota en un celular
+  -b:a 96k            de sobra para musica de fondo; 64k tambien sirve
+  -af afade           entra y sale suave, para que el bucle no de un salto
+  -movflags faststart imprescindible en .m4a: pone el indice al principio.
+                      Sin eso el navegador baja el archivo ENTERO antes de
+                      tocar la primera nota.
+
+Acordate de cambiar tambien la extension en config.js.
+
+
+CUANDO SE BAJA
+--------------
+No al cargar la pagina. Se baja en el ratito que el invitado pasa
+mirando la portada, antes de tocar "Abrir invitacion". Asi la pagina
+abre igual de rapido y la musica suena apenas toca, sin el silencio de
+un par de segundos que habria si empezara a bajar en ese momento.
+Se apaga con  musica.precargar: false  en config.js.
+
+
+OJO: EL REPOSITORIO ES PUBLICO
+------------------------------
+La cancion esta subida a un repositorio que cualquiera puede ver, y el
+historial de git la conserva aunque despues se borre el archivo. Si se
+cambia por otra, la anterior se queda ahi para siempre y va sumando
+peso al repositorio.

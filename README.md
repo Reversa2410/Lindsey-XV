@@ -138,13 +138,53 @@ diciembre de 2026**).
 
 | Qué falta | Dónde |
 |---|---|
-| Canción de fondo | poner el mp3 en `assets/audio/cancion.mp3` |
 | **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
 | Nombres de los padres | `config.js` → `padres` |
 | Texto real de la carta | `config.js` → `carta` |
 | Dirección y enlace de Google Maps | `config.js` → `lugar` |
 | Número de WhatsApp para confirmaciones | `config.js` → `rsvp.whatsapp` |
 | Enlace para subir fotos | `config.js` → `fotos.enlace` |
+
+## Sobre la canción
+
+La página **no baja la canción al cargar**: el `<audio>` va con
+`preload="none"`, así que no pesa ni un byte en el arranque. Eso solo movía
+el problema de lugar, porque entonces la descarga empezaba recién al tocar
+*Abrir invitación* y quedaba un silencio incómodo justo en el mejor momento.
+
+Así que se usa el hueco que hay entre las dos cosas: cuando la página ya
+terminó de cargar todo lo demás y el invitado todavía está mirando la
+portada, ahí se baja la canción. Medido en local, con un archivo de 1.9 MB:
+
+| | Al tocar el botón | Tarda en sonar |
+|---|---|---|
+| Antes | sin nada descargado | 142 ms |
+| Ahora | archivo completo en memoria | **7 ms** |
+
+Y la carga de la página no se toca: el `load` termina a los 929 ms y la
+canción arranca a los 1019 ms, después, sin quitarle ancho de banda al
+marco floral ni a las tipografías.
+
+Con datos limitados o red 2G no se adelanta nada, porque esos megas los paga
+el invitado: en ese caso se baja solo si de verdad le da play. Se apaga del
+todo con `musica.precargar: false`.
+
+**El archivo.** `assets/audio/cancion.mp3`, 58 segundos, 913 KB. Llegó ya
+recortada, que es lo que más importa para que cargue rápido. Lo que le sobraba
+era el final: después de su propio fade-out traía un timbre a 0 dBFS que dejó
+el conversor online —más fuerte que la canción misma— y detrás 2.5 segundos de
+silencio digital. Como suena en bucle, los dos se escuchaban en cada vuelta.
+
+Se cortó en 58.38 s, justo en el silencio que hay entre el fade de la canción
+y el timbre: se va todo lo que sobraba y el fade queda intacto, que es lo que
+evita que el bucle chasquee. El corte es a nivel de fotogramas MP3, sin volver
+a comprimir, así que no perdió nada de calidad.
+
+Se quedó en `.mp3` y no se pasó a `.m4a` a propósito: ya venía comprimida a
+128 kbps, y volver a comprimir algo que ya perdió calidad la hace perder otra
+vez a cambio de unos 300 KB. El detalle está en
+[`assets/audio/LEEME.txt`](assets/audio/LEEME.txt), junto con la receta para
+el día que se cambie la canción.
 
 ## Sobre la sección de fotos
 

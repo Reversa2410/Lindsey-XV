@@ -102,8 +102,15 @@ window.CONFIG = {
   /* ---- Musica de fondo ------------------------------------------------ */
   musica: {
     activo: true,
-    archivo: 'assets/audio/cancion.mp3',  // <-- PENDIENTE: poner el mp3 ahi
-    titulo: 'Canción de Lindsey'
+    archivo: 'assets/audio/cancion.mp3',
+    titulo: 'Canción de Lindsey',
+
+    /* La cancion no se baja al cargar la pagina, sino en el ratito que el
+       invitado pasa mirando la portada antes de tocarla. Asi la pagina
+       abre igual de rapido y la musica suena apenas toca el boton, sin
+       ese silencio de dos segundos mientras empieza a bajar.
+       Ponlo en false para que no baje nada hasta que le den play. */
+    precargar: true
   },
 
   /* ---- Fotos y videos de los invitados --------------------------------

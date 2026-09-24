@@ -408,6 +408,48 @@
     btnMusica.addEventListener('click', function () {
       if (audio.paused) reproducir(); else pausar();
     });
+
+    if (C.musica.precargar !== false) adelantarDescarga();
+  }
+
+  /* ----------------------------------------------------------------------
+     Adelantar la descarga de la cancion.
+
+     El <audio> viene con preload="none", asi que al cargar la pagina no
+     baja ni un byte: la portada, el marco floral y las tipografias no
+     compiten con la cancion. Eso ya estaba bien.
+
+     Lo que faltaba es el otro lado: si la descarga arranca recien cuando
+     el invitado toca "Abrir invitacion", queda un silencio incomodo hasta
+     que llegan los primeros segundos. Con el internet de un salon lleno
+     pueden ser dos o tres.
+
+     Asi que se usa el hueco que hay entre las dos cosas: la pagina YA
+     termino de cargar todo lo demas, y el invitado todavia esta mirando
+     la portada antes de tocar. Ahi se baja la cancion, sin quitarle
+     ancho de banda a nada, y al tocar el boton suena de una.
+     ---------------------------------------------------------------------- */
+  function adelantarDescarga() {
+    /* Con ahorro de datos o red lenta no se adelanta nada: esos megas los
+       paga el invitado. Que los gaste solo si de verdad le da play. */
+    var red = navigator.connection;
+    if (red && (red.saveData || /(^|-)2g$/.test(red.effectiveType || ''))) return;
+
+    function bajar() {
+      /* Si ya viene sonando (por ejemplo al volver del album), load()
+         reiniciaria la reproduccion. Mejor no tocar nada. */
+      if (!audio.paused || audio.currentTime > 0) return;
+      audio.preload = 'auto';
+      audio.load();
+    }
+
+    function enElHueco() {
+      if (window.requestIdleCallback) requestIdleCallback(bajar, { timeout: 2000 });
+      else setTimeout(bajar, 600);
+    }
+
+    if (document.readyState === 'complete') enElHueco();
+    else window.addEventListener('load', enElHueco, { once: true });
   }
 
   function reproducir() {
