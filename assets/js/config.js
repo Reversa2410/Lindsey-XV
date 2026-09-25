@@ -51,17 +51,24 @@ window.CONFIG = {
   firmaCarta: 'Con cariño, mamá y papá',
 
   /* ---- Lugar ----------------------------------------------------------
-     ATENCION: datos INVENTADOS. Este repositorio es PUBLICO.
-     El nombre real del salon y su enlace de Google Maps NO van aqui:
-     revelan donde estara la familia completa, a una hora conocida.
-     El dato real se pone al final, fuera del repositorio.
+     Datos reales del salón.
+
+     OJO: este repositorio es PUBLICO, asi que la direccion y el enlace de
+     Maps quedan en el historial de git aunque un dia se borren de aqui.
+     Se puso a proposito, con el visto bueno de la familia, porque la
+     invitacion es una beta que se comparte igual. Si alguna vez hace falta
+     que esto deje de ser publico, no basta con borrar la linea: hay que
+     pasar el repositorio a privado.
+
+     El enlace corto es el que dio Google al compartir la ubicacion. El
+     embebido apunta a las mismas coordenadas de ese enlace, porque el
+     corto no se puede meter dentro de un <iframe>.
      --------------------------------------------------------------------- */
   lugar: {
-    nombre: 'Salón Villa Estelar',                                        // ficticio
-    direccion: 'De la Catedral de León, 3 cuadras al norte y 1½ al este', // ficticio
-    /* Mapa generico de Leon, NO la ubicacion real del salon */
-    mapaEnlace: 'https://maps.google.com/?q=Le%C3%B3n,+Nicaragua',
-    mapaEmbed: 'https://www.google.com/maps?q=Le%C3%B3n,+Nicaragua&z=14&output=embed'
+    nombre: 'Punto Azzurro',
+    direccion: 'Primera entrada Reparto San Mateo',
+    mapaEnlace: 'https://maps.app.goo.gl/AQnhck8FcrtuuYdQ9',
+    mapaEmbed: 'https://www.google.com/maps?q=12.4342037,-86.8999011&z=17&output=embed'
   },
 
   /* ---- Itinerario (deja [] para ocultar la seccion) ------------------- */

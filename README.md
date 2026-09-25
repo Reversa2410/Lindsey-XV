@@ -11,11 +11,15 @@ Repositorio: <https://github.com/Reversa2410/Lindsey-XV>
 La página publicada se actualiza sola con cada `git push` a `main`. Tarda uno o
 dos minutos en reflejar los cambios.
 
-> **Este repositorio es público.** Los datos sensibles del evento —dirección
-> exacta del salón, WhatsApp de la familia y enlace de subida de fotos— son
-> **ficticios a propósito** y están marcados como tales en `config.js`. Los
-> valores reales no deben escribirse aquí: el historial de git los conservaría
-> para siempre aunque después se borren.
+> **Este repositorio es público.** La dirección del salón y su enlace de Google
+> Maps sí son los reales: se pusieron a propósito, porque la invitación se
+> comparte igual. Conviene saber que el historial de git los conserva para
+> siempre aunque un día se borren de `config.js`; si alguna vez hace falta que
+> dejen de ser públicos, hay que pasar el repositorio a privado, no basta con
+> borrar la línea.
+>
+> El WhatsApp de la familia sigue **sin poner**, porque todavía no se usa para
+> nada: las confirmaciones van a una hoja de cálculo.
 
 > **La foto del arco es de muestra.** Es la que venía en el diseño de Canva,
 > o sea una foto de banco. Hay que reemplazarla por la foto real de Lindsey
@@ -133,16 +137,15 @@ de imágenes externas.
 
 ## Estado actual
 
-Los datos son de muestra, salvo el nombre y la fecha (**viernes 11 de
-diciembre de 2026**).
+Ya son reales el nombre, la fecha (**viernes 11 de diciembre de 2026**) y el
+lugar (**Punto Azzurro**, primera entrada Reparto San Mateo).
 
 | Qué falta | Dónde |
 |---|---|
 | **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
+| **Publicar la versión del script con la tabla de asistencia** | `google-apps-script/LEEME.md`, paso 7 |
 | Nombres de los padres | `config.js` → `padres` |
 | Texto real de la carta | `config.js` → `carta` |
-| Dirección y enlace de Google Maps | `config.js` → `lugar` |
-| Publicar la versión del script con la tabla de asistencia | `google-apps-script/LEEME.md`, paso 7 |
 | Enlace para subir videos | `config.js` → `fotos.destinos` |
 | WhatsApp de contacto (para más adelante) | `config.js` → `rsvp.whatsapp` |
 
