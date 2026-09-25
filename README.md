@@ -4,12 +4,18 @@ Invitación de quince años hecha como página web. Una sola columna, pensada
 primero para celular. Sin dependencias, sin framework y sin paso de compilación:
 es HTML, CSS y JavaScript plano.
 
-**Ver en vivo: <https://reversa2410.github.io/Lindsey-XV/>**
+**Ver en vivo (beta): <https://lindsey-xv.vercel.app>**
 
 Repositorio: <https://github.com/Reversa2410/Lindsey-XV>
 
-La página publicada se actualiza sola con cada `git push` a `main`. Tarda uno o
-dos minutos en reflejar los cambios.
+Se despliega en **Vercel**, sin build: es HTML plano, así que el repositorio se
+sirve tal cual. Cada `git push` a `main` redespliega solo, en menos de un
+minuto. La caché la fija [`vercel.json`](vercel.json): larga para el marco
+floral y la canción, que no cambian, y corta para el HTML, que sí.
+
+Sigue existiendo la copia en GitHub Pages
+(<https://reversa2410.github.io/Lindsey-XV/>), que se actualiza con el mismo
+push. La buena es la de Vercel.
 
 > **Este repositorio es público.** La dirección del salón y su enlace de Google
 > Maps sí son los reales: se pusieron a propósito, porque la invitación se
