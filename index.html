@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Italiana&family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Style+Script&display=swap" rel="stylesheet">
 <!-- El ?v= obliga al navegador a bajar la version nueva en vez de usar
      la que tenga guardada. Subir el numero al cambiar estilos o logica. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=11">
+<link rel="stylesheet" href="assets/css/estilos.css?v=12">
 </head>
 <body class="bloqueado">
 
@@ -335,20 +335,15 @@
   <section class="seccion seccion--rsvp" id="seccionRsvp">
     <h3 class="titulo reveal">Confirma tu asistencia</h3>
     <p class="parrafo reveal" id="rsvpTexto"></p>
-    <form class="rsvp reveal" id="rsvpForm" autocomplete="off">
+    <p class="rsvp__nota reveal" id="rsvpNota" hidden></p>
+    <form class="rsvp reveal" id="rsvpForm" autocomplete="on">
       <label class="campo">
-        <span>Tu nombre</span>
-        <input type="text" id="rsvpNombre" placeholder="Nombre y apellido" required>
+        <span>Nombre</span>
+        <input type="text" id="rsvpNombre" placeholder="Tu nombre" autocomplete="given-name" required>
       </label>
       <label class="campo">
-        <span>¿Cuántos asistirán?</span>
-        <select id="rsvpCantidad">
-          <option value="1">1 persona</option>
-          <option value="2">2 personas</option>
-          <option value="3">3 personas</option>
-          <option value="4">4 personas</option>
-          <option value="5">5 o más</option>
-        </select>
+        <span>Apellido</span>
+        <input type="text" id="rsvpApellido" placeholder="Tu apellido" autocomplete="family-name" required>
       </label>
       <div class="campo">
         <span>¿Nos acompañas?</span>
@@ -357,7 +352,8 @@
           <input type="radio" name="asiste" id="asisteNo" value="no"><label for="asisteNo">No podré</label>
         </div>
       </div>
-      <button type="submit" class="boton boton--solido boton--ancho">Enviar por WhatsApp</button>
+      <button type="submit" class="boton boton--solido boton--ancho" id="rsvpEnviar">Confirmar asistencia</button>
+      <p class="subida__estado" id="rsvpEstado" hidden></p>
     </form>
   </section>
 
@@ -421,8 +417,8 @@
 
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=11"></script>
-<script src="assets/js/subida.js?v=11"></script>
-<script src="assets/js/main.js?v=11"></script>
+<script src="assets/js/config.js?v=12"></script>
+<script src="assets/js/subida.js?v=12"></script>
+<script src="assets/js/main.js?v=12"></script>
 </body>
 </html>

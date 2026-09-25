@@ -67,7 +67,7 @@ que quien únicamente quiere ver la fecha no se descarga decenas de fotos.
 
 **`index.html`** — Portada que se abre · Portada de adentro · Cuenta regresiva · Reserva este
 día (calendario) · Padres · Carta · Lugar con mapa · Programa · Código de
-vestimenta · Lluvia de sobres · Confirmación por WhatsApp · Subir fotos ·
+vestimenta · Lluvia de sobres · Confirmación de asistencia · Subir fotos ·
 Cierre.
 
 **`galeria.html`** — El álbum con las fotos que suben los invitados, con visor
@@ -119,7 +119,7 @@ el hueco que tiene encima y no se mete sobre el filete.
 - Cuenta regresiva en vivo, con animación en cada cifra que cambia.
 - Apariciones escalonadas al hacer scroll y parallax suave en el hero.
 - Botón **Agregar a mi calendario** que descarga un `.ics` real.
-- Formulario de confirmación que arma el mensaje y lo manda por WhatsApp.
+- Formulario de confirmación que escribe una fila en una hoja de cálculo.
 - Mapa embebido del lugar.
 - Pétalos flotantes y lluvia final al llegar al cierre.
 - Barra de progreso de lectura y reproductor de música flotante.
@@ -142,8 +142,66 @@ diciembre de 2026**).
 | Nombres de los padres | `config.js` → `padres` |
 | Texto real de la carta | `config.js` → `carta` |
 | Dirección y enlace de Google Maps | `config.js` → `lugar` |
-| Número de WhatsApp para confirmaciones | `config.js` → `rsvp.whatsapp` |
-| Enlace para subir fotos | `config.js` → `fotos.enlace` |
+| Publicar la versión del script con la tabla de asistencia | `google-apps-script/LEEME.md`, paso 7 |
+| Enlace para subir videos | `config.js` → `fotos.destinos` |
+| WhatsApp de contacto (para más adelante) | `config.js` → `rsvp.whatsapp` |
+
+## Sobre la confirmación de asistencia
+
+El invitado escribe **nombre y apellido**, marca si va o no, y eso se va como
+una fila a una hoja de cálculo de Google:
+
+| Fecha | Nombre | Apellido | Asiste |
+|---|---|---|---|
+| 2026-11-20 19:42 | Kevin | Torrez | Sí |
+| 2026-11-20 20:05 | Ana | Mejía | No |
+
+**No se pregunta cuántas personas van.** Los lugares están asignados de
+antemano, así que dejarlo a elección del invitado solo abre la puerta a que el
+número no cuadre con lo que ya se planeó. Lo único que falta saber es quién
+viene.
+
+Lo escribe el **mismo script de Google** que recibe las fotos, así que no hay
+un segundo servicio que configurar. El paso a paso está en
+[`google-apps-script/LEEME.md`](google-apps-script/LEEME.md), paso 7.
+
+> El script tiene que volver a publicarse (**nueva versión** de la
+> implementación) para que sepa recibir confirmaciones. Con el publicado antes
+> de este cambio, la invitación responde *No se pudo enviar tu confirmación*.
+
+Si la misma persona confirma dos veces se actualiza su fila en vez de agregar
+otra, porque una lista con duplicados no sirve para contar lugares.
+
+Ya no se manda por WhatsApp. `rsvp.whatsapp` se quedó en `config.js` vacío,
+apuntado para cuando se agregue el contacto de la familia.
+
+## Botones apagados a propósito (beta)
+
+Tres botones se ven y se pueden tocar, pero por ahora solo avisan
+*Botón deshabilitado temporalmente*:
+
+- **Subir fotos**
+- **Subir videos**
+- **Álbum de la noche** (la tarjeta y el botón flotante de la cámara)
+
+El interruptor está en `config.js` → `fotos.deshabilitados`. Se apagan desde
+ahí y no borrando los enlaces justamente para **no tocar la configuración de
+Drive ni la de OneDrive**: esos datos quedan intactos, y poner el interruptor
+en `false` devuelve cada botón a su funcionamiento normal sin ningún otro
+cambio.
+
+```js
+deshabilitados: {
+  subirFotos: true,
+  subirVideos: true,
+  album: true,
+  mensaje: 'Botón deshabilitado temporalmente'
+}
+```
+
+La página del álbum (`galeria.html`) sigue existiendo: lo que se apaga son los
+caminos que llevan a ella. Quien escriba la dirección a mano la verá, aunque
+con el botón de subir también apagado ahí dentro.
 
 ## Sobre la canción
 

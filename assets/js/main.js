@@ -98,6 +98,10 @@
     if (C.rsvp && C.rsvp.activo) {
       $('rsvpTexto').textContent = 'Por favor confirma antes del ' + C.rsvp.limite +
                                    ' para reservar tu lugar.';
+      if (C.rsvp.nota) {
+        $('rsvpNota').textContent = C.rsvp.nota;
+        $('rsvpNota').hidden = false;
+      }
     } else {
       $('seccionRsvp').style.display = 'none';
     }
@@ -110,24 +114,86 @@
     }
   }
 
+  /* ----------------------------------------------------------------------
+     BOTONES APAGADOS A PROPOSITO (beta)
+
+     Los botones de subir fotos, subir videos y ver el album se siguen
+     viendo y se pueden tocar, pero por ahora solo avisan que estan
+     apagados. Se hace desde aqui y no borrando los enlaces justamente
+     para no tocar la configuracion de Drive ni la de OneDrive: esos
+     datos quedan intactos y el dia que se encienda el interruptor en
+     config.js todo vuelve a funcionar sin mas cambios.
+     ---------------------------------------------------------------------- */
+  function apagado(llave) {
+    var d = C.fotos && C.fotos.deshabilitados;
+    return !!(d && d[llave]);
+  }
+
+  function mensajeApagado() {
+    var d = C.fotos && C.fotos.deshabilitados;
+    return (d && d.mensaje) || 'Botón deshabilitado temporalmente';
+  }
+
+  /* Que interruptor le toca a cada destino: el formulario de Drive es el de
+     las fotos, cualquier otro destino es el enlace de los videos. */
+  function llaveDeDestino(d) {
+    return d.tipo === 'drive' ? 'subirFotos' : 'subirVideos';
+  }
+
+  /* El aviso flotante que sale al tocar un boton apagado. Se crea la
+     primera vez que hace falta y despues se reusa. */
+  var toast = null;
+  var toastReloj = null;
+
+  function avisar(texto) {
+    if (!toast) {
+      toast = document.createElement('p');
+      toast.className = 'toast';
+      toast.setAttribute('role', 'status');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = texto;
+    /* Reiniciar la animacion si ya estaba a la vista */
+    toast.classList.remove('toast--visible');
+    void toast.offsetWidth;
+    toast.classList.add('toast--visible');
+
+    clearTimeout(toastReloj);
+    toastReloj = setTimeout(function () {
+      toast.classList.remove('toast--visible');
+    }, 2600);
+  }
+
   /* Dibuja los destinos de subida (uno para fotos, otro para videos).
-     Un destino sin enlace se muestra apagado y no se puede tocar, para
-     que se note que falta conectarlo en vez de llevar a una pagina rota. */
+     Un destino se muestra apagado en dos casos: porque su interruptor de
+     config lo apago a proposito, o porque todavia le falta el enlace. En
+     el primero avisa al tocarlo; en el segundo ni siquiera se puede tocar,
+     para que se note que falta conectarlo en vez de llevar a una pagina
+     rota. */
   function pintarFotos() {
     $('fotosTitulo').textContent = C.fotos.titulo;
     $('fotosTexto').textContent = C.fotos.texto;
 
     var destinos = C.fotos.destinos || [];
     var sinEnlace = 0;
+    var hayApagados = false;
 
-    var html = destinos.map(function (d, i) {
+    var html = destinos.map(function (d) {
       var esFormulario = d.tipo === 'drive';
+      var enPausa = apagado(llaveDeDestino(d));
       var listo = esFormulario ? driveListo() : !!d.enlace;
-      if (!listo) sinEnlace++;
 
-      var etiqueta = esFormulario ? 'button' : 'a';
+      if (enPausa) hayApagados = true;
+      else if (!listo) sinEnlace++;
+
+      /* En pausa siempre es un <button>: aunque el destino tenga enlace,
+         no queremos que lleve a ningun lado todavia. */
+      var etiqueta = (enPausa || esFormulario) ? 'button' : 'a';
       var atributos = '';
-      if (listo && esFormulario) {
+
+      if (enPausa) {
+        atributos = ' type="button" data-apagado="1"';
+      } else if (listo && esFormulario) {
         atributos = ' type="button" data-abre-subida="1"';
       } else if (listo) {
         atributos = ' href="' + escapar(d.enlace) + '" target="_blank" rel="noopener"';
@@ -135,8 +201,8 @@
         atributos = ' type="button" disabled';
       }
 
-      return '<' + etiqueta + ' class="destino' + (listo ? '' : ' destino--apagado') + '"' +
-             atributos + '>' +
+      return '<' + etiqueta + ' class="destino' +
+             (enPausa || !listo ? ' destino--apagado' : '') + '"' + atributos + '>' +
                '<svg class="destino__icono"><use href="#ico-' + escapar(d.icono) + '"/></svg>' +
                '<span class="destino__texto">' +
                  '<span class="destino__etiqueta">' + escapar(d.etiqueta) + '</span>' +
@@ -148,16 +214,21 @@
 
     /* El album se ofrece como un destino mas, junto a los de subir: es
        donde la gente lo va a buscar despues de mandar sus fotos. */
-    if (galeriaLista()) {
-      var g = C.fotos.galeria;
-      html += '<a class="destino destino--album" href="galeria.html">' +
-                '<svg class="destino__icono"><use href="#ico-camara"/></svg>' +
+    var g = C.fotos.galeria;
+    if (g && g.activa && (galeriaLista() || apagado('album'))) {
+      var albumEnPausa = apagado('album');
+      if (albumEnPausa) hayApagados = true;
+
+      html += albumEnPausa
+        ? '<button type="button" class="destino destino--album destino--apagado" data-apagado="1">'
+        : '<a class="destino destino--album" href="galeria.html">';
+      html +=   '<svg class="destino__icono"><use href="#ico-camara"/></svg>' +
                 '<span class="destino__texto">' +
                   '<span class="destino__etiqueta">' + escapar(g.titulo) + '</span>' +
                   '<span class="destino__nota">' + escapar(g.notaEnlace) + '</span>' +
                 '</span>' +
-                '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>' +
-              '</a>';
+                '<svg class="destino__flecha"><use href="#ico-flecha"/></svg>';
+      html += albumEnPausa ? '</button>' : '</a>';
     }
 
     $('fotosDestinos').innerHTML = html;
@@ -171,8 +242,15 @@
       });
     }
 
+    /* Un solo escucha para todos los apagados, en el contenedor. */
+    $('fotosDestinos').addEventListener('click', function (e) {
+      if (e.target.closest('[data-apagado]')) avisar(mensajeApagado());
+    });
+
     var aviso = $('fotosPendiente');
-    if (C.fotos.demo) {
+    if (hayApagados) {
+      aviso.textContent = 'Fotos, videos y álbum se activarán antes del evento';
+    } else if (C.fotos.demo) {
       aviso.textContent = 'Enlaces de muestra — se activarán antes del evento';
     } else if (sinEnlace) {
       aviso.textContent = sinEnlace === 1
@@ -224,13 +302,30 @@
      verdad un album que mostrar.
      ====================================================================== */
   function prepararBotonGaleria() {
-    if (!galeriaLista()) return;
+    var g = C.fotos && C.fotos.galeria;
+    if (!g || !g.activa) return;
 
-    var g = C.fotos.galeria;
+    var enPausa = apagado('album');
+    if (!galeriaLista() && !enPausa) return;
+
     var boton = $('btnGaleria');
     boton.hidden = false;
     boton.setAttribute('aria-label', 'Ver ' + g.titulo);
-    boton.title = 'Ver ' + g.titulo;
+    boton.title = enPausa ? mensajeApagado() : 'Ver ' + g.titulo;
+
+    /* Apagado sigue siendo el mismo boton, en el mismo sitio: solo deja de
+       llevar al album y avisa por que. Se le quita el href para que no se
+       pueda abrir en otra pestaña con el menu del navegador. */
+    if (enPausa) {
+      boton.classList.add('btnFlotante--apagado');
+      boton.removeAttribute('href');
+      boton.setAttribute('role', 'button');
+      boton.setAttribute('tabindex', '0');
+      boton.addEventListener('click', function (e) {
+        e.preventDefault();
+        avisar(mensajeApagado());
+      });
+    }
   }
 
   /* ----------------------------------------------------------------------
@@ -574,29 +669,109 @@
   }
 
   /* ======================================================================
-     9. CONFIRMACION POR WHATSAPP
+     9. CONFIRMACION DE ASISTENCIA
+     ----------------------------------------------------------------------
+     Cada confirmacion se va como una fila a una hoja de calculo de Google:
+     fecha, nombre, apellido y si asiste o no. Asi la familia tiene la lista
+     completa en un solo sitio, sin ir juntando mensajes sueltos.
+
+     La cantidad de personas no se pregunta: los lugares ya estan asignados
+     de antemano. Lo unico que falta saber es quien viene.
+
+     Lo escribe el MISMO script de Google que recibe las fotos, asi que no
+     hay servidor propio que contratar ni que se pueda caer.
      ====================================================================== */
+
+  /* El script del RSVP normalmente es el mismo de las fotos. Se deja la
+     opcion de apuntar a otro por si algun dia se separan. */
+  function urlRsvp() {
+    if (!C.rsvp || !C.rsvp.activo) return '';
+    if (C.rsvp.urlScript) return C.rsvp.urlScript;
+    var d = C.fotos && C.fotos.drive;
+    return (d && d.urlScript) || '';
+  }
+
   function prepararRsvp() {
     var form = $('rsvpForm');
-    if (!form) return;
+    if (!form || !C.rsvp || !C.rsvp.activo) return;
+
+    var boton = $('rsvpEnviar');
+    var estado = $('rsvpEstado');
+
+    /* Sin script publicado no hay donde escribir la fila. Mejor decirlo
+       antes de que alguien llene el formulario para nada. */
+    if (!urlRsvp()) {
+      boton.disabled = true;
+      mostrarEstadoRsvp('aviso', 'La confirmación se activará en unos días.');
+      return;
+    }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+
       var nombre = $('rsvpNombre').value.trim();
-      if (!nombre) return;
+      var apellido = $('rsvpApellido').value.trim();
+      if (!nombre || !apellido) return;
 
       var asiste = document.querySelector('input[name=asiste]:checked').value;
-      var cantidad = $('rsvpCantidad').value;
 
-      var mensaje = asiste === 'si'
-        ? '¡Hola! Soy ' + nombre + '. Confirmo mi asistencia a los XV de ' + C.nombre +
-          '. Seremos ' + cantidad + (cantidad === '1' ? ' persona.' : ' personas.')
-        : 'Hola, soy ' + nombre + '. Lamentablemente no podré acompañarlos en los XV de ' +
-          C.nombre + '. ¡Muchas felicidades!';
+      boton.disabled = true;
+      boton.textContent = 'Enviando…';
+      estado.hidden = true;
 
-      window.open('https://wa.me/' + C.rsvp.whatsapp + '?text=' +
-                  encodeURIComponent(mensaje), '_blank');
+      enviarRsvp(nombre, apellido, asiste)
+        .then(function () {
+          form.querySelectorAll('input').forEach(function (el) { el.disabled = true; });
+          boton.hidden = true;
+          mostrarEstadoRsvp('bien', asiste === 'si'
+            ? '¡Gracias, ' + nombre + '! Tu confirmación quedó registrada. Nos vemos ese día.'
+            : 'Gracias por avisarnos, ' + nombre + '. Te vamos a extrañar.');
+        })
+        .catch(function (err) {
+          boton.disabled = false;
+          boton.textContent = 'Confirmar asistencia';
+          mostrarEstadoRsvp('aviso',
+            'No se pudo enviar tu confirmación. Revisa tu conexión e inténtalo otra vez.');
+          console.warn('[XV] Falló la confirmación:', err);
+        });
     });
+  }
+
+  /* Ojo con el formato: va como formulario clasico, NO como JSON. Con JSON
+     el navegador manda antes una peticion OPTIONS ("preflight") que Apps
+     Script no sabe contestar, y la confirmacion falla por CORS. Es el mismo
+     truco que usa la subida de fotos; esta explicado a fondo en subida.js. */
+  function enviarRsvp(nombre, apellido, asiste) {
+    var cuerpo = new URLSearchParams();
+    cuerpo.set('accion', 'rsvp');
+    cuerpo.set('nombre', nombre);
+    cuerpo.set('apellido', apellido);
+    cuerpo.set('asiste', asiste);
+
+    return fetch(urlRsvp(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: cuerpo.toString()
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Google respondió ' + r.status);
+        return r.text();
+      })
+      .then(function (texto) {
+        /* Apps Script contesta 200 aunque algo haya fallado por dentro, asi
+           que hay que mirar el contenido de la respuesta. */
+        var r;
+        try { r = JSON.parse(texto); }
+        catch (e) { throw new Error('Respuesta inesperada'); }
+        if (!r || !r.ok) throw new Error((r && r.error) || 'Rechazada por el script');
+      });
+  }
+
+  function mostrarEstadoRsvp(tipo, texto) {
+    var estado = $('rsvpEstado');
+    estado.className = 'subida__estado subida__estado--' + tipo;
+    estado.textContent = texto;
+    estado.hidden = false;
   }
 
   /* ======================================================================

@@ -1,7 +1,18 @@
-# Receptor de fotos en Google Drive
+# Receptor de la invitación en Google
 
-Cómo dejar funcionando la subida de fotos de la invitación. Son unos diez
-minutos y todo es gratis.
+Un solo script de Google atiende las dos cosas que manda la invitación:
+
+| Qué | Dónde cae | Para qué |
+|---|---|---|
+| **Confirmaciones de asistencia** | Una hoja de cálculo | La tabla con quién viene y quién no |
+| **Fotos de los invitados** | Una carpeta de Drive | El álbum de la noche |
+
+Son unos diez minutos y todo es gratis.
+
+> **Para la beta solo hace falta la parte de las confirmaciones.** Los botones
+> de subir fotos, subir videos y ver el álbum están apagados a propósito desde
+> `config.js` (`fotos.deshabilitados`), así que los pasos de la carpeta de
+> Drive pueden esperar. La tabla de asistencia es el **Paso 7**.
 
 ## Por qué así
 
@@ -125,6 +136,82 @@ Debe devolver la lista de fotos en formato JSON. Si responde
 `{"ok":true,"mensaje":"Receptor activo"}` en vez de la lista, es que **falta
 crear una nueva versión de la implementación** (ver la sección de abajo).
 
+---
+
+## Paso 7 — La tabla de confirmaciones
+
+Cada invitado que confirme deja una fila en una hoja de cálculo:
+
+| Fecha | Nombre | Apellido | Asiste |
+|---|---|---|---|
+| 2026-11-20 19:42 | Kevin | Torrez | Sí |
+| 2026-11-20 20:05 | Ana | Mejía | No |
+
+La cantidad de personas **no** se pregunta: los lugares ya están asignados de
+antemano, así que lo único que falta saber es quién viene.
+
+### La hoja
+
+Tienes dos caminos. El cómodo es no hacer nada: si dejas `ID_HOJA_RSVP`
+vacío, el script **crea la hoja solo** la primera vez que alguien confirma, la
+deja en tu Drive con el nombre *Confirmaciones XV Lindsey*, y recuerda cuál es
+para escribir siempre en la misma.
+
+Si prefieres crearla tú (por ejemplo para compartirla con la familia desde el
+principio), crea una hoja en [sheets.google.com](https://sheets.google.com),
+copia su ID de la barra de direcciones y pégalo en el script:
+
+```
+https://docs.google.com/spreadsheets/d/1a2B3c4D5e6F7g8H9i/edit
+                                       └──── esto es el ID ────┘
+```
+
+```js
+const ID_HOJA_RSVP = '1a2B3c4D5e6F7g8H9i';
+```
+
+Los títulos de las columnas los pone el script solo la primera vez. No hay que
+preparar nada dentro de la hoja.
+
+### Permisos
+
+Escribir en una hoja es un permiso **nuevo** que el script antes no tenía. La
+primera vez que ejecutes algo que la toque, Google va a volver a pedir
+autorización aunque ya la hubieras dado para Drive. Es normal: acepta igual
+que en el Paso 3.
+
+Lo más cómodo es provocarlo tú desde el editor:
+
+1. En el desplegable de funciones, elige **probarHojaRsvp**.
+2. Pulsa **Ejecutar** y acepta los permisos.
+3. En el registro sale el enlace de la hoja. **Guárdalo**: ahí es donde vas a
+   ver la lista.
+
+### Conectarlo a la invitación
+
+Normalmente **no hay que tocar nada**: la invitación usa el mismo script de las
+fotos, así que con `fotos.drive.urlScript` ya puesto la confirmación funciona.
+
+`rsvp.urlScript` en `config.js` existe solo por si algún día quieres que las
+confirmaciones vayan a un script distinto del de las fotos. Si lo dejas vacío,
+se usa el de las fotos.
+
+### Si alguien confirma dos veces
+
+Se actualiza su fila en vez de agregar otra. Pasa cuando alguien se equivoca y
+vuelve a mandarlo, y una lista con duplicados no sirve para contar lugares. La
+comparación no distingue mayúsculas ni acentos, así que *kevin torrez* y
+*Kevin Tórrez* cuentan como la misma persona.
+
+### Acuérdate de publicar la versión nueva
+
+El script cambió, así que **hay que crear una nueva versión de la
+implementación** o la invitación seguirá hablando con el script viejo, que no
+sabe qué hacer con una confirmación. Ver *Cada vez que cambies el script*, aquí
+abajo. La URL no cambia.
+
+---
+
 ## Comprobar que funciona
 
 Abre la URL del script en el navegador. Debe responder:
@@ -152,6 +239,9 @@ La URL se mantiene, así que no hay que tocar `config.js` otra vez.
 | Responde que no tiene autorización | Falta aceptar los permisos del paso 3 |
 | `probarCarpeta` da error | El ID de la carpeta está mal copiado |
 | Los cambios del script no surten efecto | Falta crear una **nueva versión** al implementar |
+| Al confirmar dice *No llegó ningún archivo* | El script publicado es el viejo: falta la **nueva versión** |
+| Al confirmar dice que no tiene autorización | Falta aceptar el permiso de hojas de cálculo (Paso 7) |
+| La hoja de confirmaciones no aparece | Ejecuta **probarHojaRsvp** y mira el enlace en el registro |
 
 ## Límites que conviene saber
 

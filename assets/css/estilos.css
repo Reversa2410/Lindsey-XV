@@ -543,7 +543,13 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 
 /* ---------------------------------------------------------------- RSVP */
 .seccion--rsvp{background:var(--papel-2)}
-.rsvp{max-width:340px; margin:26px auto 0; text-align:left; display:grid; gap:16px}
+.rsvp{max-width:340px; margin:20px auto 0; text-align:left; display:grid; gap:16px}
+/* Explica por que no se pregunta cuantos van: los lugares ya estan dados. */
+.rsvp__nota{
+  max-width:340px; margin:14px auto 0;
+  font-size:.86rem; font-style:italic; line-height:1.55; color:var(--tinta-suave);
+}
+.rsvp__nota[hidden]{display:none}
 .campo{display:grid; gap:7px}
 .campo > span{
   font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--tinta-suave);
@@ -599,6 +605,34 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   opacity:.5; cursor:default; border-style:dashed;
 }
 .destino--apagado:hover{transform:none; box-shadow:none; background:#fff}
+/* Apagado a proposito (no por falta de enlace): se puede tocar, y al
+   tocarlo sale el aviso. Por eso conserva el cursor de mano. */
+.destino--apagado[data-apagado]{cursor:pointer}
+.destino--apagado[data-apagado]:active{opacity:.62}
+
+/* Aviso flotante de los botones apagados.
+   Se coloca POR ENCIMA de los botones flotantes, no al ras del borde: la
+   pila de musica + album ocupa los primeros 132 px de abajo y el aviso es
+   ancho, asi que centrado al ras le quedaria por debajo. */
+.toast{
+  position:fixed; z-index:90; left:50%; transform:translate(-50%, 14px);
+  bottom:calc(148px + env(safe-area-inset-bottom, 0px));
+  max-width:min(88vw, 340px); margin:0;
+  padding:11px 18px; border-radius:999px;
+  background:var(--tono-800); color:#fff;
+  font-family:var(--serif); font-size:.9rem; line-height:1.35; text-align:center;
+  box-shadow:0 10px 30px rgba(123,30,58,.32);
+  opacity:0; pointer-events:none;
+  transition:opacity .28s var(--curva), transform .28s var(--curva);
+}
+.toast--visible{opacity:1; transform:translate(-50%, 0)}
+
+/* El boton flotante del album, apagado: se queda en su sitio pero en
+   grises, para que se vea que ahora mismo no lleva a ningun lado. */
+.btnFlotante--apagado{
+  opacity:.55; filter:grayscale(.55); cursor:pointer;
+}
+.btnFlotante--apagado:hover{transform:none}
 
 /* ----------------------------------------------- FORMULARIO DE SUBIDA */
 .subida{display:grid; gap:16px; margin-top:20px; text-align:left}

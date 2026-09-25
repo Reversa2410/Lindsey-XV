@@ -1,9 +1,15 @@
 /**
  * ===========================================================================
- * RECEPTOR DE FOTOS — Invitación de XV de Lindsey
+ * RECEPTOR DE LA INVITACIÓN — XV de Lindsey
  * ---------------------------------------------------------------------------
- * Este script recibe las fotos que mandan los invitados desde la invitación
- * y las guarda en una carpeta de Google Drive.
+ * Este script atiende dos cosas que manda la invitación:
+ *
+ *   1. Las CONFIRMACIONES de asistencia. Cada una se escribe como una fila
+ *      en una hoja de cálculo: fecha, nombre, apellido y si asiste o no.
+ *   2. Las FOTOS de los invitados, que se guardan en una carpeta de Drive.
+ *
+ * La cantidad de personas no se pregunta: los lugares ya están asignados de
+ * antemano, así que la tabla solo registra quién viene y quién no.
  *
  * El invitado NO necesita cuenta de Google ni iniciar sesión: el script se
  * publica para que corra con TUS permisos, así que es tu cuenta la que
@@ -26,6 +32,25 @@ const ID_CARPETA = 'PEGA_AQUI_EL_ID_DE_LA_CARPETA';
    Recomendado ponerla: el enlace de la invitacion es publico.             */
 const ID_CARPETA_GALERIA = '';
 
+/* ---------------------------------------------------------------------------
+   HOJA DE LAS CONFIRMACIONES
+   ---------------------------------------------------------------------------
+   ID de la hoja de cálculo donde cae la tabla de asistencia. Se saca de la
+   barra de direcciones al abrir la hoja:
+   docs.google.com/spreadsheets/d/ESTO_DE_AQUI/edit
+
+   Si se deja vacío, el script CREA la hoja solo la primera vez que alguien
+   confirma y la deja en tu Drive con el nombre de abajo. Funciona igual,
+   pero conviene pegar el ID después para no perderla de vista.        */
+const ID_HOJA_RSVP = '';
+
+/* Nombre de la hoja que se crea sola, y de la pestaña de adentro. */
+const NOMBRE_HOJA_RSVP = 'Confirmaciones XV Lindsey';
+const PESTANA_RSVP = 'Confirmaciones';
+
+/* Zona horaria para la columna de la fecha. */
+const ZONA = 'America/Managua';
+
 /* Tope por archivo ya comprimido, como red de seguridad. */
 const MAX_MB = 25;
 
@@ -39,6 +64,9 @@ const TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/
 function doPost(e) {
   try {
     const p = (e && e.parameter) || {};
+
+    /* Una confirmación de asistencia, no una foto. */
+    if (p.accion === 'rsvp') return guardarRsvp(p);
 
     if (!p.archivo) {
       return responder({ ok: false, error: 'No llegó ningún archivo' });
@@ -92,6 +120,153 @@ function doGet(e) {
   const accion = (e && e.parameter && e.parameter.accion) || '';
   if (accion === 'listar') return listarFotos(e);
   return responder({ ok: true, mensaje: 'Receptor activo' });
+}
+
+
+/**
+ * ===========================================================================
+ * CONFIRMACIONES DE ASISTENCIA
+ * ===========================================================================
+ * Escribe una fila por cada invitado que confirma. La hoja queda así:
+ *
+ *   Fecha              | Nombre  | Apellido | Asiste
+ *   2026-11-20 19:42   | Kevin   | Torrez   | Sí
+ *
+ * Si la misma persona confirma dos veces, se actualiza su fila en vez de
+ * agregar otra: es lo que pasa cuando alguien se equivoca y vuelve a
+ * mandarlo, y una lista con duplicados no sirve para contar lugares.
+ */
+function guardarRsvp(p) {
+  const nombre = limpiarTexto(p.nombre);
+  const apellido = limpiarTexto(p.apellido);
+
+  if (!nombre || !apellido) {
+    return responder({ ok: false, error: 'Faltan el nombre o el apellido' });
+  }
+
+  const asiste = String(p.asiste) === 'si' ? 'Sí' : 'No';
+  const hoja = hojaRsvp();
+  const fecha = Utilities.formatDate(new Date(), ZONA, 'yyyy-MM-dd HH:mm');
+
+  /* Se busca por nombre + apellido, sin distinguir mayúsculas ni acentos
+     de más, para que "kevin torrez" y "Kevin Torrez" sean el mismo. */
+  const fila = buscarFila(hoja, nombre, apellido);
+
+  if (fila > 0) {
+    hoja.getRange(fila, 1, 1, 4).setValues([[fecha, nombre, apellido, asiste]]);
+    return responder({ ok: true, actualizado: true, fila: fila });
+  }
+
+  hoja.appendRow([fecha, nombre, apellido, asiste]);
+  return responder({ ok: true, actualizado: false, fila: hoja.getLastRow() });
+}
+
+
+/**
+ * ID del libro donde va la tabla.
+ *
+ * Si ID_HOJA_RSVP está lleno, se usa ese y ya. Si está vacío, el libro se
+ * crea UNA sola vez y su ID se guarda en las propiedades del script, para
+ * que la siguiente confirmación escriba en el mismo y no en uno nuevo.
+ *
+ * Esto último importa: sin recordarlo, cada invitado que confirmara dejaría
+ * una hoja suelta en tu Drive y la lista quedaría partida en pedazos.
+ */
+function idDelLibro() {
+  if (ID_HOJA_RSVP) return ID_HOJA_RSVP;
+
+  const props = PropertiesService.getScriptProperties();
+  const guardado = props.getProperty('ID_HOJA_RSVP');
+
+  if (guardado) {
+    /* Si alguien borró el libro desde Drive, el ID guardado ya no sirve:
+       se olvida y se crea otro en vez de fallar en cada confirmación. */
+    try {
+      SpreadsheetApp.openById(guardado);
+      return guardado;
+    } catch (err) {
+      props.deleteProperty('ID_HOJA_RSVP');
+    }
+  }
+
+  const nuevo = SpreadsheetApp.create(NOMBRE_HOJA_RSVP).getId();
+  props.setProperty('ID_HOJA_RSVP', nuevo);
+  Logger.log('Hoja de confirmaciones creada: ' + nuevo);
+  return nuevo;
+}
+
+
+/**
+ * Devuelve la hoja de confirmaciones, creándola con sus títulos si hace
+ * falta. Es segura de llamar muchas veces.
+ */
+function hojaRsvp() {
+  const libro = SpreadsheetApp.openById(idDelLibro());
+
+  let hoja = libro.getSheetByName(PESTANA_RSVP);
+  if (!hoja) {
+    /* Un libro recién creado trae una pestaña "Hoja 1" vacía: se reusa en
+       vez de dejarla ahí al lado sin nada. */
+    const hojas = libro.getSheets();
+    hoja = (hojas.length === 1 && hojas[0].getLastRow() === 0)
+      ? hojas[0].setName(PESTANA_RSVP)
+      : libro.insertSheet(PESTANA_RSVP);
+  }
+
+  if (hoja.getLastRow() === 0) {
+    hoja.appendRow(['Fecha', 'Nombre', 'Apellido', 'Asiste']);
+    hoja.getRange(1, 1, 1, 4).setFontWeight('bold');
+    hoja.setFrozenRows(1);
+    hoja.setColumnWidth(1, 150);
+    hoja.setColumnWidth(2, 160);
+    hoja.setColumnWidth(3, 160);
+    hoja.setColumnWidth(4, 90);
+  }
+
+  return hoja;
+}
+
+
+/**
+ * Número de fila de esa persona, o 0 si todavía no está.
+ */
+function buscarFila(hoja, nombre, apellido) {
+  const ultimas = hoja.getLastRow();
+  if (ultimas < 2) return 0;
+
+  const datos = hoja.getRange(2, 2, ultimas - 1, 2).getValues();
+  const buscado = comparable(nombre + ' ' + apellido);
+
+  for (let i = 0; i < datos.length; i++) {
+    if (comparable(datos[i][0] + ' ' + datos[i][1]) === buscado) return i + 2;
+  }
+  return 0;
+}
+
+
+/**
+ * Deja el texto en una forma comparable: sin acentos, sin mayúsculas y sin
+ * espacios de sobra. Solo se usa para comparar; lo que se guarda en la hoja
+ * es lo que escribió el invitado.
+ */
+function comparable(texto) {
+  return String(texto)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+
+/**
+ * Recorta y limpia lo que llega del formulario. No se guarda nada que
+ * empiece por = + - @ tal cual: en una hoja de cálculo eso se interpreta
+ * como fórmula.
+ */
+function limpiarTexto(valor) {
+  const texto = String(valor || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  return /^[=+\-@]/.test(texto) ? "'" + texto : texto;
 }
 
 
@@ -179,6 +354,18 @@ function responder(objeto) {
 function probarCarpeta() {
   const carpeta = DriveApp.getFolderById(ID_CARPETA);
   Logger.log('Carpeta encontrada: ' + carpeta.getName());
+}
+
+
+/**
+ * Comprobación rápida de la tabla de confirmaciones.
+ * Ejecútala una vez desde el editor: crea la hoja si hacía falta e imprime
+ * su enlace en el registro, para que sepas dónde ver la lista.
+ */
+function probarHojaRsvp() {
+  const hoja = hojaRsvp();
+  Logger.log('Hoja lista: ' + hoja.getParent().getUrl());
+  Logger.log('Confirmaciones registradas: ' + Math.max(0, hoja.getLastRow() - 1));
 }
 
 

@@ -89,14 +89,32 @@ window.CONFIG = {
     cierre: '¡Gracias por su cariño y generosidad!'
   },
 
-  /* ---- Confirmacion de asistencia (RSVP) ------------------------------ */
+  /* ---- Confirmacion de asistencia (RSVP) ------------------------------
+     La confirmacion ya NO se manda por WhatsApp: cada invitado escribe su
+     nombre y apellido, marca si va o no, y eso cae como una fila en una
+     hoja de calculo de Google. La lista completa la ves tu en Drive.
+
+     La cantidad de personas NO la elige el invitado: los lugares ya estan
+     asignados de antemano, por eso el formulario no pregunta cuantos son.
+     --------------------------------------------------------------------- */
   rsvp: {
     activo: true,
-    /* ATENCION: numero INVENTADO. Repositorio publico: el WhatsApp real de
-       la familia no va aqui, se llena en cuanto se publique la pagina. */
-    whatsapp: '50588887777',           // ficticio (505 = Nicaragua)
+
+    /* URL del script de Google que escribe en la hoja. Es el MISMO script
+       que recibe las fotos, asi que si se deja vacio se usa el de
+       fotos.drive.urlScript y no hay nada que llenar aqui.
+       El paso a paso esta en google-apps-script/LEEME.md               */
+    urlScript: '',
+
     /* Fecha limite para confirmar, texto libre */
-    limite: '25 de noviembre'
+    limite: '25 de noviembre',
+
+    /* Aclara por que no se pregunta cuantos van. Deja '' para no mostrarlo. */
+    nota: 'Los lugares ya están reservados a tu nombre, así que solo necesitamos saber si nos acompañas.',
+
+    /* PENDIENTE: el WhatsApp de la familia. Todavia no se usa para nada;
+       queda apuntado para cuando se agregue el contacto del cliente. */
+    whatsapp: ''
   },
 
   /* ---- Musica de fondo ------------------------------------------------ */
@@ -133,6 +151,21 @@ window.CONFIG = {
     /* En true, la pagina avisa que los enlaces todavia son de muestra.
        Ponlo en false cuando los enlaces reales ya esten puestos. */
     demo: true,
+
+    /* ---- Botones apagados a proposito ---------------------------------
+       Para la beta. Los botones se siguen VIENDO y se pueden tocar, pero
+       en vez de hacer nada avisan que estan apagados por ahora.
+
+       No toca nada de la configuracion de Drive ni del enlace de videos de
+       OneDrive: esos datos se quedan tal cual. Poner el interruptor en
+       false devuelve el boton a su funcionamiento normal, sin mas cambios.
+       ------------------------------------------------------------------- */
+    deshabilitados: {
+      subirFotos: true,      // el formulario de subir fotos a Drive
+      subirVideos: true,     // el enlace de subir videos (OneDrive)
+      album: true,           // el album de la noche (tarjeta y boton flotante)
+      mensaje: 'Botón deshabilitado temporalmente'
+    },
 
     destinos: [
       {

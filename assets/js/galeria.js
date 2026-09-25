@@ -254,6 +254,22 @@
      montado aqui.
      ====================================================================== */
   function prepararSubidaEnAlbum() {
+    var tarjeta = $('tarjetaSubir');
+
+    /* Mismo interruptor que en la invitacion. Aqui el boton se enseña
+       igual, pero apagado: si en la invitacion avisa que la subida esta
+       en pausa, entrar por el album no puede saltarse esa pausa. */
+    var d = C.fotos && C.fotos.deshabilitados;
+    if (d && d.subirFotos) {
+      tarjeta.hidden = false;
+      tarjeta.classList.add('destino--apagado');
+      tarjeta.setAttribute('data-apagado', '1');
+      tarjeta.addEventListener('click', function () {
+        avisar(d.mensaje || 'Botón deshabilitado temporalmente');
+      });
+      return;
+    }
+
     /* Cuando termine de subir se vuelve a pedir la lista, para que la foto
        recien mandada aparezca sola en la rejilla. Es el momento en que el
        invitado la esta esperando. */
@@ -263,7 +279,6 @@
        un boton que no podria cumplir. */
     if (!montado) return;
 
-    var tarjeta = $('tarjetaSubir');
     tarjeta.hidden = false;
     tarjeta.addEventListener('click', function () {
       var panel = $('subida');
@@ -271,6 +286,30 @@
       tarjeta.classList.toggle('destino--abierto', !panel.hidden);
       if (!panel.hidden) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
+  }
+
+  /* El aviso flotante que sale al tocar un boton apagado. Es el mismo que
+     usa la invitacion; esta repetido y no compartido porque son cuatro
+     lineas y sacarlas a un archivo aparte costaria otra peticion. */
+  var toast = null;
+  var toastReloj = null;
+
+  function avisar(texto) {
+    if (!toast) {
+      toast = document.createElement('p');
+      toast.className = 'toast';
+      toast.setAttribute('role', 'status');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = texto;
+    toast.classList.remove('toast--visible');
+    void toast.offsetWidth;
+    toast.classList.add('toast--visible');
+
+    clearTimeout(toastReloj);
+    toastReloj = setTimeout(function () {
+      toast.classList.remove('toast--visible');
+    }, 2600);
   }
 
   /* ======================================================================
