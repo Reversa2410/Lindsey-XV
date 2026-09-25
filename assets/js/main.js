@@ -636,20 +636,35 @@
   function prepararBotonCalendario() {
     $('btnCalendario').addEventListener('click', function () {
       var inicio = FECHA_EVENTO;
-      var fin = new Date(inicio.getTime() + 5 * 3600 * 1000);
+      var horas = C.duracionHoras || 5;
+      var fin = new Date(inicio.getTime() + horas * 3600 * 1000);
 
-      var ics = [
-        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//XV//ES',
+      /* La direccion escrita no le basta al telefono para saber donde
+         queda: "Primera entrada Reparto San Mateo" no es algo que un mapa
+         acierte solo. Por eso el evento lleva ademas las coordenadas y el
+         enlace de Maps, que es lo que de verdad se toca el dia del evento. */
+      var donde = C.lugar.nombre + ' - ' + C.lugar.direccion;
+      var detalle = 'Te esperamos para celebrar los quince años de ' + C.nombre + '.';
+      if (C.lugar.mapaEnlace) detalle += '\n\nCómo llegar: ' + C.lugar.mapaEnlace;
+
+      var lineas = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//XV//ES', 'CALSCALE:GREGORIAN',
         'BEGIN:VEVENT',
         'UID:' + Date.now() + '@xv',
         'DTSTAMP:' + aFormatoICS(new Date()),
         'DTSTART:' + aFormatoICS(inicio),
         'DTEND:' + aFormatoICS(fin),
-        'SUMMARY:XV años de ' + C.nombre + ' ' + C.apellido,
-        'DESCRIPTION:Te esperamos para celebrar los quince años de ' + C.nombre + '.',
-        'LOCATION:' + (C.lugar.nombre + ' - ' + C.lugar.direccion).replace(/,/g, '\\,'),
-        'END:VEVENT', 'END:VCALENDAR'
-      ].join('\r\n');
+        'SUMMARY:' + escaparICS('XV años de ' + C.nombre + ' ' + C.apellido),
+        'DESCRIPTION:' + escaparICS(detalle),
+        'LOCATION:' + escaparICS(donde)
+      ];
+
+      /* GEO lleva punto y coma, no coma: "GEO:12.434;-86.899" */
+      if (C.lugar.coordenadas) lineas.push('GEO:' + C.lugar.coordenadas.replace(',', ';'));
+
+      lineas.push('END:VEVENT', 'END:VCALENDAR');
+
+      var ics = lineas.map(plegar).join('\r\n');
 
       var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
       var a = document.createElement('a');
@@ -662,10 +677,55 @@
     });
   }
 
+  /* La fecha del .ics va en UTC, con la Z al final. El navegador hace la
+     conversion desde la hora local que se puso en config. */
   function aFormatoICS(d) {
     var p = function (n) { return String(n).padStart(2, '0'); };
     return d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate()) + 'T' +
            p(d.getUTCHours()) + p(d.getUTCMinutes()) + '00Z';
+  }
+
+  /* En un .ics la coma y el punto y coma separan valores, asi que dentro
+     de un texto hay que escaparlos o la linea se parte en dos y el evento
+     llega cortado. Antes solo se escapaba la coma de LOCATION, que alcanzaba
+     porque no habia mas texto con simbolos; ahora la descripcion lleva un
+     enlace y conviene hacerlo bien. */
+  function escaparICS(texto) {
+    return String(texto)
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r?\n/g, '\\n');
+  }
+
+  /* El formato no permite lineas de mas de 75 octetos: las largas se parten
+     y la continuacion empieza con un espacio. Sin esto, la de DESCRIPTION
+     (que ahora lleva el enlace de Maps) se pasa de largo, y hay calendarios
+     que rechazan el evento entero por eso.
+
+     Se cuenta en octetos y no en caracteres porque una tilde ocupa dos: con
+     contar caracteres, una linea llena de acentos se pasaria igual. */
+  function plegar(linea) {
+    if (linea.length < 74) return linea;          // atajo para las cortas
+
+    var partes = [];
+    var actual = '';
+    var octetos = 0;
+
+    for (var i = 0; i < linea.length; i++) {
+      var c = linea[i];
+      var peso = encodeURIComponent(c).replace(/%[0-9A-F]{2}/gi, 'x').length;
+      if (octetos + peso > 74) {
+        partes.push(actual);
+        actual = '';
+        octetos = 1;                              // el espacio de la sangria
+      }
+      actual += c;
+      octetos += peso;
+    }
+    partes.push(actual);
+
+    return partes.join('\r\n ');
   }
 
   /* ======================================================================

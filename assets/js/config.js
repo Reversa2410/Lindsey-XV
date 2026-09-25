@@ -16,6 +16,10 @@ window.CONFIG = {
   /* Formato: AÑO, MES(1-12), DIA, HORA(0-23), MINUTO                      */
   fecha: { anio: 2026, mes: 12, dia: 11, hora: 17, minuto: 0 },
 
+  /* Cuanto dura, en horas. Solo lo usa el evento que se agrega al
+     calendario, para saber a que hora ponerle el final.                 */
+  duracionHoras: 5,
+
   /* ---- La portada de adentro -----------------------------------------
      Es lo primero que se ve al abrir la invitacion: el diseño de Canva,
      rehecho en HTML. El lienzo mide 943x2000 y todo lo de encima se
@@ -68,7 +72,13 @@ window.CONFIG = {
     nombre: 'Punto Azzurro',
     direccion: 'Primera entrada Reparto San Mateo',
     mapaEnlace: 'https://maps.app.goo.gl/AQnhck8FcrtuuYdQ9',
-    mapaEmbed: 'https://www.google.com/maps?q=12.4342037,-86.8999011&z=17&output=embed'
+    mapaEmbed: 'https://www.google.com/maps?q=12.4342037,-86.8999011&z=17&output=embed',
+
+    /* Las mismas coordenadas, sueltas. Van en el evento del calendario:
+       con solo el nombre escrito, la app del telefono tiene que adivinar
+       donde queda, y "Primera entrada Reparto San Mateo" no es algo que
+       vaya a acertar. Deja '' si alguna vez no se saben.                */
+    coordenadas: '12.4342037,-86.8999011'
   },
 
   /* ---- Itinerario (deja [] para ocultar la seccion) ------------------- */
