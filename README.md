@@ -154,10 +154,22 @@ invitación de verdad, no sobre una muestra de colores:
 | **Vino & Oro antiguo** | `#87122A` | `#BD9146` | Granate profundo, claros hacia el marfil. Es donde más luce el dorado. |
 | **Escarlata & Oro brillante** | `#C0161C` | `#D4AF37` | Rojo de fuego y dorado franco. El más fuerte y el más joven. |
 
-Abriendo **`paletas.html`** salen las tres una al lado de la otra. También se
-puede ver cada una a pantalla completa con `index.html?paleta=carmin`,
-`?paleta=vino` o `?paleta=escarlata`; sin parámetro queda la rosa original,
-para comparar.
+**Para verlas, sobre todo desde el teléfono, lo mejor son los tres enlaces
+directos.** Cada uno abre la invitación entera en esa paleta, igual que la
+verá un invitado:
+
+- <https://lindsey-xv.vercel.app/?paleta=carmin>
+- <https://lindsey-xv.vercel.app/?paleta=vino>
+- <https://lindsey-xv.vercel.app/?paleta=escarlata>
+
+Sin parámetro (<https://lindsey-xv.vercel.app>) queda la rosa original, para
+comparar. Es lo que siguen viendo los invitados: el parámetro no cambia nada
+para quien no lo escribe.
+
+También existe **`paletas.html`** (<https://lindsey-xv.vercel.app/paletas>),
+que las pone una al lado de la otra en recuadros. Va bien en una pantalla
+ancha; en el teléfono se apilan y se ven pequeñas, así que ahí conviene más
+abrir los enlaces de arriba uno por uno.
 
 **El marco floral todavía es el PNG rosa.** Es una imagen de Canva, no CSS, así
 que no cambia de color sola: en la vista previa va teñido por encima con una
@@ -195,12 +207,11 @@ comprobado que la tabla se llena.
 | **Elegir la paleta y reexportar el marco en ese color** | `paletas.html`, `assets/img/marco-floral.webp` |
 | Enlace para subir videos | `config.js` → `fotos.destinos` |
 | Encender los botones de fotos cuando toque | `config.js` → `fotos.deshabilitados` |
-| Decidir si hay padrinos | `config.js` → `padrinos` |
 | WhatsApp de contacto (para más adelante) | `config.js` → `rsvp.whatsapp` |
 
-Lo de los padrinos no está resuelto: mientras el arreglo esté vacío esa parte
-de la sección no se muestra, así que si no va a haber, se queda como está y no
-hay nada que hacer.
+**No va a haber padrinos.** Está decidido, no es un pendiente: `padrinos` se
+queda como un arreglo vacío y esa parte de la sección no se muestra. No hay que
+tocar nada.
 
 ## Sobre la confirmación de asistencia
 
