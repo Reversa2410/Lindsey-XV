@@ -95,8 +95,12 @@ window.CONFIG = {
     etiqueta: 'Formal',
     texto: 'Por favor abstenerse de usar cualquier tono de rojo, ya que es un color reservado para la quinceañera.',
     /* Colores que se piden evitar, se muestran como muestras tachadas.
-       Deben coincidir con el color que menciona el texto de arriba. */
-    coloresReservados: ['#F4CCD8', '#DB98AE', '#A83258', '#7B1E3A']
+       Deben coincidir con el color que menciona el texto de arriba.
+       Se escriben como tokens de la paleta en vez de hex sueltos: el
+       color reservado ES el de la quinceañera, asi que si la paleta
+       cambia, las muestras cambian con ella y nunca se descuadran. */
+    coloresReservados: ['var(--tono-300)', 'var(--tono-500)',
+                        'var(--tono-700)', 'var(--tono-900)']
   },
 
   /* ---- Lluvia de sobres ----------------------------------------------- */

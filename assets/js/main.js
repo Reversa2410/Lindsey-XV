@@ -20,6 +20,43 @@
 
   var menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* Devuelve el valor ya calculado de una lista de variables CSS. Hace
+     falta para todo lo que se pinta fuera del CSS (el canvas del confeti,
+     la barra de color del navegador), porque ahi var(--...) no llega. */
+  function tokens(nombres) {
+    var css = getComputedStyle(document.documentElement);
+    return nombres.map(function (n) { return css.getPropertyValue(n).trim(); });
+  }
+
+  /* ======================================================================
+     0. PALETA
+     -------------------------------------------------------------------
+     PROVISIONAL, solo para elegir entre las propuestas de color. Con
+     ?paleta=carmin | vino | escarlata se marca el <html> y la hoja de
+     estilos aplica el bloque [data-paleta] correspondiente; sin parametro
+     queda la paleta original. Cuando la familia elija una, sus valores
+     pasan al :root del CSS y esta seccion entera se borra.
+     ====================================================================== */
+  var PALETAS = ['carmin', 'vino', 'escarlata'];
+
+  /* paletas.html abre la invitacion ya destapada dentro de su recuadro:
+     comparar tres portadas iguales no dice nada, lo que hay que ver es el
+     encabezado y lo que viene despues. */
+  var saltarPortada = false;
+
+  function aplicarPaleta() {
+    var params = new URLSearchParams(location.search);
+    var pedida = params.get('paleta');
+    if (PALETAS.indexOf(pedida) !== -1) {
+      document.documentElement.setAttribute('data-paleta', pedida);
+    }
+    saltarPortada = params.get('abierta') === '1';
+    /* La barra del navegador en el movil es de las pocas cosas que no
+       puede leer la variable: hay que escribirle el color resuelto. */
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', tokens(['--tono-700'])[0]);
+  }
+
   /* ======================================================================
      1. VOLCAR LOS DATOS DE CONFIG EN LA PAGINA
      ====================================================================== */
@@ -72,8 +109,11 @@
     /* --- Vestimenta --- */
     $('vestEtiqueta').textContent = C.vestimenta.etiqueta;
     $('vestTexto').textContent = C.vestimenta.texto;
+    /* Sin title: ahora los valores son tokens de la paleta y un tooltip
+       que diga "var(--tono-700)" no le sirve a nadie. Son decorativas, el
+       texto de al lado ya explica que color se pide evitar. */
     $('muestras').innerHTML = C.vestimenta.coloresReservados.map(function (c) {
-      return '<span class="muestra" style="background:' + c + '" title="' + c + '"></span>';
+      return '<span class="muestra" style="background:' + c + '"></span>';
     }).join('');
 
     /* --- Sobres --- */
@@ -588,7 +628,7 @@
   function prepararPortada() {
     /* Al volver del album la invitacion ya estaba abierta: repetir la
        portada se sentiria un paso atras, asi que se entra directo. */
-    if (recordado(LLAVE_ABIERTA)) { entrarSinPortada(); return; }
+    if (saltarPortada || recordado(LLAVE_ABIERTA)) { entrarSinPortada(); return; }
 
     $('btnAbrir').addEventListener('click', function () {
       var portada = $('portada');
@@ -873,7 +913,11 @@
     var ctx = lienzo.getContext('2d');
     var piezas = [];
     var animando = false;
-    var colores = ['#F4CCD8', '#F9E0E8', '#FFFFFF', '#DB98AE', '#E7D2AE', '#C5A06A'];
+    /* El canvas no entiende var(--...), asi que los colores se resuelven
+       una vez contra la hoja de estilos ya aplicada. De ese modo los
+       petalos del cierre siguen a la paleta activa sin repetirla aqui. */
+    var colores = tokens(['--tono-300', '--tono-200', '--oro-claro', '--oro'])
+                    .concat(['#FFFFFF']);
 
     function medir() {
       lienzo.width = window.innerWidth;
@@ -944,6 +988,7 @@
      ARRANQUE
      ====================================================================== */
   function iniciar() {
+    aplicarPaleta();
     pintarDatos();
     Subida.preparar();
     prepararBotonGaleria();

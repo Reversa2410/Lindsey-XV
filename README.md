@@ -58,6 +58,7 @@ el CSS para cambiar nombres, textos o fechas.
 ```
 index.html              la invitación: estructura + ilustraciones SVG propias
 galeria.html            el álbum de fotos, en su propia página
+paletas.html            comparador de paletas (provisional, ver más abajo)
 assets/css/estilos.css  diseño y animaciones (de las dos páginas)
 assets/js/config.js     <-- los datos del evento
 assets/js/main.js       lógica de la invitación
@@ -98,7 +99,7 @@ vuelve a pedir solo, así que la foto recién mandada aparece sin recargar.
 
 Lo primero que aparece al abrir la invitación es el diseño que se hizo en
 Canva, rehecho en HTML: el marco de acuarela, el nombre en cursiva, la foto
-dentro del arco rosa, la fecha y el filete dorado.
+dentro del arco de color, la fecha y el filete dorado.
 
 No es una captura de pantalla. El lienzo guarda la misma proporción que el
 original (943×2000) y todo lo que va encima se coloca en porcentajes de ese
@@ -141,6 +142,43 @@ Todas las ilustraciones (el lazo, la tiara, la quinceañera, el sobre, las ramas
 son SVG dibujados para este proyecto, así que escalan sin pixelarse y no dependen
 de imágenes externas.
 
+## Eligiendo la paleta (provisional)
+
+La invitación nace en rosa y champagne, pero se está probando pasarla a
+**rojo más fuerte con dorado**. Hay tres propuestas montadas sobre la
+invitación de verdad, no sobre una muestra de colores:
+
+| | Rojo | Dorado | De qué va |
+|---|---|---|---|
+| **Carmín & Champagne** | `#A81428` | `#C5A06A` | El rojo clásico de gala. El salto más corto desde el rosa actual. |
+| **Vino & Oro antiguo** | `#87122A` | `#BD9146` | Granate profundo, claros hacia el marfil. Es donde más luce el dorado. |
+| **Escarlata & Oro brillante** | `#C0161C` | `#D4AF37` | Rojo de fuego y dorado franco. El más fuerte y el más joven. |
+
+Abriendo **`paletas.html`** salen las tres una al lado de la otra. También se
+puede ver cada una a pantalla completa con `index.html?paleta=carmin`,
+`?paleta=vino` o `?paleta=escarlata`; sin parámetro queda la rosa original,
+para comparar.
+
+**El marco floral todavía es el PNG rosa.** Es una imagen de Canva, no CSS, así
+que no cambia de color sola: en la vista previa va teñido por encima con una
+capa en modo `color`, que le cambia el tono pero le respeta la luz. Sirve para
+hacerse una idea, no es el resultado final. **Cuando se elija la paleta hay
+que reexportar el marco desde Canva ya en ese color** y reemplazar
+`assets/img/marco-floral.webp`.
+
+### Cuando ya esté elegida
+
+Toda la paleta vive en los tokens del `:root` de `estilos.css`, y ningún otro
+sitio lleva un color escrito a mano — ni el CSS, ni los dibujos SVG de
+`index.html`, ni los pétalos del cierre, ni las muestras del código de
+vestimenta. Para cerrar la decisión:
+
+1. Copiar los valores de la paleta ganadora al `:root`.
+2. Borrar los tres bloques `[data-paleta]` del CSS y la regla `.lienzo::after`
+   (el tinte del marco).
+3. Borrar la sección `0. PALETA` de `main.js` y la llamada `aplicarPaleta()`.
+4. Borrar `paletas.html` y esta sección del README.
+
 ## Estado actual
 
 Ya son reales el nombre, la fecha (**viernes 11 de diciembre de 2026**) y el
@@ -149,6 +187,7 @@ lugar (**Punto Azzurro**, primera entrada Reparto San Mateo).
 | Qué falta | Dónde |
 |---|---|
 | **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
+| **Elegir la paleta y reexportar el marco en ese color** | `paletas.html`, `assets/img/marco-floral.webp` |
 | **Publicar la versión del script con la tabla de asistencia** | `google-apps-script/LEEME.md`, paso 7 |
 | Nombres de los padres | `config.js` → `padres` |
 | Texto real de la carta | `config.js` → `carta` |

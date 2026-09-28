@@ -1,15 +1,21 @@
 /* =========================================================================
    INVITACION DIGITAL XV — HOJA DE ESTILOS
-   Paleta rosa con detalles en champagne gold. Mobile first.
+   Paleta de dos colores: el rojo del evento y el dorado de los detalles.
+   Mobile first.
    ========================================================================= */
 
 /* ---------------------------------------------------------------- TOKENS
-   La escala --tono-* esta construida sobre los colores de la paleta del
-   evento. Los que llevan (paleta) son los valores exactos que dio el
-   cliente; el resto son pasos intermedios derivados de ellos para tener
-   una escala pareja.
-   Se llaman "tono" y no "rosa" a proposito: si mas adelante cambia la
-   paleta, basta reemplazar estos diez valores.
+   Toda la paleta vive aqui. Ningun otro sitio del CSS lleva un color de
+   la paleta escrito a mano: si esta lista cambia, cambia la invitacion
+   entera (incluidos los dibujos SVG y los petalos del cierre).
+
+   La escala --tono-* va de 900 (el mas profundo) a 50 (casi papel).
+   Las --rgb-* son las mismas de arriba pero en componentes sueltos,
+   porque rgba() necesita numeros y no acepta un hex guardado en una
+   variable; se usan para sombras y bordes translucidos.
+
+   Para probar otra paleta no hace falta tocar esto: estan definidas mas
+   abajo como bloques [data-paleta] y se eligen con ?paleta=... en la URL.
    ------------------------------------------------------------------------ */
 :root{
   --tono-900:#5E1429;   /* derivado, el mas profundo    */
@@ -23,17 +29,33 @@
   --tono-100:#FCEDF2;   /* derivado                     */
   --tono-50:#FEF7F9;    /* derivado                     */
 
+  --rgb-950:48,10,22;
+  --rgb-800:123,30,58;
+  --rgb-700:168,50,88;
+  --rgb-600:193,91,123;
+  --rgb-500:219,152,174;
+
   /* Champagne gold. Solo para detalles: filetes, la tiara, el fajin,
      el corazon del calendario. Nunca para texto pequeño, porque sobre
      blanco no alcanza el contraste minimo de lectura. */
   --oro:#C5A06A;        /* Champagne Gold   (paleta)    */
   --oro-claro:#E7D2AE;
   --oro-oscuro:#A07C45;
+  --rgb-oro:197,160,106;
 
   --papel:#FFFCFD;
   --papel-2:#FDF6F9;
   --tinta:#6B2038;
   --tinta-suave:#9A6275;
+
+  /* Los lavados del fondo de la pagina y los dos de la portada. Son
+     tintes muy claros de la paleta, por eso viajan con ella. */
+  --fondo-base:#FDF6F8;
+  --fondo-a:#FBE7EE;
+  --fondo-b:#F8EFE3;
+  --fondo-c:#FAE2EA;
+  --portada-halo:#FBEDF2;
+  --portada-abajo:#F7DFE8;
 
   --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --display:'Italiana', 'Cormorant Garamond', Georgia, serif;
@@ -42,18 +64,173 @@
   /* --- Lo del lienzo del hero ---
      Son los valores sacados del PNG del diseño de Canva, no derivados de
      la paleta de arriba. Van aparte a proposito: si el diseño cambia, se
-     cambian estos cinco y no se toca nada mas. El rosa es mas vivo que el
-     --tono-500 y el oro mas apagado que el --oro, por eso no se reusan. */
-  --rosa-lienzo:#E48895;
+     cambian estos y no se toca nada mas. El color del lienzo es mas vivo
+     que el --tono-500 y el oro mas apagado que el --oro, por eso no se
+     reusan.
+     --marco-tinte tiñe el PNG del marco floral para que acompañe a la
+     paleta. Es un apaño de vista previa: el marco definitivo tiene que
+     salir exportado de Canva ya en el color nuevo. */
+  --tono-lienzo:#E48895;
   --oro-lienzo:#CEC4AE;
   --crema:#FDFAF7;
+  --marco-tinte:transparent;
   --gala:'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   --firma:'Style Script', 'Parisienne', 'Segoe Script', cursive;
 
   --ancho:480px;
   --radio:4px;
-  --sombra:0 24px 70px rgba(123,30,58,.15);
+  --sombra:0 24px 70px rgba(var(--rgb-800),.15);
   --curva:cubic-bezier(.22,.68,.25,1);
+}
+
+/* ====================================================== PALETAS DE PRUEBA
+   Tres propuestas de rojo + dorado. Se activan poniendo ?paleta=carmin,
+   ?paleta=vino o ?paleta=escarlata en la URL; main.js lee ese parametro y
+   escribe data-paleta en el <html>. Sin parametro queda la rosa original,
+   para poder comparar.
+   Cuando se elija una, sus valores pasan al :root de arriba y estos tres
+   bloques se borran.
+   ------------------------------------------------------------------------ */
+
+/* --- 1. CARMIN & CHAMPAGNE ---------------------------------------------
+   El rojo clasico de gala: profundo, calido, con los tintes claros
+   tirando a rubor. Es el salto mas corto desde la paleta rosa actual,
+   asi que todo lo que ya estaba equilibrado sigue estandolo. */
+:root[data-paleta="carmin"]{
+  --tono-900:#4E0A16;
+  --tono-800:#6E0E1E;
+  --tono-700:#A81428;
+  --tono-600:#C33A45;
+  --tono-500:#D9707A;
+  --tono-400:#E69A9F;
+  --tono-300:#F2C4C6;
+  --tono-200:#F8DEDE;
+  --tono-100:#FCEDEC;
+  --tono-50:#FEF7F5;
+
+  --rgb-950:40,6,12;
+  --rgb-800:110,14,30;
+  --rgb-700:168,20,40;
+  --rgb-600:195,58,69;
+  --rgb-500:217,112,122;
+
+  --oro:#C5A06A;
+  --oro-claro:#E7D2AE;
+  --oro-oscuro:#A07C45;
+  --rgb-oro:197,160,106;
+
+  --papel:#FFFCFB;
+  --papel-2:#FDF7F4;
+  --tinta:#5E1018;
+  --tinta-suave:#8E5058;
+
+  --fondo-base:#FDF7F4;
+  --fondo-a:#FBE8E6;
+  --fondo-b:#F8EFE1;
+  --fondo-c:#FAE3E0;
+  --portada-halo:#FBEEEC;
+  --portada-abajo:#F6DEDA;
+
+  --tono-lienzo:#A81428;
+  --oro-lienzo:#C5A06A;
+  --crema:#FDFAF6;
+  --marco-tinte:#A81428;
+  --marco-fuerza:1.9;
+  --marco-contraste:1.04;
+}
+
+/* --- 2. VINO & ORO ANTIGUO ---------------------------------------------
+   El mas serio de los tres: granate oscuro y un dorado envejecido, menos
+   rosado en los claros porque los tintes se van hacia el marfil. Es el
+   que mejor deja lucir al dorado, porque el fondo ya no le compite. */
+:root[data-paleta="vino"]{
+  --tono-900:#3D0712;
+  --tono-800:#5C0D1B;
+  --tono-700:#87122A;
+  --tono-600:#A82A3C;
+  --tono-500:#C55F6B;
+  --tono-400:#DC9199;
+  --tono-300:#EFD0CC;
+  --tono-200:#F7E6DE;
+  --tono-100:#FCF4EC;
+  --tono-50:#FFFBF5;
+
+  --rgb-950:32,5,14;
+  --rgb-800:92,13,27;
+  --rgb-700:135,18,42;
+  --rgb-600:168,42,60;
+  --rgb-500:197,95,107;
+
+  --oro:#BD9146;
+  --oro-claro:#E3C98E;
+  --oro-oscuro:#8F6A2C;
+  --rgb-oro:189,145,70;
+
+  --papel:#FFFDF9;
+  --papel-2:#FCF6EE;
+  --tinta:#4A0C16;
+  --tinta-suave:#7E4A52;
+
+  --fondo-base:#FCF6EE;
+  --fondo-a:#F7E7E2;
+  --fondo-b:#F6EDDC;
+  --fondo-c:#F9E6DC;
+  --portada-halo:#FBF1E9;
+  --portada-abajo:#F2DDD4;
+
+  --tono-lienzo:#87122A;
+  --oro-lienzo:#BD9146;
+  --crema:#FFFCF6;
+  --marco-tinte:#87122A;
+  --marco-fuerza:1.75;
+  --marco-contraste:1.05;
+}
+
+/* --- 3. ESCARLATA & ORO BRILLANTE --------------------------------------
+   El mas fuerte y el mas joven. Rojo de fuego, casi bandera, con un
+   dorado franco en vez de champagne. Es el que mas se aleja del diseño
+   original, y el que mas pide que el marco floral se rehaga. */
+:root[data-paleta="escarlata"]{
+  --tono-900:#5A0B10;
+  --tono-800:#7E1013;
+  --tono-700:#C0161C;
+  --tono-600:#D93B3B;
+  --tono-500:#E97B77;
+  --tono-400:#F2A8A2;
+  --tono-300:#F9CCC6;
+  --tono-200:#FCE3DE;
+  --tono-100:#FEF1EE;
+  --tono-50:#FFF9F7;
+
+  --rgb-950:48,7,9;
+  --rgb-800:126,16,19;
+  --rgb-700:192,22,28;
+  --rgb-600:217,59,59;
+  --rgb-500:233,123,119;
+
+  --oro:#D4AF37;
+  --oro-claro:#F0DC9A;
+  --oro-oscuro:#A8862A;
+  --rgb-oro:212,175,55;
+
+  --papel:#FFFDFC;
+  --papel-2:#FFF8F4;
+  --tinta:#6B1016;
+  --tinta-suave:#A05F5F;
+
+  --fondo-base:#FFF8F4;
+  --fondo-a:#FDE9E3;
+  --fondo-b:#FCF2DE;
+  --fondo-c:#FDE6DE;
+  --portada-halo:#FEF0EC;
+  --portada-abajo:#FBDFD6;
+
+  --tono-lienzo:#C0161C;
+  --oro-lienzo:#D4AF37;
+  --crema:#FFFCF8;
+  --marco-tinte:#C0161C;
+  --marco-fuerza:2;
+  --marco-contraste:1.03;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -70,10 +247,10 @@ body{
   font-family:var(--serif);
   color:var(--tinta);
   background:
-    radial-gradient(1000px 700px at 12% 4%,  #FBE7EE 0%, transparent 60%),
-    radial-gradient(900px 650px at 88% 32%, #F8EFE3 0%, transparent 58%),
-    radial-gradient(1100px 800px at 50% 100%, #FAE2EA 0%, transparent 62%),
-    #FDF6F8;
+    radial-gradient(1000px 700px at 12% 4%,  var(--fondo-a) 0%, transparent 60%),
+    radial-gradient(900px 650px at 88% 32%, var(--fondo-b) 0%, transparent 58%),
+    radial-gradient(1100px 800px at 50% 100%, var(--fondo-c) 0%, transparent 62%),
+    var(--fondo-base);
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -85,13 +262,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ------------------------------------------------------------- PROGRESO */
 .progreso{
   position:fixed; inset:0 0 auto 0; height:3px; z-index:70;
-  background:rgba(219,152,174,.22); opacity:0; transition:opacity .6s;
+  background:rgba(var(--rgb-500),.22); opacity:0; transition:opacity .6s;
 }
 body.abierta .progreso{opacity:1}
 .progreso span{
   display:block; height:100%; width:0%;
   background:linear-gradient(90deg,var(--oro-claro),var(--oro));
-  box-shadow:0 0 12px rgba(197,160,106,.65);
+  box-shadow:0 0 12px rgba(var(--rgb-oro),.65);
 }
 
 /* ================================================================ PORTADA */
@@ -105,8 +282,8 @@ body.abierta .progreso{opacity:1}
   /* El fondo mide el alto completo de la pantalla y cada mitad muestra su
      parte, asi la union no se nota hasta que se abre */
   background-image:
-    radial-gradient(620px 340px at 50% 46%, #FBEDF2 0%, transparent 72%),
-    linear-gradient(#FFFCFD, #F7DFE8);
+    radial-gradient(620px 340px at 50% 46%, var(--portada-halo) 0%, transparent 72%),
+    linear-gradient(var(--papel), var(--portada-abajo));
   background-size:100% 100vh, 100% 100vh;
   background-repeat:no-repeat;
   transition:transform 1.35s var(--curva);
@@ -114,8 +291,8 @@ body.abierta .progreso{opacity:1}
 }
 .portada__hoja--arriba{top:0;    background-position:top,    top}
 .portada__hoja--abajo {bottom:0; background-position:bottom, bottom}
-.portada.abriendo .portada__hoja--arriba{box-shadow:0 14px 44px rgba(123,30,58,.13)}
-.portada.abriendo .portada__hoja--abajo {box-shadow:0 -14px 44px rgba(123,30,58,.13)}
+.portada.abriendo .portada__hoja--arriba{box-shadow:0 14px 44px rgba(var(--rgb-800),.13)}
+.portada.abriendo .portada__hoja--abajo {box-shadow:0 -14px 44px rgba(var(--rgb-800),.13)}
 .portada.abriendo .portada__hoja--arriba{transform:translateY(-101%)}
 .portada.abriendo .portada__hoja--abajo {transform:translateY(101%)}
 
@@ -172,7 +349,7 @@ body.abierta .progreso{opacity:1}
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);
   transform:skewX(-18deg);
 }
-.boton:hover{transform:translateY(-2px); box-shadow:0 10px 26px rgba(123,30,58,.2)}
+.boton:hover{transform:translateY(-2px); box-shadow:0 10px 26px rgba(var(--rgb-800),.2)}
 .boton:hover::after{animation:brillo .85s ease}
 .boton:active{transform:translateY(0)}
 @keyframes brillo{to{left:130%}}
@@ -270,13 +447,26 @@ body.abierta .invitacion{opacity:1}
 .lienzo__marco{
   position:absolute; left:0; top:-2%; width:100%; height:104%;
   object-fit:cover; z-index:0; pointer-events:none;
+  filter:saturate(var(--marco-fuerza, 1)) contrast(var(--marco-contraste, 1));
+}
+
+/* Tinte de vista previa, mientras el marco siga siendo el PNG rosa del
+   diseño original. Se mezcla en modo "color": toma el tono del rojo de la
+   paleta pero respeta la luz del PNG, asi que las flores cambian de color
+   y el papel crema sigue siendo crema (un multiply, en cambio, ensuciaba
+   el fondo entero). Va en z-index 0 para quedarse pegado al marco: los
+   textos y el arco de la foto estan en z-index 1 y no lo notan.
+   Con el marco definitivo exportado de Canva, esta regla se borra. */
+.lienzo::after{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:var(--marco-tinte); mix-blend-mode:color;
 }
 
 .lienzo__mis,.lienzo__xv,.lienzo__nombre,
 .lienzo__dia,.lienzo__fecha,.lienzo__lugar{
   position:absolute; left:0; right:0; z-index:1;
   margin:0; text-align:center; line-height:1;
-  color:var(--rosa-lienzo); font-family:var(--gala); font-weight:400;
+  color:var(--tono-lienzo); font-family:var(--gala); font-weight:400;
 }
 
 /* El diseño lleva la serif abierta con tracking. El padding-left no es
@@ -312,7 +502,7 @@ body.abierta .invitacion{opacity:1}
   position:absolute; top:35.05%; left:50%; transform:translateX(-50%);
   z-index:1; margin:0; padding:var(--filo);
   width:var(--arco); aspect-ratio:486 / 599;
-  background:var(--rosa-lienzo);
+  background:var(--tono-lienzo);
   border-radius:calc(var(--arco) / 2) calc(var(--arco) / 2) .9cqw .9cqw;
 }
 .arco__interior{
@@ -348,7 +538,7 @@ body.abierta .invitacion{opacity:1}
   margin:0; font-size:.78rem; letter-spacing:.2em; text-transform:uppercase;
   color:var(--tinta-suave); display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
 }
-.musica__corazon{width:15px;height:15px;fill:#B8496B}
+.musica__corazon{width:15px;height:15px;fill:var(--tono-700)}
 .ecualizador{display:flex; align-items:flex-end; justify-content:center; gap:4px; height:24px; margin-top:16px}
 .ecualizador i{
   width:3px; height:6px; border-radius:2px; background:var(--tono-400); opacity:.45;
@@ -420,7 +610,10 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 .calendario__dia--marcado{color:var(--tono-800); font-weight:600}
 .calendario__dia--marcado::before{
   content:''; position:absolute; inset:8%;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21C4.6 15.9 2 12.5 2 9a5 5 0 0 1 10-2.2A5 5 0 0 1 22 9c0 3.5-2.6 6.9-10 12z' fill='none' stroke='%23C5A06A' stroke-width='1.4'/%3E%3C/svg%3E") center/contain no-repeat;
+  --corazon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21C4.6 15.9 2 12.5 2 9a5 5 0 0 1 10-2.2A5 5 0 0 1 22 9c0 3.5-2.6 6.9-10 12z' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E");
+  background:var(--oro);
+  -webkit-mask:var(--corazon) center/contain no-repeat;
+          mask:var(--corazon) center/contain no-repeat;
   animation:latirCal 2.4s ease-in-out infinite;
 }
 @keyframes latirCal{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.12);opacity:1}}
@@ -459,7 +652,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 .seccion--carta{padding-top:40px}
 .carta{
   position:relative; padding:40px 26px 34px; border:1px solid var(--oro);
-  background:linear-gradient(#FFFFFF,#FFFBFC); overflow:hidden;
+  background:linear-gradient(#FFFFFF,var(--papel)); overflow:hidden;
 }
 .carta__rama{position:absolute; width:118px; height:118px; opacity:.42; pointer-events:none}
 .carta__rama--a{top:-14px; left:-16px}
@@ -515,7 +708,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 /* ------------------------------------------------------------ TARJETAS */
 .tarjeta{
   padding:34px 24px 30px; border:1px solid var(--tono-200); background:#fff;
-  box-shadow:0 10px 30px rgba(123,30,58,.05);
+  box-shadow:0 10px 30px rgba(var(--rgb-800),.05);
 }
 .icono--traje{width:96px; height:78px; margin-top:6px}
 .icono--sobre{width:98px; height:72px; transition:transform .6s var(--curva)}
@@ -529,12 +722,12 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 .muestras{display:flex; justify-content:center; gap:10px; margin:22px 0 8px}
 .muestra{
   position:relative; width:30px; height:30px; border-radius:50%;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.6), 0 3px 8px rgba(123,30,58,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.6), 0 3px 8px rgba(var(--rgb-800),.16);
 }
 .muestra::after{
   content:''; position:absolute; left:50%; top:50%; width:38px; height:1.5px;
   background:#fff; transform:translate(-50%,-50%) rotate(-45deg);
-  box-shadow:0 0 4px rgba(123,30,58,.35);
+  box-shadow:0 0 4px rgba(var(--rgb-800),.35);
 }
 .muestras__pie{
   margin:0; font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
@@ -561,7 +754,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   border-radius:var(--radio); outline:none; transition:border-color .3s, box-shadow .3s;
 }
 .campo input[type=text]:focus,.campo select:focus{
-  border-color:var(--tono-500); box-shadow:0 0 0 3px rgba(168,50,88,.16);
+  border-color:var(--tono-500); box-shadow:0 0 0 3px rgba(var(--rgb-700),.16);
 }
 .radios{display:flex; gap:10px}
 .radios input{position:absolute; opacity:0; pointer-events:none}
@@ -572,7 +765,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 }
 .radios input:checked + label{
   background:var(--tono-500); border-color:var(--tono-500); color:#fff;
-  box-shadow:0 6px 16px rgba(193,91,123,.3);
+  box-shadow:0 6px 16px rgba(var(--rgb-600),.3);
 }
 
 /* --------------------------------------------------------------- FOTOS */
@@ -585,7 +778,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 }
 .destino:hover{
   transform:translateY(-2px); background:var(--tono-50);
-  box-shadow:0 10px 24px rgba(123,30,58,.13);
+  box-shadow:0 10px 24px rgba(var(--rgb-800),.13);
 }
 .destino:hover .destino__flecha{transform:translateX(4px)}
 .destino__icono{
@@ -621,7 +814,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   padding:11px 18px; border-radius:999px;
   background:var(--tono-800); color:#fff;
   font-family:var(--serif); font-size:.9rem; line-height:1.35; text-align:center;
-  box-shadow:0 10px 30px rgba(123,30,58,.32);
+  box-shadow:0 10px 30px rgba(var(--rgb-800),.32);
   opacity:0; pointer-events:none;
   transition:opacity .28s var(--curva), transform .28s var(--curva);
 }
@@ -712,7 +905,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 .album__cabecera{
   position:relative; overflow:hidden;
   padding:54px 30px 6px; text-align:center;
-  background:linear-gradient(#FFFCFD,var(--papel-2));
+  background:linear-gradient(var(--papel),var(--papel-2));
 }
 .album__tiara{width:76px; height:34px; color:var(--oro); margin:0 auto 16px}
 
@@ -757,7 +950,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   width:100%; height:100%; object-fit:cover; display:block;
   transition:transform .5s var(--curva);
 }
-.galeria__foto:hover{border-color:var(--oro); box-shadow:0 8px 20px rgba(123,30,58,.16)}
+.galeria__foto:hover{border-color:var(--oro); box-shadow:0 8px 20px rgba(var(--rgb-800),.16)}
 .galeria__foto:hover img{transform:scale(1.06)}
 
 .galeria__estado{
@@ -770,7 +963,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   position:fixed; inset:0; z-index:120;
   display:grid; grid-template-columns:auto 1fr auto; align-items:center;
   gap:4px; padding:16px;
-  background:rgba(48,10,22,.94); backdrop-filter:blur(6px);
+  background:rgba(var(--rgb-950),.94); backdrop-filter:blur(6px);
   animation:aparecerVisor .3s ease;
 }
 .visor[hidden]{display:none !important}
@@ -820,7 +1013,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 /* -------------------------------------------------------------- CIERRE */
 .cierre{
   position:relative; padding:56px 28px 66px; text-align:center; overflow:hidden;
-  background:linear-gradient(#FDF4F7,#F8DFE7);
+  background:linear-gradient(var(--tono-100),var(--tono-200));
 }
 .cierre__lazo{width:110px; height:94px; margin:0 auto 10px; opacity:.9}
 .cierre__texto{font-size:clamp(2.6rem,14vw,3.4rem); margin:0; line-height:1.1}
@@ -838,7 +1031,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   position:fixed; right:16px; z-index:80;
   width:52px; height:52px; border-radius:50%; border:1px solid var(--tono-200);
   background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
-  display:grid; place-items:center; box-shadow:0 8px 24px rgba(123,30,58,.16);
+  display:grid; place-items:center; box-shadow:0 8px 24px rgba(var(--rgb-800),.16);
   color:var(--tono-700); text-decoration:none;
   opacity:0; transform:translateY(14px) scale(.9);
   transition:opacity .6s var(--curva), transform .6s var(--curva),
@@ -846,7 +1039,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 }
 body.abierta .btnFlotante{opacity:1; transform:none}
 .btnFlotante:hover{border-color:var(--oro); background:#fff}
-.btnFlotante__icono{width:22px; height:18px; color:#C0587A; transition:color .3s}
+.btnFlotante__icono{width:22px; height:18px; color:var(--tono-600); transition:color .3s}
 .btnFlotante:hover .btnFlotante__icono{color:var(--tono-700)}
 /* La misma flecha del resto de la pagina, girada para que apunte atras */
 .btnFlotante__icono--volver{width:20px; height:20px; transform:rotate(180deg)}
@@ -857,8 +1050,8 @@ body.abierta .btnFlotante{opacity:1; transform:none}
 
 /* -------------------------------------------------------- BOTON MUSICA */
 .btnMusica{bottom:18px}
-.btnMusica__icono{width:20px; height:20px; fill:#C0587A; transition:fill .3s, transform .3s}
-body.sonando .btnMusica__icono{fill:#A83258; animation:latir 1.6s ease-in-out infinite}
+.btnMusica__icono{width:20px; height:20px; fill:var(--tono-600); transition:fill .3s, transform .3s}
+body.sonando .btnMusica__icono{fill:var(--tono-700); animation:latir 1.6s ease-in-out infinite}
 .btnMusica__anillo{
   position:absolute; inset:-1px; border-radius:50%; border:1.5px solid var(--tono-400);
   opacity:0;
@@ -885,7 +1078,7 @@ body.sonando .btnMusica__anillo{animation:pulsoAnillo 2.2s ease-out infinite; op
   body{padding:0}
   .invitacion{
     margin:34px auto; border-radius:6px; overflow:hidden;
-    border:1px solid rgba(168,50,88,.18);
+    border:1px solid rgba(var(--rgb-700),.18);
   }
   .seccion{padding:76px 44px}
   /* Descontando el margen de la hoja, para que no sobre scroll */

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paletas · Mis XV</title>
+<!--
+  PAGINA DE TRABAJO, NO SE COMPARTE CON LOS INVITADOS.
+  Pone las tres propuestas de rojo + dorado una al lado de la otra,
+  cada una cargando la invitacion de verdad en un iframe con su
+  ?paleta=. Cuando la familia elija, se borra este archivo junto con
+  los bloques [data-paleta] del CSS y la seccion 0 de main.js.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fondo:#14100F; --panel:#1E1917; --linea:#332B28;
+    --texto:#F2EBE6; --texto-2:#A79B93;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:28px 20px 60px;
+    font-family:'Cormorant Garamond',Georgia,serif;
+    background:var(--fondo); color:var(--texto);
+  }
+  header{max-width:1180px; margin:0 auto 26px}
+  h1{margin:0 0 6px; font-weight:400; font-size:1.9rem; letter-spacing:.04em}
+  header p{margin:0; color:var(--texto-2); font-size:.95rem; max-width:62ch; line-height:1.6}
+
+  .rejilla{
+    max-width:1180px; margin:0 auto;
+    display:grid; gap:20px;
+    grid-template-columns:repeat(auto-fit,minmax(272px,1fr));
+  }
+  .opcion{
+    background:var(--panel); border:1px solid var(--linea);
+    border-radius:10px; overflow:hidden; display:flex; flex-direction:column;
+  }
+  .opcion__cab{padding:16px 18px 14px; border-bottom:1px solid var(--linea)}
+  .opcion__num{
+    font-size:.68rem; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--texto-2);
+  }
+  .opcion__nombre{margin:4px 0 10px; font-size:1.3rem; font-weight:400}
+  .opcion__nota{margin:0; font-size:.88rem; line-height:1.55; color:var(--texto-2)}
+
+  /* Las muestras: la fila larga es la escala del rojo, la corta el oro. */
+  .tiras{display:flex; flex-direction:column; gap:6px; margin:14px 0 2px}
+  .tira{display:flex; height:26px; border-radius:4px; overflow:hidden}
+  .tira span{flex:1}
+  .tira--oro{width:46%}
+  .hexes{
+    display:flex; gap:10px; margin-top:8px;
+    font-size:.72rem; letter-spacing:.06em; color:var(--texto-2);
+  }
+
+  /* El iframe entra a 480px (el ancho de la invitacion) y se encoge con
+     una escala, asi se ve la maqueta real y no una version estrujada. */
+  .visor{position:relative; height:620px; overflow:hidden; background:#000}
+  .visor iframe{
+    position:absolute; top:0; left:0;
+    width:480px; height:1033px; border:0;
+    transform:scale(var(--z)); transform-origin:top left;
+    /* Sordo al raton: si no, la rueda se la queda el iframe de turno y la
+       pagina de comparacion deja de bajar. Para tocar la invitacion esta
+       el enlace de abajo, que la abre entera. */
+    pointer-events:none;
+  }
+  .opcion__pie{
+    padding:12px 18px; border-top:1px solid var(--linea);
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px 14px; flex-wrap:wrap; font-size:.86rem;
+  }
+  .opcion__pie a{color:var(--texto); text-decoration:none; border-bottom:1px solid var(--linea)}
+  .opcion__pie a:hover{border-color:currentColor}
+  .opcion__pie code{color:var(--texto-2); font-size:.76rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Paletas en rojo y dorado</h1>
+  <p>
+    Las tres propuestas sobre la invitación real. Cada recuadro es la página
+    entera: se puede abrir y recorrer. El marco floral del encabezado todavía
+    es el PNG rosa de Canva, aquí sólo va teñido por encima para hacerse una
+    idea; el definitivo hay que reexportarlo en el color que se elija.
+  </p>
+</header>
+
+<div class="rejilla" id="rejilla"></div>
+
+<script>
+var OPCIONES = [
+  {
+    id:'carmin',
+    nombre:'Carmín & Champagne',
+    nota:'El rojo clásico de gala. Es el salto más corto desde el rosa de ahora: cambia el color pero no el carácter de la invitación. El dorado sigue siendo el champagne suave que ya estaba.',
+    rojo:['#4E0A16','#6E0E1E','#A81428','#C33A45','#D9707A','#E69A9F','#F2C4C6','#F8DEDE'],
+    oro:['#A07C45','#C5A06A','#E7D2AE'],
+    hex:['#A81428','#C5A06A']
+  },
+  {
+    id:'vino',
+    nombre:'Vino & Oro antiguo',
+    nota:'El más serio y el más formal. Granate profundo con un dorado envejecido, y los tonos claros tirando a marfil en vez de a rosa. Es donde mejor luce el dorado, porque el fondo ya no le compite.',
+    rojo:['#3D0712','#5C0D1B','#87122A','#A82A3C','#C55F6B','#DC9199','#EFD0CC','#F7E6DE'],
+    oro:['#8F6A2C','#BD9146','#E3C98E'],
+    hex:['#87122A','#BD9146']
+  },
+  {
+    id:'escarlata',
+    nombre:'Escarlata & Oro brillante',
+    nota:'El más fuerte y el más joven. Rojo de fuego con un dorado franco, no champagne. Es el que más se aleja del diseño original y el que más pide que el marco floral se rehaga entero.',
+    rojo:['#5A0B10','#7E1013','#C0161C','#D93B3B','#E97B77','#F2A8A2','#F9CCC6','#FCE3DE'],
+    oro:['#A8862A','#D4AF37','#F0DC9A'],
+    hex:['#C0161C','#D4AF37']
+  }
+];
+
+function tira(colores, clase){
+  return '<div class="tira' + (clase ? ' ' + clase : '') + '">' +
+    colores.map(function(c){ return '<span style="background:' + c + '"></span>'; }).join('') +
+  '</div>';
+}
+
+document.getElementById('rejilla').innerHTML = OPCIONES.map(function(o, i){
+  return '<section class="opcion">' +
+    '<div class="opcion__cab">' +
+      '<div class="opcion__num">Propuesta ' + (i + 1) + '</div>' +
+      '<h2 class="opcion__nombre">' + o.nombre + '</h2>' +
+      '<p class="opcion__nota">' + o.nota + '</p>' +
+      '<div class="tiras">' + tira(o.rojo) + tira(o.oro, 'tira--oro') + '</div>' +
+      '<div class="hexes"><span>' + o.hex[0] + '</span><span>' + o.hex[1] + '</span></div>' +
+    '</div>' +
+    '<div class="visor"><iframe src="index.html?paleta=' + o.id + '&abierta=1" loading="lazy" title="' + o.nombre + '"></iframe></div>' +
+    '<div class="opcion__pie">' +
+      '<a href="index.html?paleta=' + o.id + '" target="_blank" rel="noopener">Abrir a pantalla completa →</a>' +
+      '<code>?paleta=' + o.id + '</code>' +
+    '</div>' +
+  '</section>';
+}).join('');
+
+/* El iframe se dibuja siempre a 480px y despues se encoge hasta el ancho
+   real de la columna. Se recalcula al cambiar el tamaño de la ventana,
+   porque la rejilla pasa de tres columnas a una en pantallas chicas. */
+function ajustarZoom(){
+  document.querySelectorAll('.visor').forEach(function(v){
+    v.style.setProperty('--z', v.clientWidth / 480);
+  });
+}
+ajustarZoom();
+window.addEventListener('resize', ajustarZoom);
+</script>
+</body>
+</html>
