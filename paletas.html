@@ -10,6 +10,11 @@
   cada una cargando la invitacion de verdad en un iframe con su
   ?paleta=. Cuando la familia elija, se borra este archivo junto con
   los bloques [data-paleta] del CSS y la seccion 0 de main.js.
+
+  Los enlaces van a "./" y no a "index.html" porque Vercel tiene
+  cleanUrls: pedir index.html devuelve una redireccion a /index, y esa
+  redireccion ocurriria dentro de cada iframe. A la raiz no redirige
+  nada, ni aqui ni en el servidor local.
 -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -133,9 +138,9 @@ document.getElementById('rejilla').innerHTML = OPCIONES.map(function(o, i){
       '<div class="tiras">' + tira(o.rojo) + tira(o.oro, 'tira--oro') + '</div>' +
       '<div class="hexes"><span>' + o.hex[0] + '</span><span>' + o.hex[1] + '</span></div>' +
     '</div>' +
-    '<div class="visor"><iframe src="index.html?paleta=' + o.id + '&abierta=1" loading="lazy" title="' + o.nombre + '"></iframe></div>' +
+    '<div class="visor"><iframe src="./?paleta=' + o.id + '&abierta=1" loading="lazy" title="' + o.nombre + '"></iframe></div>' +
     '<div class="opcion__pie">' +
-      '<a href="index.html?paleta=' + o.id + '" target="_blank" rel="noopener">Abrir a pantalla completa →</a>' +
+      '<a href="./?paleta=' + o.id + '" target="_blank" rel="noopener">Abrir a pantalla completa →</a>' +
       '<code>?paleta=' + o.id + '</code>' +
     '</div>' +
   '</section>';

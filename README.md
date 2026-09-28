@@ -181,18 +181,26 @@ vestimenta. Para cerrar la decisión:
 
 ## Estado actual
 
-Ya son reales el nombre, la fecha (**viernes 11 de diciembre de 2026**) y el
-lugar (**Punto Azzurro**, primera entrada Reparto San Mateo).
+Ya son definitivos el nombre, la fecha (**viernes 11 de diciembre de 2026**), el
+lugar (**Punto Azzurro**, primera entrada Reparto San Mateo), los nombres de los
+padres y el texto de la carta.
+
+La confirmación de asistencia **ya funciona de punta a punta**: el script de
+Google está publicado con la versión que escribe en la hoja de cálculo, y está
+comprobado que la tabla se llena.
 
 | Qué falta | Dónde |
 |---|---|
 | **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
 | **Elegir la paleta y reexportar el marco en ese color** | `paletas.html`, `assets/img/marco-floral.webp` |
-| **Publicar la versión del script con la tabla de asistencia** | `google-apps-script/LEEME.md`, paso 7 |
-| Nombres de los padres | `config.js` → `padres` |
-| Texto real de la carta | `config.js` → `carta` |
 | Enlace para subir videos | `config.js` → `fotos.destinos` |
+| Encender los botones de fotos cuando toque | `config.js` → `fotos.deshabilitados` |
+| Decidir si hay padrinos | `config.js` → `padrinos` |
 | WhatsApp de contacto (para más adelante) | `config.js` → `rsvp.whatsapp` |
+
+Lo de los padrinos no está resuelto: mientras el arreglo esté vacío esa parte
+de la sección no se muestra, así que si no va a haber, se queda como está y no
+hay nada que hacer.
 
 ## Sobre la confirmación de asistencia
 
