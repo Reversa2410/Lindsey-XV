@@ -58,7 +58,6 @@ el CSS para cambiar nombres, textos o fechas.
 ```
 index.html              la invitación: estructura + ilustraciones SVG propias
 galeria.html            el álbum de fotos, en su propia página
-paletas.html            comparador de paletas (provisional, ver más abajo)
 assets/css/estilos.css  diseño y animaciones (de las dos páginas)
 assets/js/config.js     <-- los datos del evento
 assets/js/main.js       lógica de la invitación
@@ -142,60 +141,57 @@ Todas las ilustraciones (el lazo, la tiara, la quinceañera, el sobre, las ramas
 son SVG dibujados para este proyecto, así que escalan sin pixelarse y no dependen
 de imágenes externas.
 
-## Eligiendo la paleta (provisional)
+## La paleta
 
-La invitación nace en rosa y champagne, pero se está probando pasarla a
-**rojo más fuerte con dorado**. Hay tres propuestas montadas sobre la
-invitación de verdad, no sobre una muestra de colores:
+**Vino y oro antiguo.** Dos colores y nada más:
 
-| | Rojo | Dorado | De qué va |
-|---|---|---|---|
-| **Carmín & Champagne** | `#A81428` | `#C5A06A` | El rojo clásico de gala. El salto más corto desde el rosa actual. |
-| **Vino & Oro antiguo** | `#87122A` | `#BD9146` | Granate profundo, claros hacia el marfil. Es donde más luce el dorado. |
-| **Escarlata & Oro brillante** | `#C0161C` | `#D4AF37` | Rojo de fuego y dorado franco. El más fuerte y el más joven. |
+| | Hex | Dónde se usa |
+|---|---|---|
+| **Vino** | `#87122A` | Es el color del evento: títulos, el arco de la foto, la cuenta regresiva, los botones. |
+| **Oro antiguo** | `#BD9146` | Solo detalles: el filete, la tiara, el fajín del vestido, el corazón del calendario. **Nunca texto pequeño**, porque sobre blanco no llega al contraste mínimo para leerse. |
 
-**Para verlas, sobre todo desde el teléfono, lo mejor son los tres enlaces
-directos.** Cada uno abre la invitación entera en esa paleta, igual que la
-verá un invitado:
+Los tonos claros tiran a **marfil**, no a rosa. Es a propósito: sobre un fondo
+rosado el dorado se apaga, y aquí tiene que lucir.
 
-- <https://lindsey-xv.vercel.app/?paleta=carmin>
-- <https://lindsey-xv.vercel.app/?paleta=vino>
-- <https://lindsey-xv.vercel.app/?paleta=escarlata>
+Toda la paleta vive en los tokens del `:root` de
+[`estilos.css`](assets/css/estilos.css). Ningún otro sitio lleva un color
+escrito a mano — ni el resto del CSS, ni los dibujos SVG de `index.html`, ni
+los pétalos del cierre, ni las muestras del código de vestimenta. Cambiando esa
+lista cambia la invitación entera.
 
-Sin parámetro (<https://lindsey-xv.vercel.app>) queda la rosa original, para
-comparar. Es lo que siguen viendo los invitados: el parámetro no cambia nada
-para quien no lo escribe.
+### Falta el marco en vino
 
-También existe **`paletas.html`** (<https://lindsey-xv.vercel.app/paletas>),
-que las pone una al lado de la otra en recuadros. Va bien en una pantalla
-ancha; en el teléfono se apilan y se ven pequeñas, así que ahí conviene más
-abrir los enlaces de arriba uno por uno.
+El marco floral del encabezado sigue siendo **el PNG rosa** del diseño
+original. Es una imagen, no CSS, así que no cambia de color sola: por ahora va
+teñido con una capa en modo `color` (`.lienzo::after`), que le impone el tono
+del vino pero le respeta la luz, de modo que las flores cambian y el papel
+crema sigue siendo crema.
 
-**El marco floral todavía es el PNG rosa.** Es una imagen de Canva, no CSS, así
-que no cambia de color sola: en la vista previa va teñido por encima con una
-capa en modo `color`, que le cambia el tono pero le respeta la luz. Sirve para
-hacerse una idea, no es el resultado final. **Cuando se elija la paleta hay
-que reexportar el marco desde Canva ya en ese color** y reemplazar
-`assets/img/marco-floral.webp`.
+Es un apaño, y se nota: las flores quedan más claras de lo que pide un vino.
+**Hay que reexportar el marco desde Canva ya en vino** y reemplazar
+`assets/img/marco-floral.webp`. Cuando eso pase:
 
-### Cuando ya esté elegida
+1. Borrar la regla `.lienzo::after` de `estilos.css`.
+2. Poner `--marco-tinte` en `transparent`.
+3. Quitar el `filter` de `.lienzo__marco` (y los tokens `--marco-fuerza` y
+   `--marco-contraste`, que solo lo alimentan a él).
 
-Toda la paleta vive en los tokens del `:root` de `estilos.css`, y ningún otro
-sitio lleva un color escrito a mano — ni el CSS, ni los dibujos SVG de
-`index.html`, ni los pétalos del cierre, ni las muestras del código de
-vestimenta. Para cerrar la decisión:
+### Sobre la caché al cambiar colores
 
-1. Copiar los valores de la paleta ganadora al `:root`.
-2. Borrar los tres bloques `[data-paleta]` del CSS y la regla `.lienzo::after`
-   (el tinte del marco).
-3. Borrar la sección `0. PALETA` de `main.js` y la llamada `aplicarPaleta()`.
-4. Borrar `paletas.html` y esta sección del README.
+`vercel.json` deja el CSS y el JavaScript en caché **una semana**. El `?v=` de
+`index.html` es lo único que fuerza la descarga, así que hay que **subirlo en
+todos los ficheros a la vez**, aunque solo haya cambiado uno.
+
+Ya pasó lo contrario una vez: se subió el del CSS y no el del JS, y los
+teléfonos que ya habían entrado se quedaron con un `main.js` viejo que no
+entendía el CSS nuevo. En un escritorio recién estrenado no se notaba, porque
+no tenía nada guardado.
 
 ## Estado actual
 
 Ya son definitivos el nombre, la fecha (**viernes 11 de diciembre de 2026**), el
 lugar (**Punto Azzurro**, primera entrada Reparto San Mateo), los nombres de los
-padres y el texto de la carta.
+padres, el texto de la carta y la paleta (**vino y oro antiguo**).
 
 La confirmación de asistencia **ya funciona de punta a punta**: el script de
 Google está publicado con la versión que escribe en la hoja de cálculo, y está
@@ -204,7 +200,7 @@ comprobado que la tabla se llena.
 | Qué falta | Dónde |
 |---|---|
 | **Foto real de Lindsey** | `assets/img/` + `config.js` → `hero.foto` |
-| **Elegir la paleta y reexportar el marco en ese color** | `paletas.html`, `assets/img/marco-floral.webp` |
+| **Reexportar el marco floral en vino** | Canva → `assets/img/marco-floral.webp` |
 | Enlace para subir videos | `config.js` → `fotos.destinos` |
 | Encender los botones de fotos cuando toque | `config.js` → `fotos.deshabilitados` |
 | WhatsApp de contacto (para más adelante) | `config.js` → `rsvp.whatsapp` |

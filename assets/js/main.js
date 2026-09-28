@@ -21,40 +21,12 @@
   var menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* Devuelve el valor ya calculado de una lista de variables CSS. Hace
-     falta para todo lo que se pinta fuera del CSS (el canvas del confeti,
-     la barra de color del navegador), porque ahi var(--...) no llega. */
+     falta para lo que se pinta fuera del CSS, que hoy es el canvas de los
+     petalos del cierre: ahi var(--...) no llega, hay que darle el color
+     resuelto. Asi los petalos siguen a la paleta sin repetirla aqui. */
   function tokens(nombres) {
     var css = getComputedStyle(document.documentElement);
     return nombres.map(function (n) { return css.getPropertyValue(n).trim(); });
-  }
-
-  /* ======================================================================
-     0. PALETA
-     -------------------------------------------------------------------
-     PROVISIONAL, solo para elegir entre las propuestas de color. Con
-     ?paleta=carmin | vino | escarlata se marca el <html> y la hoja de
-     estilos aplica el bloque [data-paleta] correspondiente; sin parametro
-     queda la paleta original. Cuando la familia elija una, sus valores
-     pasan al :root del CSS y esta seccion entera se borra.
-     ====================================================================== */
-  var PALETAS = ['carmin', 'vino', 'escarlata'];
-
-  /* paletas.html abre la invitacion ya destapada dentro de su recuadro:
-     comparar tres portadas iguales no dice nada, lo que hay que ver es el
-     encabezado y lo que viene despues. */
-  var saltarPortada = false;
-
-  function aplicarPaleta() {
-    var params = new URLSearchParams(location.search);
-    var pedida = params.get('paleta');
-    if (PALETAS.indexOf(pedida) !== -1) {
-      document.documentElement.setAttribute('data-paleta', pedida);
-    }
-    saltarPortada = params.get('abierta') === '1';
-    /* La barra del navegador en el movil es de las pocas cosas que no
-       puede leer la variable: hay que escribirle el color resuelto. */
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', tokens(['--tono-700'])[0]);
   }
 
   /* ======================================================================
@@ -628,7 +600,7 @@
   function prepararPortada() {
     /* Al volver del album la invitacion ya estaba abierta: repetir la
        portada se sentiria un paso atras, asi que se entra directo. */
-    if (saltarPortada || recordado(LLAVE_ABIERTA)) { entrarSinPortada(); return; }
+    if (recordado(LLAVE_ABIERTA)) { entrarSinPortada(); return; }
 
     $('btnAbrir').addEventListener('click', function () {
       var portada = $('portada');
@@ -988,7 +960,6 @@
      ARRANQUE
      ====================================================================== */
   function iniciar() {
-    aplicarPaleta();
     pintarDatos();
     Subida.preparar();
     prepararBotonGaleria();

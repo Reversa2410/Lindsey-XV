@@ -1,159 +1,33 @@
 /* =========================================================================
    INVITACION DIGITAL XV — HOJA DE ESTILOS
-   Paleta de dos colores: el rojo del evento y el dorado de los detalles.
-   Mobile first.
+   Paleta de dos colores: vino y oro antiguo. Mobile first.
    ========================================================================= */
 
 /* ---------------------------------------------------------------- TOKENS
-   Toda la paleta vive aqui. Ningun otro sitio del CSS lleva un color de
-   la paleta escrito a mano: si esta lista cambia, cambia la invitacion
-   entera (incluidos los dibujos SVG y los petalos del cierre).
+   Toda la paleta vive aqui. Ningun otro sitio lleva un color de la paleta
+   escrito a mano — ni el resto de este archivo, ni los dibujos SVG de
+   index.html, ni los petalos del cierre, ni las muestras del codigo de
+   vestimenta. Cambiando esta lista cambia la invitacion entera.
 
-   La escala --tono-* va de 900 (el mas profundo) a 50 (casi papel).
-   Las --rgb-* son las mismas de arriba pero en componentes sueltos,
-   porque rgba() necesita numeros y no acepta un hex guardado en una
-   variable; se usan para sombras y bordes translucidos.
+   La escala --tono-* va de 900 (el mas profundo) a 50 (casi papel). Los
+   claros tiran a marfil y no a rosa: es lo que deja lucir al dorado, que
+   sobre un fondo rosado se apaga.
 
-   Para probar otra paleta no hace falta tocar esto: estan definidas mas
-   abajo como bloques [data-paleta] y se eligen con ?paleta=... en la URL.
+   Las --rgb-* son esos mismos colores en componentes sueltos, porque
+   rgba() necesita numeros y no acepta un hex guardado en una variable;
+   se usan para sombras y bordes translucidos.
    ------------------------------------------------------------------------ */
 :root{
-  --tono-900:#5E1429;   /* derivado, el mas profundo    */
-  --tono-800:#7B1E3A;   /* Deep Rose        (paleta)    */
-  --tono-700:#A83258;   /* Raspberry        (paleta)    */
-  --tono-600:#C15B7B;   /* derivado                     */
-  --tono-500:#DB98AE;   /* Pink Mist        (paleta)    */
-  --tono-400:#E6B3C3;   /* derivado                     */
-  --tono-300:#F4CCD8;   /* Pastel Petal     (paleta)    */
-  --tono-200:#F9E0E8;   /* derivado                     */
-  --tono-100:#FCEDF2;   /* derivado                     */
-  --tono-50:#FEF7F9;    /* derivado                     */
-
-  --rgb-950:48,10,22;
-  --rgb-800:123,30,58;
-  --rgb-700:168,50,88;
-  --rgb-600:193,91,123;
-  --rgb-500:219,152,174;
-
-  /* Champagne gold. Solo para detalles: filetes, la tiara, el fajin,
-     el corazon del calendario. Nunca para texto pequeño, porque sobre
-     blanco no alcanza el contraste minimo de lectura. */
-  --oro:#C5A06A;        /* Champagne Gold   (paleta)    */
-  --oro-claro:#E7D2AE;
-  --oro-oscuro:#A07C45;
-  --rgb-oro:197,160,106;
-
-  --papel:#FFFCFD;
-  --papel-2:#FDF6F9;
-  --tinta:#6B2038;
-  --tinta-suave:#9A6275;
-
-  /* Los lavados del fondo de la pagina y los dos de la portada. Son
-     tintes muy claros de la paleta, por eso viajan con ella. */
-  --fondo-base:#FDF6F8;
-  --fondo-a:#FBE7EE;
-  --fondo-b:#F8EFE3;
-  --fondo-c:#FAE2EA;
-  --portada-halo:#FBEDF2;
-  --portada-abajo:#F7DFE8;
-
-  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --display:'Italiana', 'Cormorant Garamond', Georgia, serif;
-  --script:'Parisienne', 'Segoe Script', cursive;
-
-  /* --- Lo del lienzo del hero ---
-     Son los valores sacados del PNG del diseño de Canva, no derivados de
-     la paleta de arriba. Van aparte a proposito: si el diseño cambia, se
-     cambian estos y no se toca nada mas. El color del lienzo es mas vivo
-     que el --tono-500 y el oro mas apagado que el --oro, por eso no se
-     reusan.
-     --marco-tinte tiñe el PNG del marco floral para que acompañe a la
-     paleta. Es un apaño de vista previa: el marco definitivo tiene que
-     salir exportado de Canva ya en el color nuevo. */
-  --tono-lienzo:#E48895;
-  --oro-lienzo:#CEC4AE;
-  --crema:#FDFAF7;
-  --marco-tinte:transparent;
-  --gala:'Playfair Display', 'Cormorant Garamond', Georgia, serif;
-  --firma:'Style Script', 'Parisienne', 'Segoe Script', cursive;
-
-  --ancho:480px;
-  --radio:4px;
-  --sombra:0 24px 70px rgba(var(--rgb-800),.15);
-  --curva:cubic-bezier(.22,.68,.25,1);
-}
-
-/* ====================================================== PALETAS DE PRUEBA
-   Tres propuestas de rojo + dorado. Se activan poniendo ?paleta=carmin,
-   ?paleta=vino o ?paleta=escarlata en la URL; main.js lee ese parametro y
-   escribe data-paleta en el <html>. Sin parametro queda la rosa original,
-   para poder comparar.
-   Cuando se elija una, sus valores pasan al :root de arriba y estos tres
-   bloques se borran.
-   ------------------------------------------------------------------------ */
-
-/* --- 1. CARMIN & CHAMPAGNE ---------------------------------------------
-   El rojo clasico de gala: profundo, calido, con los tintes claros
-   tirando a rubor. Es el salto mas corto desde la paleta rosa actual,
-   asi que todo lo que ya estaba equilibrado sigue estandolo. */
-:root[data-paleta="carmin"]{
-  --tono-900:#4E0A16;
-  --tono-800:#6E0E1E;
-  --tono-700:#A81428;
-  --tono-600:#C33A45;
-  --tono-500:#D9707A;
-  --tono-400:#E69A9F;
-  --tono-300:#F2C4C6;
-  --tono-200:#F8DEDE;
-  --tono-100:#FCEDEC;
-  --tono-50:#FEF7F5;
-
-  --rgb-950:40,6,12;
-  --rgb-800:110,14,30;
-  --rgb-700:168,20,40;
-  --rgb-600:195,58,69;
-  --rgb-500:217,112,122;
-
-  --oro:#C5A06A;
-  --oro-claro:#E7D2AE;
-  --oro-oscuro:#A07C45;
-  --rgb-oro:197,160,106;
-
-  --papel:#FFFCFB;
-  --papel-2:#FDF7F4;
-  --tinta:#5E1018;
-  --tinta-suave:#8E5058;
-
-  --fondo-base:#FDF7F4;
-  --fondo-a:#FBE8E6;
-  --fondo-b:#F8EFE1;
-  --fondo-c:#FAE3E0;
-  --portada-halo:#FBEEEC;
-  --portada-abajo:#F6DEDA;
-
-  --tono-lienzo:#A81428;
-  --oro-lienzo:#C5A06A;
-  --crema:#FDFAF6;
-  --marco-tinte:#A81428;
-  --marco-fuerza:1.9;
-  --marco-contraste:1.04;
-}
-
-/* --- 2. VINO & ORO ANTIGUO ---------------------------------------------
-   El mas serio de los tres: granate oscuro y un dorado envejecido, menos
-   rosado en los claros porque los tintes se van hacia el marfil. Es el
-   que mejor deja lucir al dorado, porque el fondo ya no le compite. */
-:root[data-paleta="vino"]{
-  --tono-900:#3D0712;
-  --tono-800:#5C0D1B;
-  --tono-700:#87122A;
-  --tono-600:#A82A3C;
-  --tono-500:#C55F6B;
-  --tono-400:#DC9199;
-  --tono-300:#EFD0CC;
-  --tono-200:#F7E6DE;
-  --tono-100:#FCF4EC;
-  --tono-50:#FFFBF5;
+  --tono-900:#3D0712;   /* derivado, el mas profundo    */
+  --tono-800:#5C0D1B;   /* Vino oscuro      (paleta)    */
+  --tono-700:#87122A;   /* Vino             (paleta)    */
+  --tono-600:#A82A3C;   /* derivado                     */
+  --tono-500:#C55F6B;   /* derivado                     */
+  --tono-400:#DC9199;   /* derivado                     */
+  --tono-300:#EFD0CC;   /* derivado, ya hacia el marfil */
+  --tono-200:#F7E6DE;   /* derivado                     */
+  --tono-100:#FCF4EC;   /* derivado                     */
+  --tono-50:#FFFBF5;    /* derivado                     */
 
   --rgb-950:32,5,14;
   --rgb-800:92,13,27;
@@ -161,7 +35,10 @@
   --rgb-600:168,42,60;
   --rgb-500:197,95,107;
 
-  --oro:#BD9146;
+  /* Oro antiguo. Solo para detalles: filetes, la tiara, el fajin, el
+     corazon del calendario. Nunca para texto pequeño, porque sobre
+     blanco no alcanza el contraste minimo de lectura. */
+  --oro:#BD9146;        /* Oro antiguo      (paleta)    */
   --oro-claro:#E3C98E;
   --oro-oscuro:#8F6A2C;
   --rgb-oro:189,145,70;
@@ -171,6 +48,8 @@
   --tinta:#4A0C16;
   --tinta-suave:#7E4A52;
 
+  /* Los lavados del fondo de la pagina y los dos de la portada. Son
+     tintes muy claros de la paleta, por eso viajan con ella. */
   --fondo-base:#FCF6EE;
   --fondo-a:#F7E7E2;
   --fondo-b:#F6EDDC;
@@ -178,59 +57,33 @@
   --portada-halo:#FBF1E9;
   --portada-abajo:#F2DDD4;
 
+  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --display:'Italiana', 'Cormorant Garamond', Georgia, serif;
+  --script:'Parisienne', 'Segoe Script', cursive;
+
+  /* --- Lo del lienzo del hero ---
+     El lienzo reproduce el diseño de Canva. Estos valores van aparte de la
+     escala de arriba porque se miden del PNG, no se derivan de la paleta.
+
+     --marco-tinte tiñe el PNG del marco floral, que sigue siendo el rosa
+     del diseño original. Es un apaño: EN CUANTO EL MARCO SE REEXPORTE DE
+     CANVA EN VINO, este token se pone en transparent y se borra la regla
+     .lienzo::after de mas abajo. --marco-fuerza y --marco-contraste
+     empujan un poco el PNG antes de teñirlo, para que las flores no se
+     queden lavadas. */
   --tono-lienzo:#87122A;
   --oro-lienzo:#BD9146;
   --crema:#FFFCF6;
   --marco-tinte:#87122A;
   --marco-fuerza:1.75;
   --marco-contraste:1.05;
-}
+  --gala:'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --firma:'Style Script', 'Parisienne', 'Segoe Script', cursive;
 
-/* --- 3. ESCARLATA & ORO BRILLANTE --------------------------------------
-   El mas fuerte y el mas joven. Rojo de fuego, casi bandera, con un
-   dorado franco en vez de champagne. Es el que mas se aleja del diseño
-   original, y el que mas pide que el marco floral se rehaga. */
-:root[data-paleta="escarlata"]{
-  --tono-900:#5A0B10;
-  --tono-800:#7E1013;
-  --tono-700:#C0161C;
-  --tono-600:#D93B3B;
-  --tono-500:#E97B77;
-  --tono-400:#F2A8A2;
-  --tono-300:#F9CCC6;
-  --tono-200:#FCE3DE;
-  --tono-100:#FEF1EE;
-  --tono-50:#FFF9F7;
-
-  --rgb-950:48,7,9;
-  --rgb-800:126,16,19;
-  --rgb-700:192,22,28;
-  --rgb-600:217,59,59;
-  --rgb-500:233,123,119;
-
-  --oro:#D4AF37;
-  --oro-claro:#F0DC9A;
-  --oro-oscuro:#A8862A;
-  --rgb-oro:212,175,55;
-
-  --papel:#FFFDFC;
-  --papel-2:#FFF8F4;
-  --tinta:#6B1016;
-  --tinta-suave:#A05F5F;
-
-  --fondo-base:#FFF8F4;
-  --fondo-a:#FDE9E3;
-  --fondo-b:#FCF2DE;
-  --fondo-c:#FDE6DE;
-  --portada-halo:#FEF0EC;
-  --portada-abajo:#FBDFD6;
-
-  --tono-lienzo:#C0161C;
-  --oro-lienzo:#D4AF37;
-  --crema:#FFFCF8;
-  --marco-tinte:#C0161C;
-  --marco-fuerza:2;
-  --marco-contraste:1.03;
+  --ancho:480px;
+  --radio:4px;
+  --sombra:0 24px 70px rgba(var(--rgb-800),.15);
+  --curva:cubic-bezier(.22,.68,.25,1);
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -450,13 +303,18 @@ body.abierta .invitacion{opacity:1}
   filter:saturate(var(--marco-fuerza, 1)) contrast(var(--marco-contraste, 1));
 }
 
-/* Tinte de vista previa, mientras el marco siga siendo el PNG rosa del
-   diseño original. Se mezcla en modo "color": toma el tono del rojo de la
-   paleta pero respeta la luz del PNG, asi que las flores cambian de color
-   y el papel crema sigue siendo crema (un multiply, en cambio, ensuciaba
-   el fondo entero). Va en z-index 0 para quedarse pegado al marco: los
-   textos y el arco de la foto estan en z-index 1 y no lo notan.
-   Con el marco definitivo exportado de Canva, esta regla se borra. */
+/* APAÑO TEMPORAL. El marco floral sigue siendo el PNG rosa del diseño
+   original, que con la paleta vino desentona. Esta capa lo tiñe: se mezcla
+   en modo "color", o sea que le impone el tono del vino pero le respeta la
+   luz, asi que las flores cambian de color y el papel crema sigue siendo
+   crema (con multiply, probado, se ensuciaba el fondo entero). Va en
+   z-index 0 para quedarse pegada al marco: los textos y el arco de la foto
+   estan en z-index 1 y no lo notan.
+
+   No es el resultado bueno: las flores quedan mas claras de lo que pide un
+   vino. EN CUANTO EL MARCO SE REEXPORTE DE CANVA YA EN VINO, hay que
+   borrar esta regla, poner --marco-tinte en transparent y quitar el filter
+   de .lienzo__marco. */
 .lienzo::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
   background:var(--marco-tinte); mix-blend-mode:color;
