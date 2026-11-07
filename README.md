@@ -316,7 +316,7 @@ de sobra.
 
 | | Destino | Estado |
 |---|---|---|
-| **Fotos** | Formulario dentro de la invitación → Google Drive | Falta publicar el script |
+| **Fotos** | Formulario dentro de la invitación → Google Drive | Script publicado · el botón sigue apagado para la beta |
 | **Videos** | Enlace externo (OneDrive) | Falta el enlace |
 
 Se eligió Google Drive porque **Cloudinary no presta servicio en Nicaragua**.
