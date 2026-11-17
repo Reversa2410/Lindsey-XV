@@ -3,9 +3,15 @@
   "configurations": [
     {
       "name": "invitacion",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5500"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/servidor.js"],
       "port": 5500
+    },
+    {
+      "name": "conversor-de-video",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/conversor/servidor-conv.js", "assets/video/original-intro-buena-16nov.mp4"],
+      "port": 5511
     }
   ]
 }

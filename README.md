@@ -35,12 +35,15 @@ push. La buena es la de Vercel.
 ## Cómo verla
 
 ```bash
-python -m http.server 5500
+node .claude/servidor.js
 ```
 
 Luego abrir <http://localhost:5500>.
 
-Cualquier servidor estático sirve igual. Lo que **no** funciona es abrir el
+Es un servidor estático de treinta líneas, sin dependencias. Antes esto era
+`python -m http.server`, pero en una máquina sin Python instalado Windows
+responde con el atajo de la Microsoft Store y el servidor ni arranca; Node ya
+estaba. Cualquier otro servidor estático sirve igual. Lo que **no** funciona es abrir el
 `index.html` con doble clic, porque el navegador bloquea la carga del mapa y del
 audio cuando la página viene del sistema de archivos.
 
@@ -63,9 +66,12 @@ assets/js/config.js     <-- los datos del evento
 assets/js/main.js       lógica de la invitación
 assets/js/galeria.js    lógica del álbum
 assets/js/subida.js     el formulario de subir fotos, que usan las dos
-assets/img/             el marco floral y la foto del arco
+assets/img/             el marco floral, la foto del arco y el cartel de la intro
 assets/audio/           aquí va la canción
-.claude/launch.json     configuración del servidor local
+assets/video/           el video de la intro (y su LEEME.txt)
+.claude/servidor.js     servidor estático para verla en local
+.claude/conversor/      saca el video de la intro de un original nuevo
+.claude/launch.json     configuración de los dos servidores
 ```
 
 Son dos páginas y no una sola. El álbum crece durante la fiesta y se mira
@@ -75,7 +81,7 @@ que quien únicamente quiere ver la fecha no se descarga decenas de fotos.
 
 ## Secciones
 
-**`index.html`** — Portada que se abre · Portada de adentro · Cuenta regresiva · Reserva este
+**`index.html`** — Intro (el sobre) · Portada que se abre · Portada de adentro · Cuenta regresiva · Reserva este
 día (calendario) · Padres · Carta · Lugar con mapa · Programa · Código de
 vestimenta · Lluvia de sobres · Confirmación de asistencia · Subir fotos ·
 Cierre.
@@ -124,6 +130,9 @@ el hueco que tiene encima y no se mete sobre el filete.
 
 ## Lo que hace que no sea un Canva
 
+- Intro: un video de siete segundos —un sobre de lacre que se abre entre
+  rosas— cuya tarjeta es la portada, y un destello que el CSS termina para
+  que no haya corte entre una cosa y la otra.
 - Portada que se abre en dos mitades y desbloquea la música con ese mismo toque
   (los navegadores no dejan sonar audio sin un gesto previo del usuario).
 - Cuenta regresiva en vivo, con animación en cada cifra que cambia.
@@ -265,6 +274,134 @@ deshabilitados: {
 La página del álbum (`galeria.html`) sigue existiendo: lo que se apaga son los
 caminos que llevan a ella. Quien escriba la dirección a mano la verá, aunque
 con el botón de subir también apagado ahí dentro.
+
+## Sobre la intro
+
+Lo primero que se ve es un video de **7.1 segundos**, vertical y sin sonido:
+un sobre vino con lacre dorado entre rosas, que se abre; sale la tarjeta, se
+despliega y dice *Te invito a mis · XV · Lindsey*; la cámara se le acerca y
+la tarjeta se enciende.
+
+Esa tarjeta **es la portada**: mismo texto, mismo botón, misma tiara. Así que
+el video no termina en un corte, termina en lo que viene después.
+
+**El destello lo empieza el video y lo termina el CSS.** En el video la luz
+sale del centro de la tarjeta pero se queda en la tarjeta: en los bordes
+siguen viéndose las rosas. Medio segundo antes del último fotograma pasan
+tres cosas a la vez, que juntas se leen como una sola luz que crece:
+
+1. **El video se aclara** (`brightness`). Las rosas de los bordes se
+   encienden antes de que la luz las alcance, que es lo que hace que parezca
+   luz y no un círculo tapando cosas.
+2. **Crece la luz** desde el centro de la tarjeta. Arranca del tamaño que el
+   destello ya tiene en el video, así que no «aparece»: sigue.
+3. **Llega el crema de la portada**, que es exactamente el degradado que hay
+   debajo, píxel por píxel.
+
+Cuando el crema ya tapó todo arrancan las animaciones de la portada —que
+hasta ese momento estaban en pausa— y la capa se desvanece. De principio a
+fin, el cierre dura 1.6 segundos.
+
+Se usa una luz que se abre y no un velo plano porque **mezclar crema sobre el
+rojo de las rosas pasa por un rosa turbio** a mitad de camino, que es justo
+el que esta paleta evita a propósito. Una luz tapa el rojo en vez de
+mezclarse con él.
+
+### Lo que pesa
+
+| Archivo | Peso | Quién lo baja |
+|---|---|---|
+| `intro.webm` (AV1) | 530 KB | Chrome, Firefox y Android |
+| `intro.mp4` (H.264) | 896 KB | el iPhone y todo lo demás |
+| `intro-cartel.webp` | 23 KB | todos: es el primer fotograma, mientras llega el video |
+
+Cada invitado baja **uno** de los dos videos. Los dos van a 720×1280 y 30
+fotogramas por segundo, sin pista de audio. El original pesaba 16.2 MB a
+1080×1920.
+
+Cómo se sacaron esos archivos, y cómo volver a sacarlos de otro original,
+está en `assets/video/LEEME.txt`.
+
+### Lo que se paga por usar un video
+
+**El texto de la tarjeta está pintado en los fotogramas.** «XV», «Lindsey» y
+el botón no salen de `config.js`: si cambia el nombre, hay que cambiar el
+video. Es lo único de toda la invitación que no se edita desde ahí.
+
+**Y pesa**, cuando la versión anterior no bajaba nada. Por eso vuelve a
+mirarse el ahorro de datos (ver «Quién no la ve»).
+
+### Las tres versiones anteriores
+
+Ninguna llegó a producción.
+
+1. **Un video horizontal** (16:9, 8.4 s). En un teléfono ocupaba el 26% del
+   alto; la tarjeta salía en blanco; la mitad del video era una pantalla
+   blanca.
+2. **Un sobre dibujado con CSS** (3.8 s, 0 KB). Arreglaba las tres cosas y
+   sacaba los datos de `config.js`, pero era un dibujo plano al lado de lo
+   que puede un video.
+3. **Un video vertical con la tarjeta en blanco** y el texto puesto encima
+   en HTML. Nítido y editable, pero el texto aparecía sobre el papel en vez
+   de venir con él.
+
+La de ahora es la primera en la que el video trae la tarjeta escrita, bien
+escrita y quieta, y por eso se puede usar tal cual.
+
+### Cómo cabe en la pantalla
+
+El video es 9:16 y un teléfono es más alargado (9:19.5). El cuadro del video
+tiene **siempre el alto de la pantalla** y el ancho que le toque: en un
+375×812 sale de 457 px, así que sobran 41 px por lado, que se recortan.
+
+La tarjeta cabe justa —va del 11% al 90% del ancho cuando termina de salir, y
+en ese teléfono se ve del 9% al 91%— y cuando la cámara se le acerca se sale
+por los lados. Es lo que se busca: lo siguiente que ve el invitado es la
+portada, que es esa misma tarjeta ocupando la pantalla.
+
+En una ventana apaisada pasa al revés: el video queda al centro y lo que
+sobra a los lados va en vino.
+
+El cierre **no espera al evento `ended`**: para entonces el video ya se
+congeló en su último fotograma y la luz llegaría tarde. `main.js` mira el
+reloj del video en cada cuadro de pantalla y arranca 0.55 s antes del final.
+Los tiempos de `main.js` (`DURA_VELO`, `DURA_SALIR`) tienen que coincidir con
+las transiciones de `.intro` en el CSS.
+
+### Quién no la ve
+
+Un adorno no puede dejar a nadie fuera de la invitación. La intro se salta
+sola cuando:
+
+- el sistema pide **movimiento reducido**;
+- el teléfono está en **ahorro de datos** o en **2G**: esos megas los paga el
+  invitado;
+- la invitación **ya se abrió en esta visita** (al volver del álbum);
+- **no hay JavaScript**.
+
+Esto se decide en un script dentro del `<head>` de `index.html`, y no en
+`main.js`, porque la capa de la intro tapa la pantalla entera en vino y
+`main.js` corre recién al terminar de leer el HTML: decidirlo allí dejaría ver
+un parpadeo de vino a quien no va a ver la animación.
+
+Y una vez empezada, se sale igual de sola si el video **no arranca en cuatro
+segundos**, si el navegador le niega la reproducción automática, si el
+archivo falla, o si el invitado toca **Saltar**, que está siempre a la vista.
+
+### El orden de las descargas
+
+Mientras corre la intro, lo único que se baja es el video. Lo demás espera a
+que termine, para no pelearle el ancho de banda a lo único que el invitado
+está mirando:
+
+| Qué | Cuánto | Por qué puede esperar |
+|---|---|---|
+| El marco floral y la foto del arco | 136 KB | están debajo de la portada, que está debajo de la intro |
+| La canción | 913 KB | no suena hasta que se toca *Abrir invitación* |
+
+Las dos caen después en el mismo hueco de siempre: la página ya cargó y el
+invitado está mirando la portada sin tocar nada todavía. Si no hay intro,
+bajan igual que antes, sin esperar a nada.
 
 ## Sobre la canción
 

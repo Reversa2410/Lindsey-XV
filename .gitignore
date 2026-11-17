@@ -16,3 +16,9 @@ dist/
 
 # Vercel
 .vercel/
+
+# Los originales de video (16 MB el ultimo) y lo que saca el conversor.
+# El repositorio es publico y git no olvida: lo que se sube es solo
+# intro.webm, intro.mp4 y el cartel.
+assets/video/original-*
+.claude/conversor/salida/

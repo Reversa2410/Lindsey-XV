@@ -18,7 +18,46 @@
      telefonos que ya habian entrado se quedaron con un main.js viejo que no
      entendia el CSS nuevo. En escritorios recien estrenados no se notaba,
      porque no tenian nada guardado. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=16">
+<link rel="stylesheet" href="assets/css/estilos.css?v=20">
+
+<!-- Decide si hay intro ANTES del primer pintado.
+
+     Tiene que ir aqui y no en main.js: la capa de la intro tapa la
+     pantalla entera en vino, y main.js corre recien al terminar de leer
+     el HTML. Decidirlo alli dejaria ver un parpadeo de vino a quien no
+     va a ver la animacion, que es justo lo contrario de lo que se busca.
+
+     Sin JavaScript no se pone ninguna clase y el CSS deja la capa en
+     display:none, asi que la invitacion arranca en la portada de
+     siempre. El caso raro es el que falla sin quedarse trabado.
+
+     SE VUELVE A MIRAR EL AHORRO DE DATOS. La intro es otra vez un video
+     (530 o 896 KB, segun el telefono) y esos megas los paga el
+     invitado: con el ahorro de datos puesto, o en 2G, se pasa directo a
+     la portada. Es la misma regla que usa main.js para no adelantar la
+     descarga de la cancion.
+
+     OJO: la llave 'xv-abierta' es la misma que usa main.js (LLAVE_ABIERTA).
+     Si se cambia alla, hay que cambiarla aqui tambien. -->
+<script>
+(function () {
+  var salta = false;
+
+  /* Ya entro en esta visita (vuelve del album): la intro es para la
+     primera vez, no para cada ida y vuelta. */
+  try { salta = sessionStorage.getItem('xv-abierta') === '1'; } catch (e) { /* modo privado */ }
+
+  /* Quien pidio menos movimiento no quiere un sobre abriendose y un
+     destello llenando la pantalla. */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) salta = true;
+
+  /* Ahorro de datos o 2G: el video no se baja. */
+  var red = navigator.connection;
+  if (red && (red.saveData || /(^|-)2g$/.test(red.effectiveType || ''))) salta = true;
+
+  document.documentElement.classList.add(salta ? 'sin-intro' : 'con-intro');
+})();
+</script>
 </head>
 <body class="bloqueado">
 
@@ -187,6 +226,45 @@
 <!-- ====================================================================
      PORTADA — se abre al tocar el boton
      ==================================================================== -->
+<!-- ====================================================================
+     INTRO — el sobre que se abre
+
+     Un video de 7.1 s, 720x1280, sin sonido: el sobre se abre, sale la
+     tarjeta, la camara se le acerca y la tarjeta se enciende. Va encima
+     de la portada y termina fundiendose con ella: el destello del video
+     no llega a los bordes, asi que lo termina el CSS —crece una luz
+     desde el centro de la tarjeta hasta llenar la pantalla— y debajo
+     queda el mismo degradado de la portada. El corte entre una cosa y
+     la otra no llega a existir.
+
+     EL TEXTO DE LA TARJETA ESTA EN EL VIDEO. "XV", "Lindsey" y el boton
+     vienen pintados en los fotogramas, no salen de config.js: si cambia
+     el nombre, hay que cambiar el video.
+
+     El <video> viene con preload="none" a proposito: la decision de
+     bajarlo o no se toma en main.js (seccion 7), asi que quien no lo va
+     a ver no gasta ni un byte. Lo unico que se baja siempre es el
+     cartel, 23 KB, que es lo que evita el rectangulo negro mientras
+     llega el video.
+     ==================================================================== -->
+<div class="intro" id="intro">
+  <!-- Este cuadro tiene la proporcion exacta del video (9:16). -->
+  <div class="intro__cuadro">
+    <video class="intro__video" id="introVideo"
+           muted playsinline preload="none"
+           poster="assets/img/intro-cartel.webp?v=20"
+           disablepictureinpicture disableremoteplayback
+           aria-hidden="true">
+      <!-- AV1 primero: 530 KB contra los 896 KB del MP4. Quien no lo
+           entienda cae solo al MP4, que lo reproduce cualquier cosa. -->
+      <source src="assets/video/intro.webm?v=20" type='video/webm; codecs="av01.0.05M.08"'>
+      <source src="assets/video/intro.mp4?v=20"  type='video/mp4; codecs="avc1.4D4028"'>
+    </video>
+  </div>
+
+  <button class="intro__saltar" id="btnSaltar" type="button">Saltar</button>
+</div>
+
 <div class="portada" id="portada">
   <div class="portada__hoja portada__hoja--arriba"></div>
   <div class="portada__hoja portada__hoja--abajo"></div>
@@ -424,8 +502,8 @@
 
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=16"></script>
-<script src="assets/js/subida.js?v=16"></script>
-<script src="assets/js/main.js?v=16"></script>
+<script src="assets/js/config.js?v=20"></script>
+<script src="assets/js/subida.js?v=20"></script>
+<script src="assets/js/main.js?v=20"></script>
 </body>
 </html>

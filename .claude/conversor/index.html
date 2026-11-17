@@ -1,0 +1,122 @@
+<!doctype html>
+<!-- CONVERSOR DE VIDEO PARA LA INTRO. No es parte de la invitacion.
+
+     Decodifica el original y lo vuelve a codificar con WebCodecs, dentro
+     del navegador. Existe porque en esta maquina Windows (Smart App
+     Control) no deja correr ffmpeg. No tiene botones: se maneja desde la
+     consola de esta pagina, con el servidor de al lado andando.
+
+       await convertir({ nombre:'intro.webm', contenedor:'webm', codec:'av1',
+                         codecCompleto:'av01.0.05M.08',
+                         ancho:720, alto:1280, bitrate:620000 })
+       await convertir({ nombre:'intro.mp4', contenedor:'mp4', codec:'avc',
+                         codecCompleto:'avc1.4D4028',
+                         ancho:720, alto:1280, bitrate:1050000 })
+       await cartel({ nombre:'intro-cartel.webp', t:0, ancho:540, alto:960, calidad:.7 })
+
+     'ini' y 'fin' (en segundos) recortan. La pista de audio no se copia
+     nunca. Lo que sale queda en ./salida; de ahi se copia a mano a
+     assets/video y assets/img. Hay que dejar la pestana A LA VISTA: en
+     segundo plano el navegador frena la pagina. -->
+<meta charset="utf-8">
+<title>conversor</title>
+<body style="margin:0;background:#222;color:#ddd;font:13px monospace">
+<div id="log">listo</div>
+<div id="vista" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+<script type="module">
+import {
+  Input, Output, ALL_FORMATS, BlobSource, BufferTarget,
+  Mp4OutputFormat, WebMOutputFormat, VideoSampleSink, CanvasSource
+} from './node_modules/mediabunny/dist/bundles/mediabunny.mjs';
+
+const log = t => { document.getElementById('log').textContent = t; };
+let fuente = null;
+async function laFuente() {
+  if (!fuente) fuente = await (await fetch('/fuente.mp4')).blob();
+  return fuente;
+}
+
+/* o = { nombre, contenedor:'mp4'|'webm', codec:'avc'|'av1'|'vp9', codecCompleto,
+         ancho, alto, bitrate, ini, fin, gop, hw } */
+window.convertir = async function (o) {
+  const input = new Input({ source: new BlobSource(await laFuente()), formats: ALL_FORMATS });
+  const pista = await input.getPrimaryVideoTrack();
+  const sink = new VideoSampleSink(pista);
+
+  const lienzo = new OffscreenCanvas(o.ancho, o.alto);
+  const ctx = lienzo.getContext('2d', { alpha: false });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  const output = new Output({
+    format: o.contenedor === 'mp4' ? new Mp4OutputFormat({ fastStart: 'in-memory' }) : new WebMOutputFormat(),
+    target: new BufferTarget()
+  });
+  let cfg = null;
+  const origen = new CanvasSource(lienzo, {
+    codec: o.codec,
+    bitrate: o.bitrate,
+    keyFrameInterval: o.gop || 2,
+    latencyMode: 'quality',
+    bitrateMode: 'variable',
+    fullCodecString: o.codecCompleto,
+    hardwareAcceleration: o.hw || 'no-preference',
+    onEncoderConfig: c => { cfg = c; }
+  });
+  output.addVideoTrack(origen, { frameRate: 30 });
+  await output.start();
+
+  const ini = o.ini || 0, fin = o.fin || Infinity;
+  let n = 0;
+  for await (const muestra of sink.samples(ini, fin)) {
+    const t = muestra.timestamp - ini;
+    if (t < -1e-6) { muestra.close(); continue; }
+    muestra.draw(ctx, 0, 0, o.ancho, o.alto);
+    await origen.add(Math.max(0, t), muestra.duration);
+    muestra.close();
+    n++;
+    if (n % 30 === 0) log(o.nombre + ' ' + n);
+  }
+  await output.finalize();
+  const buf = output.target.buffer;
+  const r = await fetch('/guardar/' + o.nombre, { method: 'POST', body: buf });
+  log(o.nombre + ' listo ' + buf.byteLength);
+  return { nombre: o.nombre, bytes: buf.byteLength, cuadros: n, guardado: await r.text(),
+           codec: cfg && cfg.codec, hw: cfg && cfg.hardwareAcceleration };
+};
+
+/* Un fotograma del original a un archivo de imagen. */
+window.cartel = async function (o) {
+  const input = new Input({ source: new BlobSource(await laFuente()), formats: ALL_FORMATS });
+  const sink = new VideoSampleSink(await input.getPrimaryVideoTrack());
+  const muestra = await sink.getSample(o.t || 0);
+  const lienzo = new OffscreenCanvas(o.ancho, o.alto);
+  const ctx = lienzo.getContext('2d', { alpha: false });
+  ctx.imageSmoothingQuality = 'high';
+  muestra.draw(ctx, 0, 0, o.ancho, o.alto);
+  muestra.close();
+  const blob = await lienzo.convertToBlob({ type: o.tipo || 'image/webp', quality: o.calidad || .72 });
+  await fetch('/guardar/' + o.nombre, { method: 'POST', body: blob });
+  return { nombre: o.nombre, bytes: blob.size };
+};
+
+/* Compara fotogramas de varios archivos de ./salida, lado a lado. */
+window.comparar = async function (archivos, t, ancho, recorte) {
+  const vista = document.getElementById('vista');
+  vista.innerHTML = '';
+  for (const a of archivos) {
+    const v = document.createElement('video');
+    v.muted = true; v.src = URL.createObjectURL(await (await fetch(a)).blob());
+    await new Promise(ok => { v.onloadeddata = ok; });
+    await new Promise(ok => { v.onseeked = () => requestAnimationFrame(() => setTimeout(ok, 80)); v.currentTime = t; });
+    const c = document.createElement('canvas');
+    const r = recorte || [0, 0, v.videoWidth, v.videoHeight];
+    c.width = ancho; c.height = Math.round(ancho * r[3] / r[2]);
+    c.getContext('2d').drawImage(v, r[0] * v.videoWidth, r[1] * v.videoHeight, r[2] * v.videoWidth, r[3] * v.videoHeight, 0, 0, c.width, c.height);
+    c.title = a;
+    vista.appendChild(c);
+  }
+  return archivos.length;
+};
+window.listo = true;
+</script>

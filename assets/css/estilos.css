@@ -124,6 +124,180 @@ body.abierta .progreso{opacity:1}
   box-shadow:0 0 12px rgba(var(--rgb-oro),.65);
 }
 
+/* ================================================================== INTRO
+   EL SOBRE QUE SE ABRE, antes de la portada.
+
+   Es un video de 7.1 s, 720x1280, sin sonido: la pista de audio se quito
+   del archivo, no se silencio. El original sin tocar es
+   assets/video/original-intro-buena-16nov.mp4.
+
+   EL TEXTO DE LA TARJETA VIENE EN EL VIDEO. "XV", "Lindsey" y el boton
+   estan pintados en los fotogramas, asi que aqui no hay nada que poner
+   encima ni que alinear. (La version anterior traia la tarjeta en blanco
+   y el texto iba en HTML; esta ya no.)
+
+   EL FINAL ES LO UNICO QUE SE MIDE SOBRE EL VIDEO. La tarjeta se enciende
+   desde su centro, que cae en el 45% del alto del cuadro, y el destello
+   del video se queda en la tarjeta: en los bordes siguen viendose las
+   rosas. Lo que hace el CSS es terminarlo —ver "COMO TERMINA", mas
+   abajo—. Si se cambia el video por otro, lo que hay que volver a medir
+   es ese 45% y nada mas.
+   ------------------------------------------------------------------------ */
+.intro{display:none}
+
+html.con-intro .intro{
+  position:fixed; inset:0; z-index:110;
+  /* place-content, no place-items. En un telefono el cuadro es mas ancho
+     que la pantalla, y place-items solo centra el cuadro DENTRO de su
+     carril: el carril mide lo que el cuadro y arranca pegado a la
+     izquierda, asi que todo lo que sobra se iba por la derecha y la
+     tarjeta salia cortada. place-content centra el carril entero, sobre
+     o no sobre. */
+  display:grid; place-content:center;
+  background:var(--tono-900);
+  overflow:hidden;
+  transition:opacity .45s ease;
+
+  /* El alto de la pantalla. Las dos lineas son a proposito: quien no
+     entienda dvh (iOS anterior al 15.4) se queda con la de arriba. */
+  --alto:100vh;
+  --alto:100dvh;
+
+  /* EL CUADRO. Tiene SIEMPRE el alto de la pantalla, y el ancho que le
+     toque por la proporcion del video (.5625 es 9/16). Con esa sola linea
+     se resuelven los dos casos:
+
+       - En un telefono, que es mas alargado que 9:16, el ancho que sale
+         es MAYOR que la pantalla: 457 contra 375 en un 375x812. Sobran
+         41 px por lado que se van por el overflow. Se pierde un poco de
+         los costados, donde solo hay rosas, y se gana la pantalla entera.
+         La tarjeta cabe justa (va del 11% al 90% del ancho cuando
+         termina de salir, y se ve del 9% al 91%), y cuando la camara se
+         le acerca se sale por los lados: es lo que se busca, porque lo
+         siguiente que ve el invitado es la portada, que es esa misma
+         tarjeta ocupando la pantalla.
+
+       - En una ventana apaisada el ancho sale MENOR que la pantalla y lo
+         que sobra a los lados queda en vino. Tambien es lo correcto:
+         recortar un 9:16 para llenar un monitor se comeria media escena.
+
+     OJO CON LAS UNIDADES: aqui no puede entrar un porcentaje. Una
+     variable con un % adentro se resuelve contra el ANCHO del contenedor
+     cuando se usa en 'width' y contra el ALTO cuando se usa en 'height',
+     asi que el mismo --cuadro valdria dos cosas distintas y el cuadro
+     saldria con la proporcion cambiada. Ya paso: 457x974 en vez de
+     457x812. */
+  --cuadro:calc(var(--alto) * .5625);
+}
+
+.intro__cuadro{
+  position:relative;
+  width:var(--cuadro);
+  height:var(--alto);
+}
+
+.intro__video{
+  display:block; width:100%; height:100%;
+  object-fit:cover;
+  background:var(--tono-900);
+}
+
+/* COMO TERMINA: SE TERMINA EL DESTELLO QUE EL VIDEO DEJA A MEDIAS.
+
+   En el video la tarjeta se enciende desde su centro, pero la luz se
+   queda en la tarjeta: en los bordes siguen las rosas. Medio segundo
+   antes del ultimo fotograma main.js pone la capa en 'cerrando' y pasan
+   tres cosas a la vez, que juntas se leen como una sola luz que crece.
+
+   1. EL VIDEO SE ACLARA. Es un 'brightness' sobre el propio video: las
+      rosas de los bordes se encienden antes de que la luz las alcance,
+      que es lo que hace que parezca luz y no un circulo tapando cosas.
+
+   2. CRECE LA LUZ (::before). Sale del centro de la tarjeta —el 45% del
+      alto, donde el video ya esta en blanco—, y arranca del tamano que
+      el destello ya tiene en el video, asi que no "aparece": sigue. El
+      centro es blanco y el borde un dorado muy palido que se pierde.
+      No se uso un velo plano porque mezclar crema sobre el rojo de las
+      rosas pasa por un rosa turbio a mitad de camino, que es justo el
+      que esta paleta evita a proposito.
+
+      Es un CUADRADO mas grande que la pantalla, y el degradado va con
+      'closest-side'. Las dos cosas son necesarias: en una caja alta y
+      angosta el circulo se sale por los lados, y sin closest-side el
+      degradado se mide hasta la esquina y en el medio de cada lado
+      todavia le queda color. Con cualquiera de las dos mal, lo que
+      crece es un rectangulo de bordes duros y no una luz.
+
+   3. LLEGA EL CREMA DE LA PORTADA (::after). Entra despues y termina
+      las esquinas. Lleva EXACTAMENTE el mismo degradado que
+      .portada__hoja, asi que cuando la capa se desvanece no hay salto
+      de color: lo que se va y lo que queda son el mismo crema, pixel
+      por pixel. De la luz blanca al crema hay un paso muy corto, y es
+      el que se lee como "el destello se apaga y queda la portada".
+
+   Los tiempos de aqui tienen que coincidir con DURA_VELO y DURA_SALIR en
+   main.js (seccion 7). */
+.intro__video{transition:filter .9s ease-in}
+.intro.cerrando .intro__video{filter:brightness(1.38) saturate(.85)}
+
+.intro::before{
+  content:''; position:absolute; z-index:3; pointer-events:none;
+  left:50%; top:45%;
+  width:max(175vw, 175vh); height:max(175vw, 175vh);
+  translate:-50% -50%;
+  background:radial-gradient(circle closest-side,
+    #fff 0%, var(--papel) 34%, rgba(255,250,240,.96) 56%,
+    rgba(255,243,222,.55) 76%, rgba(255,240,214,0) 100%);
+  opacity:0; transform:scale(.2);
+  transition:opacity .4s ease-out, transform 1.1s cubic-bezier(.4,0,.35,1);
+}
+.intro.cerrando::before{opacity:1; transform:scale(1)}
+
+.intro::after{
+  content:''; position:absolute; inset:0; z-index:4; pointer-events:none;
+  background:
+    radial-gradient(620px 340px at 50% 46%, var(--portada-halo) 0%, transparent 72%),
+    linear-gradient(var(--papel), var(--portada-abajo));
+  opacity:0; transition:opacity .5s ease-in-out;
+}
+.intro.cerrando::after{opacity:1; transition-delay:.6s}
+.intro.fuera{opacity:0}
+
+/* Mientras crece la luz, la escena sigue acercandose al ritmo que traia
+   la camara del video: asi no se nota que el video ya se quedo quieto en
+   su ultimo fotograma. Va en 'scale', que es una propiedad aparte de
+   'transform' y por eso no le pisa nada al centrado del cuadro. */
+.intro.cerrando .intro__cuadro{scale:1.07; transition:scale 1.2s cubic-bezier(.3,.3,.4,1)}
+
+.intro__saltar{
+  position:absolute; z-index:5;
+  right:max(16px, env(safe-area-inset-right));
+  bottom:max(18px, env(safe-area-inset-bottom));
+  padding:9px 18px; border-radius:999px;
+  border:1px solid rgba(var(--rgb-oro),.45);
+  background:rgba(var(--rgb-950),.42);
+  color:var(--oro-claro);
+  font-family:var(--serif); font-size:.72rem; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase;
+  -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+  transition:background .3s, color .3s, border-color .3s;
+  /* Aparece con un segundo de retraso: antes estorba al primer plano del
+     sobre, que es lo que vale la pena mirar. */
+  opacity:0; animation:subirSuave .6s var(--curva) 1s forwards;
+}
+.intro__saltar:hover,
+.intro__saltar:focus-visible{
+  background:rgba(var(--rgb-oro),.9); color:var(--tono-900); border-color:var(--oro);
+}
+.intro.cerrando .intro__saltar{animation:none; opacity:0; transition:opacity .3s}
+
+/* La portada esta debajo todo el rato, con sus animaciones de entrada en
+   pausa. Si corrieran mientras el video tapa la pantalla, el invitado se
+   las perderia y al quitarse el velo encontraria la portada ya puesta,
+   quieta. Arrancan cuando main.js pone 'portada-lista'. */
+html.con-intro .portada *{animation-play-state:paused}
+html.con-intro.portada-lista .portada *{animation-play-state:running}
+
 /* ================================================================ PORTADA */
 .portada{
   position:fixed; inset:0; z-index:100;

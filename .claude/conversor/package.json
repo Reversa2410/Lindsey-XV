@@ -1,0 +1,8 @@
+{
+  "name": "conversor-de-video",
+  "private": true,
+  "description": "Convierte el video de la intro en el navegador (WebCodecs), sin ffmpeg. Ver assets/video/LEEME.txt.",
+  "dependencies": {
+    "mediabunny": "^1.66.0"
+  }
+}

@@ -1,0 +1,155 @@
+EL VIDEO DE LA INTRO
+====================
+
+Ya esta puesto:  intro.webm (AV1)  +  intro.mp4 (H.264)
+El cartel va aparte, en assets/img/intro-cartel.webp
+
+  7.07 segundos | 720x1280 | 30 fps | SIN pista de audio
+
+  intro.webm   530 KB   lo baja Chrome, Firefox y Android
+  intro.mp4    896 KB   lo baja el iPhone y todo lo demas
+  cartel        23 KB   lo baja todo el mundo (es el primer fotograma)
+
+Cada invitado baja UNO de los dos videos, no los dos. El <source> del AV1
+va primero y quien no lo entienda cae solo al MP4.
+
+El original sin tocar es original-intro-buena-16nov.mp4 (16.2 MB,
+1080x1920, con audio). Esta en esta carpeta pero NO se sube: .gitignore
+deja fuera todo lo que se llame original-*.
+
+Lo que se ve, por que termina como termina y quien no lo ve esta en el
+README, en "Sobre la intro". Esto de aqui es solo como se hizo el archivo.
+
+
+QUE SE LE HIZO AL ORIGINAL
+--------------------------
+  - Se bajo de 1080x1920 a 720x1280, el mismo tamano que tenia la version
+    anterior. Mas chico no conviene: la tarjeta trae letra menuda ("con
+    musica - sube el volumen") y es lo primero que se emborrona.
+  - Se le quito la pista de audio. No se silencio: se quito.
+  - Se dejo entero, los 212 fotogramas. No se recorto ni el principio ni
+    el final: el cierre lo hace el CSS encima del ultimo medio segundo.
+  - No se le toco el color. El vino del sobre y el oro del lacre ya caen
+    sobre la paleta.
+
+    16.2 MB  ->  530 KB (AV1)  /  896 KB (H.264)
+
+
+POR QUE ESOS BITRATES
+---------------------
+Es un video dificil de comprimir: damasco en el sobre, rosas, bokeh y
+chispas que cambian en cada fotograma. Medido contra el original bajado a
+720p (PSNR de luminancia, promedio de ocho fotogramas repartidos):
+
+    AV1    450 kbps    411 KB    37.6 dB
+    AV1    650 kbps    551 KB    39.3 dB
+    H.264  800 kbps    685 KB    35.8 dB   <- cae a 32 dB cuando la
+                                              tarjeta se despliega
+    H.264 1100 kbps    936 KB    38.2 dB
+
+Quedo en AV1 a 620 kbps y H.264 a 1050 kbps. Medidos ya los archivos que
+estan puestos: 39.1 dB el AV1 y 38.0 dB el H.264.
+
+El H.264 pesa casi el doble para verse parecido. No hay vuelta: es el
+codec que entiende cualquier iPhone.
+
+
+COMO SE CONVIRTIO: SIN FFMPEG
+-----------------------------
+En esta maquina Windows tiene activado el Control inteligente de
+aplicaciones (Smart App Control) y no deja correr ffmpeg, que no viene
+firmado. No se desactivo: es una proteccion del sistema.
+
+Se convirtio dentro del navegador, con WebCodecs, que son los
+codificadores que el propio Chrome trae dentro. La herramienta esta en
+.claude/conversor/ :
+
+    index.html           la pagina; se maneja desde su consola
+    servidor-conv.js     sirve la pagina y guarda lo que sale
+    package.json         una sola dependencia: mediabunny, que arma el
+                         .mp4 y el .webm
+
+
+SI SE CAMBIA EL VIDEO POR OTRO
+------------------------------
+1. Dejar el original nuevo en esta carpeta, con un nombre que empiece por
+   "original-" para que no se suba.
+
+2. La primera vez, instalar la dependencia:
+
+       cd .claude/conversor
+       npm install
+
+3. Arrancar el conversor con ese original y abrir http://localhost:5511
+
+       node .claude/conversor/servidor-conv.js assets/video/original-NUEVO.mp4
+
+4. En la consola de esa pagina (F12), con la pestana a la vista:
+
+       await convertir({ nombre:'intro.webm', contenedor:'webm', codec:'av1',
+                         codecCompleto:'av01.0.05M.08',
+                         ancho:720, alto:1280, bitrate:620000 })
+
+       await convertir({ nombre:'intro.mp4', contenedor:'mp4', codec:'avc',
+                         codecCompleto:'avc1.4D4028',
+                         ancho:720, alto:1280, bitrate:1050000 })
+
+       await cartel({ nombre:'intro-cartel.webp', t:0,
+                      ancho:540, alto:960, calidad:.7 })
+
+   Lo que sale queda en .claude/conversor/salida/. Los dos videos van a
+   assets/video/ y el cartel a assets/img/.
+
+5. Volver a medir, sobre el video nuevo, las dos cosas que dependen de el:
+
+     - a cuanto del final arranca el cierre: CIERRE_ANTES_DEL_FINAL, en
+       main.js (seccion 7)
+     - desde que altura sale la luz: el 'top:45%' de .intro::before, en
+       estilos.css. Es el centro del destello en el ultimo fotograma.
+
+6. Subir el ?v= en index.html y galeria.html, en todos a la vez.
+
+Si el video nuevo no es 9:16 hay que tocar ademas el .5625 de --cuadro en
+estilos.css, que es la proporcion.
+
+
+SI ALGUNA VEZ ALGUIEN REPORTA QUE LA INTRO SE TRABA
+---------------------------------------------------
+El AV1 no se decodifica por hardware en telefonos anteriores a 2023, y a
+720p por software un telefono muy viejo puede no llegar. El cambio es
+volver a sacar el .webm en VP9, que lo decodifica por hardware cualquier
+Android desde 2015. Pesa mas, pero no se traba:
+
+       await convertir({ nombre:'intro.webm', contenedor:'webm', codec:'vp9',
+                         codecCompleto:'vp09.00.31.08',
+                         ancho:720, alto:1280, bitrate:800000 })
+
+Y en index.html hay que cambiar el type del <source>:
+
+       type='video/webm; codecs="vp09.00.31.08"'
+
+
+SI SE QUIERE QUITAR LA INTRO DEL TODO
+-------------------------------------
+Borrar el <div class="intro"> de index.html. Todo lo demas se apaga solo:
+main.js no encuentra la capa, da la intro por terminada al instante y la
+portada arranca como antes. No hay que tocar el CSS ni el resto del JS.
+
+
+LO DEMAS QUE HAY EN ESTA CARPETA
+--------------------------------
+Es de las versiones anteriores y no lo usa nada: se puede borrar.
+
+    original-dreamina-14nov.mp4    el video anterior, el de la tarjeta en
+                                   blanco con el texto puesto en HTML
+    PROMPTS-IA.txt                 los prompts con que se pidio ese video
+    PROMPT-FINAL.txt
+    referencia-sobre.html / .png   la imagen de referencia para el generador
+
+
+OJO: EL REPOSITORIO ES PUBLICO
+------------------------------
+Los dos videos se suben a un repositorio que cualquiera puede ver, y el
+historial de git los conserva aunque despues se borren. Si se cambian por
+otros, los anteriores se quedan ahi para siempre y van sumando peso al
+repositorio: es un mega y medio por version.

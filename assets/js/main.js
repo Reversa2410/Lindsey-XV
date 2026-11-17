@@ -350,8 +350,19 @@
 
     if (H.lienzo) $('heroLienzo').style.setProperty('--lienzo', H.lienzo);
 
+    /* El marco floral y la foto del arco se piden recien cuando termina
+       la intro en video. Son 136 KB que estan DOS pantallas mas abajo:
+       debajo de la portada, que a su vez esta debajo del video. Nadie
+       los puede ver hasta que el invitado toque "Abrir invitacion", pero
+       si se piden al cargar le quitan ancho de banda al video, que es lo
+       unico que si se esta mirando. Despues de la intro queda de sobra el
+       rato que el invitado pasa en la portada antes de tocar.
+
+       Si no hay intro (ahorro de datos, movimiento reducido, volver del
+       album) la espera no existe y bajan igual que siempre. */
     var marco = $('heroMarco');
-    if (H.marco) marco.src = H.marco; else marco.hidden = true;
+    if (H.marco) cuandoTermineLaIntro(function () { marco.src = H.marco; });
+    else marco.hidden = true;
 
     $('heroNombre').textContent = C.nombre;
     $('heroDia').textContent = DIAS[FECHA_EVENTO.getDay()];
@@ -361,8 +372,8 @@
     /* Sin foto real todavia? Entonces va la ilustracion en el arco. */
     var foto = $('heroFoto');
     if (H.foto) {
-      foto.src = H.foto;
       foto.alt = H.fotoAlt || '';
+      cuandoTermineLaIntro(function () { foto.src = H.foto; });
     } else {
       foto.hidden = true;
       /* Ojo: es un <svg>, y la propiedad .hidden solo existe en los
@@ -555,8 +566,14 @@
       else setTimeout(bajar, 600);
     }
 
-    if (document.readyState === 'complete') enElHueco();
-    else window.addEventListener('load', enElHueco, { once: true });
+    /* Y se espera tambien a que termine la intro en video. Las dos cosas
+       caen en el mismo hueco —la pagina ya cargo, el invitado todavia no
+       toco nada— y si bajaran a la vez se quitarian ancho de banda entre
+       ellas. El video va primero porque es lo que se esta mirando. */
+    function enElHuecoTrasLaIntro() { cuandoTermineLaIntro(enElHueco); }
+
+    if (document.readyState === 'complete') enElHuecoTrasLaIntro();
+    else window.addEventListener('load', enElHuecoTrasLaIntro, { once: true });
   }
 
   function reproducir() {
@@ -581,7 +598,184 @@
   }
 
   /* ======================================================================
-     7. APERTURA DE LA PORTADA
+     7. INTRO — EL SOBRE QUE SE ABRE
+     ----------------------------------------------------------------------
+     Un video de 7.1 s, 720x1280, sin sonido: la pista de audio se quito
+     del archivo, no se silencio. Va encima de la portada y termina
+     fundiendose con ella.
+
+     EL TEXTO VIENE EN EL VIDEO. "XV", "Lindsey" y el boton estan pintados
+     en los fotogramas, asi que aqui no se escribe nada sobre la tarjeta.
+     Lo que SI cuesta: si cambia el nombre de la quinceanera, config.js ya
+     no alcanza y hay que cambiar el video.
+
+     COMO TERMINA. En el video la tarjeta se enciende, pero el destello no
+     llega a los bordes de la pantalla. Medio segundo antes del final se
+     pone la capa en 'cerrando' y el CSS lo termina: el video se aclara,
+     crece una luz desde el centro de la tarjeta y acaba en el MISMO
+     degradado que tiene la portada debajo (ver "COMO TERMINA" en
+     estilos.css). Cuando el crema ya tapa todo se sueltan las animaciones
+     de la portada, que venian en pausa, y recien ahi se desvanece la
+     capa. El invitado no ve un corte: ve la luz llenar la pantalla,
+     apagarse, y la portada aparecer en su lugar.
+
+     LO QUE NO HACE. No bloquea nada. Si el video no arranca en cuatro
+     segundos, si el navegador rechaza el autoplay, si el archivo falla o
+     si el invitado toca "Saltar", se pasa de largo a la portada y listo.
+     Un adorno no puede dejar a nadie fuera de la invitacion.
+
+     QUIEN NO LO VE. Lo decide el script del <head> de index.html, antes
+     del primer pintado: movimiento reducido, ahorro de datos o 2G, o
+     haber abierto ya la invitacion en esta visita (al volver del album).
+     ====================================================================== */
+
+  /* Los tiempos del cierre, en milisegundos. Tienen que coincidir con las
+     transiciones de .intro en el CSS. */
+  var DURA_VELO  = 1100;  /* lo que tarda la luz en volverse el crema */
+  var DURA_SALIR = 520;   /* el desvanecido de la capa, ya en crema   */
+
+  /* A cuanto del final arranca el cierre, en segundos de video. Se mide
+     sobre ESTE video: el destello de la tarjeta llega a su tope en 6.2 s
+     y se queda ahi hasta el ultimo fotograma (7.07 s), asi que a 0.55 del
+     final la luz del CSS sale de un centro que ya esta en blanco, y para
+     cuando el video se congela ya lo tiene medio tapado. Si se cambia el
+     video por otro, hay que volver a medirlo. */
+  var CIERRE_ANTES_DEL_FINAL = 0.55;
+
+  /* El resto de la pagina espera aqui a que la intro termine. Lo usan la
+     descarga adelantada de la cancion y las dos imagenes del hero: si
+     bajaran mientras corre el video, se pelearian el ancho de banda con
+     lo unico que el invitado esta mirando. Despues queda de sobra el rato
+     que pasa en la portada antes de tocar el boton. */
+  var trasLaIntro = [];
+  var introTerminada = false;
+
+  function cuandoTermineLaIntro(fn) {
+    if (introTerminada) fn(); else trasLaIntro.push(fn);
+  }
+
+  function marcarIntroTerminada() {
+    if (introTerminada) return;
+    introTerminada = true;
+    document.documentElement.classList.add('portada-lista');
+    trasLaIntro.forEach(function (fn) { fn(); });
+    trasLaIntro.length = 0;
+  }
+
+  function prepararIntro() {
+    var capa = $('intro');
+    var video = $('introVideo');
+
+    /* Sin capa, o con el <html> marcado como 'sin-intro': no hay nada que
+       mostrar. Se borra el nodo —asi el cartel tampoco se queda cargado—
+       y la portada arranca de una. */
+    if (!capa || !video || !document.documentElement.classList.contains('con-intro')) {
+      if (capa) capa.remove();
+      marcarIntroTerminada();
+      return;
+    }
+
+    var cerrada = false;
+    var relojDeGracia = null;
+
+    function cerrar(rapido) {
+      if (cerrada) return;
+      cerrada = true;
+      clearTimeout(relojDeGracia);
+
+      /* Al saltar no hay velo que esperar: se va directo. */
+      var velo = rapido ? 0 : DURA_VELO;
+      if (!rapido) capa.classList.add('cerrando');
+
+      setTimeout(function () {
+        document.documentElement.classList.add('portada-lista');
+        capa.classList.add('fuera');
+      }, velo);
+
+      setTimeout(function () {
+        /* Primero se saca la capa del documento y DESPUES se desmonta el
+           video. Al reves se veia un parpadeo negro de un fotograma: el
+           compositor suelta la textura del video mientras el elemento
+           todavia esta en pantalla. Con el nodo ya desprendido no hay nada
+           que pintar.
+
+           Vaciar los <source> y volver a llamar a load() corta la descarga
+           si quedaba algo en camino, que es lo que importa cuando alguien
+           salta la intro a los dos segundos. */
+        capa.remove();
+        video.pause();
+        video.innerHTML = '';
+        video.removeAttribute('poster');
+        video.load();
+        marcarIntroTerminada();
+      }, velo + DURA_SALIR);
+    }
+
+    $('btnSaltar').addEventListener('click', function () { cerrar(true); });
+
+    /* No se espera al evento 'ended' para cerrar: para entonces el video
+       ya se congelo en su ultimo fotograma y la luz llegaria tarde. Se
+       arranca un poco antes, con la tarjeta todavia moviendose. */
+    function mirarElReloj() {
+      var fin = video.duration;
+      if (!fin || !isFinite(fin)) return;
+      if (video.currentTime >= fin - CIERRE_ANTES_DEL_FINAL) cerrar(false);
+    }
+
+    /* 'timeupdate' solo avisa unas cuatro veces por segundo, y aqui un
+       cuarto de segundo se nota: es la mitad del margen que hay antes
+       del ultimo fotograma. Asi que mientras el video corre se mira el
+       reloj en cada cuadro de pantalla. 'timeupdate' y 'ended' se dejan
+       de respaldo, por si la pestana esta en segundo plano y los cuadros
+       no llegan. */
+    function cuadroACuadro() {
+      if (cerrada) return;
+      mirarElReloj();
+      requestAnimationFrame(cuadroACuadro);
+    }
+    video.addEventListener('playing', function () {
+      requestAnimationFrame(cuadroACuadro);
+    }, { once: true });
+
+    video.addEventListener('timeupdate', mirarElReloj);
+    video.addEventListener('ended', function () { cerrar(false); });
+    video.addEventListener('error', function () { cerrar(true); });
+
+    /* Los <source> se cuentan aparte. Cuando los dos archivos no estan,
+       el 'error' le llega a cada <source> pero al <video> no siempre:
+       probado con los dos caidos, lo unico que rescataba al invitado era
+       el reloj de gracia de aqui abajo, o sea cuatro segundos mirando una
+       pantalla quieta. Contandolos se sale apenas se acaban las opciones. */
+    var fuentes = video.querySelectorAll('source');
+    var caidas = 0;
+    Array.prototype.forEach.call(fuentes, function (f) {
+      f.addEventListener('error', function () {
+        caidas++;
+        if (caidas >= fuentes.length) cerrar(true);
+      });
+    });
+
+    /* Red de seguridad. Cubre de una vez la red muy lenta, el codec que no
+       se entiende y el telefono en modo de bajo consumo, que bloquea el
+       autoplay aunque el video venga mudo. */
+    relojDeGracia = setTimeout(function () {
+      if (!video.currentTime) cerrar(true);
+    }, 4000);
+    video.addEventListener('playing', function () {
+      clearTimeout(relojDeGracia);
+    }, { once: true });
+
+    /* Recien aqui se baja. En el HTML el <video> va con preload="none",
+       asi que hasta este momento no se pidio ni un byte: si la intro no
+       iba a verse, no se bajo. */
+    video.preload = 'auto';
+    video.load();
+
+    var p = video.play();
+    if (p && p.catch) p.catch(function () { cerrar(true); });
+  }
+  /* ======================================================================
+     8. APERTURA DE LA PORTADA
      ====================================================================== */
   /* Se recuerda en sessionStorage y no en localStorage a proposito: vale
      para esta visita, no para siempre. Quien vuelva otro dia merece ver la
@@ -643,7 +837,7 @@
   }
 
   /* ======================================================================
-     8. AGREGAR AL CALENDARIO (.ics)
+     9. AGREGAR AL CALENDARIO (.ics)
      ====================================================================== */
   function prepararBotonCalendario() {
     $('btnCalendario').addEventListener('click', function () {
@@ -741,7 +935,7 @@
   }
 
   /* ======================================================================
-     9. CONFIRMACION DE ASISTENCIA
+     10. CONFIRMACION DE ASISTENCIA
      ----------------------------------------------------------------------
      Cada confirmacion se va como una fila a una hoja de calculo de Google:
      fecha, nombre, apellido y si asiste o no. Asi la familia tiene la lista
@@ -847,7 +1041,7 @@
   }
 
   /* ======================================================================
-     10. PARALLAX SUAVE + BARRA DE PROGRESO
+     11. PARALLAX SUAVE + BARRA DE PROGRESO
      ====================================================================== */
   function prepararScroll() {
     var marco = $('heroMarco');
@@ -877,7 +1071,7 @@
   }
 
   /* ======================================================================
-     11. LLUVIA DE PETALOS EN EL CIERRE
+     12. LLUVIA DE PETALOS EN EL CIERRE
      ====================================================================== */
   function prepararConfeti() {
     if (menosMovimiento) return;
@@ -960,6 +1154,10 @@
      ARRANQUE
      ====================================================================== */
   function iniciar() {
+    /* Primero de todo: es lo unico que el invitado tiene en pantalla en
+       este momento, asi que su descarga no deberia esperar a nada. */
+    prepararIntro();
+
     pintarDatos();
     Subida.preparar();
     prepararBotonGaleria();
