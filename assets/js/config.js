@@ -106,8 +106,8 @@ window.CONFIG = {
   /* ---- Lluvia de sobres ----------------------------------------------- */
   sobres: {
     titulo: 'Lluvia de sobres',
-    texto: 'Mi mejor regalo será compartir este día contigo. Si deseas obsequiarme algo, estaré recibiendo con cariño tu sobre como parte de esta lluvia de bendiciones.',
-    cierre: '¡Gracias por su cariño y generosidad!'
+    texto: 'Como parte de esta celebración, tendremos lluvia de sobres. Agradecemos de corazón sus muestras de cariño y generosidad a través de su sobre.',
+    cierre: '¡Gracias por ser parte de este día tan especial!'
   },
 
   /* ---- Confirmacion de asistencia (RSVP) ------------------------------
@@ -128,10 +128,10 @@ window.CONFIG = {
     urlScript: '',
 
     /* Fecha limite para confirmar, texto libre */
-    limite: '25 de noviembre',
+    limite: '26 de noviembre',
 
     /* Aclara por que no se pregunta cuantos van. Deja '' para no mostrarlo. */
-    nota: 'Los lugares ya están reservados a tu nombre, así que solo necesitamos saber si nos acompañas.',
+    nota: 'Tu espacio ya está reservado a tu nombre; solo necesitamos saber si nos acompañarás. Una vez confirmada tu asistencia, te haremos llegar tu pase de acceso.',
 
     /* PENDIENTE: el WhatsApp de la familia. Todavia no se usa para nada;
        queda apuntado para cuando se agregue el contacto del cliente. */

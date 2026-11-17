@@ -108,7 +108,7 @@
 
     /* --- RSVP --- */
     if (C.rsvp && C.rsvp.activo) {
-      $('rsvpTexto').textContent = 'Por favor confirma antes del ' + C.rsvp.limite +
+      $('rsvpTexto').textContent = 'Por favor, confirma tu asistencia antes del ' + C.rsvp.limite +
                                    ' para reservar tu lugar.';
       if (C.rsvp.nota) {
         $('rsvpNota').textContent = C.rsvp.nota;
