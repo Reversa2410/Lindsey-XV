@@ -330,7 +330,7 @@ html.con-intro.portada-lista .portada *{animation-play-state:running}
 .portada.abriendo .portada__centro{opacity:0; transform:scale(.92) translateY(-14px)}
 
 .portada__tiara{
-  width:82px; height:38px; color:var(--oro); margin:0 auto 18px;
+  width:100px; height:44px; margin:0 auto 16px;
   opacity:0; animation:subirSuave .9s var(--curva) .15s forwards;
 }
 .portada__intro{
@@ -511,7 +511,7 @@ body.abierta .invitacion{opacity:1}
 .lienzo__mis   {top:11.65%; font-size:6.83cqw;  font-style:italic}
 .lienzo__xv    {top:15.65%; font-size:15.87cqw; letter-spacing:.367em; padding-left:.367em}
 .lienzo__nombre{top:22.90%; font-size:19.92cqw; font-family:var(--firma);
-                line-height:1.25; text-transform:lowercase}
+                line-height:1.25}
 .lienzo__dia   {top:67.40%; font-size:7.83cqw;  font-style:italic}
 .lienzo__fecha {top:73.10%; font-size:8.74cqw;  font-style:italic}
 /* La direccion se ancla por ABAJO, no por arriba. El diseño de Canva la
@@ -604,9 +604,13 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   position:relative; display:flex; align-items:flex-start; justify-content:center; gap:2px;
 }
 .cuenta__caja{display:flex; flex-direction:column; align-items:center; min-width:62px}
+/* Playfair y no Italiana: la Italiana es de trazo muy fino y, blanca
+   sobre el vino, en el telefono no se alcanzaba a leer. lining-nums
+   porque Playfair trae por defecto numeros de altura variable, y en un
+   reloj tienen que ir parejos. */
 .cuenta__num{
-  font-family:var(--display); font-size:clamp(2.1rem,10vw,2.7rem); line-height:1;
-  font-variant-numeric:tabular-nums;
+  font-family:var(--gala); font-weight:500; font-size:clamp(2rem,9.5vw,2.6rem); line-height:1;
+  font-variant-numeric:lining-nums tabular-nums;
 }
 .cuenta__num.tic{animation:tic .5s var(--curva)}
 @keyframes tic{
@@ -614,10 +618,10 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   100%{transform:none; opacity:1; filter:none}
 }
 .cuenta__lbl{
-  margin-top:8px; font-size:.6rem; letter-spacing:.22em; text-transform:uppercase; opacity:.85;
+  margin-top:8px; font-size:.7rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; opacity:.9;
 }
 .cuenta__sep{
-  font-family:var(--display); font-size:clamp(1.6rem,7vw,2rem); line-height:1.1;
+  font-family:var(--gala); font-size:clamp(1.6rem,7vw,2rem); line-height:1.1;
   color:var(--oro-claro); opacity:.75;
   animation:parpadeo 2s ease-in-out infinite;
 }
@@ -939,7 +943,7 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   padding:54px 30px 6px; text-align:center;
   background:linear-gradient(var(--papel),var(--papel-2));
 }
-.album__tiara{width:76px; height:34px; color:var(--oro); margin:0 auto 16px}
+.album__tiara{width:88px; height:39px; margin:0 auto 16px}
 
 .cierre--album{padding:40px 28px 48px}
 .cierre--album .cierre__lazo{width:86px; height:74px; margin-bottom:6px}

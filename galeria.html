@@ -18,7 +18,7 @@
      telefonos que ya habian entrado se quedaron con un main.js viejo que no
      entendia el CSS nuevo. En escritorios recien estrenados no se notaba,
      porque no tenian nada guardado. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=20">
+<link rel="stylesheet" href="assets/css/estilos.css?v=21">
 </head>
 <!-- "abierta" desde el principio: aqui no hay portada que abrir, la pagina
      se entra directo desde el boton de la invitacion. -->
@@ -51,15 +51,52 @@
       <ellipse cx="100" cy="64" rx="12" ry="14" fill="none" stroke="#A83258" stroke-width="1.4" opacity=".6"/>
     </symbol>
 
-    <!-- Tiara -->
+    <!-- Corona real: oro en degradado vertical (luz arriba, sombra abajo,
+         que es lo que la hace ver metalica), gemas vino con su brillito y
+         dos perlas. Los colores salen todos de los tokens de estilos.css. -->
+    <linearGradient id="gradCorona" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="var(--oro-claro)"/>
+      <stop offset="55%"  stop-color="var(--oro)"/>
+      <stop offset="100%" stop-color="var(--oro-oscuro)"/>
+    </linearGradient>
+    <radialGradient id="gradPerla" cx=".38" cy=".35" r=".7">
+      <stop offset="0%"   stop-color="var(--tono-50)"/>
+      <stop offset="70%"  stop-color="var(--tono-200)"/>
+      <stop offset="100%" stop-color="var(--tono-300)"/>
+    </radialGradient>
     <symbol id="ico-tiara" viewBox="0 0 140 62">
-      <path d="M8 52 L30 16 L46 42 L70 6 L94 42 L110 16 L132 52" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-      <path d="M6 52h128" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-      <circle cx="30" cy="14" r="3.4" fill="currentColor"/>
-      <circle cx="70" cy="5"  r="4"   fill="currentColor"/>
-      <circle cx="110" cy="14" r="3.4" fill="currentColor"/>
-      <circle cx="46" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
-      <circle cx="94" cy="46" r="2.2" fill="currentColor" opacity=".6"/>
+      <!-- cuerpo: cinco puntas unidas por arcos -->
+      <path d="M25 47 Q21 32 15 17 Q30 38 42 23 Q55 40 70 9 Q85 40 98 23 Q110 38 125 17 Q119 32 115 47 Q70 41 25 47Z" fill="url(#gradCorona)"/>
+      <path d="M42 27 Q43 35 45 43 M98 27 Q97 35 95 43" fill="none" stroke="var(--oro-oscuro)" stroke-width=".8" stroke-linecap="round" opacity=".55"/>
+      <path d="M18 21 Q22 33 26 44 M122 21 Q118 33 114 44" fill="none" stroke="var(--oro-claro)" stroke-width=".8" stroke-linecap="round" opacity=".8"/>
+      <!-- banda curva con canto de luz arriba y de sombra abajo -->
+      <path d="M24 46 Q70 39.5 116 46 L114.5 56 Q70 50 25.5 56Z" fill="url(#gradCorona)"/>
+      <path d="M25 46.8 Q70 40.4 115 46.8" fill="none" stroke="var(--oro-claro)" stroke-width=".9"/>
+      <path d="M25.5 56 Q70 50 114.5 56" fill="none" stroke="var(--oro-oscuro)" stroke-width="1"/>
+      <!-- esferas de las puntas y su reflejo -->
+      <g fill="url(#gradCorona)">
+        <circle cx="15" cy="14" r="3.2"/><circle cx="125" cy="14" r="3.2"/>
+        <circle cx="42" cy="19.8" r="2.6"/><circle cx="98" cy="19.8" r="2.6"/>
+        <circle cx="70" cy="5.4" r="3.6"/>
+      </g>
+      <g fill="var(--tono-50)" opacity=".75">
+        <circle cx="14" cy="13" r=".9"/><circle cx="124" cy="13" r=".9"/>
+        <circle cx="41.2" cy="19" r=".75"/><circle cx="97.2" cy="19" r=".75"/>
+        <circle cx="68.9" cy="4.3" r="1"/>
+      </g>
+      <!-- gemas vino y perlas -->
+      <path d="M70 22 C74.6 27 74.6 32 70 35 C65.4 32 65.4 27 70 22Z" fill="var(--tono-700)" stroke="var(--oro-claro)" stroke-width=".9"/>
+      <g fill="var(--tono-700)" stroke="var(--oro-claro)" stroke-width=".6">
+        <circle cx="42" cy="33" r="1.9"/><circle cx="98" cy="33" r="1.9"/>
+        <ellipse cx="70" cy="47.9" rx="3" ry="2.4"/>
+        <circle cx="34" cy="49.8" r="1.6"/><circle cx="106" cy="49.8" r="1.6"/>
+      </g>
+      <g fill="url(#gradPerla)" stroke="var(--oro)" stroke-width=".5">
+        <circle cx="50" cy="48.5" r="2"/><circle cx="90" cy="48.5" r="2"/>
+      </g>
+      <g fill="var(--tono-50)" opacity=".7">
+        <ellipse cx="68.7" cy="27.6" rx=".9" ry="1.5"/><ellipse cx="69" cy="47.2" rx=".9" ry=".6"/>
+      </g>
     </symbol>
 
     <!-- Rama floral -->
