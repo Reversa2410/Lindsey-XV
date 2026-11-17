@@ -47,12 +47,13 @@ window.CONFIG = {
 
   /* ---- La carta ------------------------------------------------------- */
   carta: [
-    'Hoy celebramos mucho más que un cumpleaños. Celebramos a la hermosa persona en la que te has convertido: noble, valiente, alegre y llena de luz.',
-    'Hace 15 años llegaste a nuestras vidas para enseñarnos el verdadero significado del amor, y desde entonces cada día contigo ha sido un regalo. Verte crecer ha sido nuestra mayor bendición.',
-    'Y aunque siempre serás nuestra niña, hoy te miramos con admiración al verte florecer en esta nueva etapa. Sigue soñando en grande, sigue siendo tú, porque el mundo necesita más corazones como el tuyo.',
-    'Por eso, con el corazón lleno de emoción, los invitamos a acompañarnos en la celebración de los 15 años de nuestra hija Lindsey. Será un honor contar con su presencia en este día inolvidable.'
+    'Hoy celebramos tus 15 años y la inmensa bendición que Dios nos ha regalado al tenerte en nuestra familia.',
+    'Eres una niña alegre, entusiasta y llena de talentos. Nos encanta tu facilidad para hacer amigos, tu amor por aprender, bailar, reír y soñar en grande.',
+    'Verte crecer ha sido un regalo maravilloso que nos llena de orgullo y gratitud.',
+    'Le pedimos a Dios que guíe tus pasos y haga realidad tus sueños. Nunca pierdas tu inocencia, tu dulzura, tu alegría ni esa risa contagiosa que tanto amamos. ¡Guarda siempre tu corazoncito!',
+    'Con mucha emoción, invitamos a familiares y amigos a acompañarnos y compartir nuestra alegría al celebrar los 15 años de nuestra hija Lindsey.'
   ],
-  firmaCarta: 'Con cariño, mamá y papá',
+  firmaCarta: 'Con todo nuestro amor, mamá y papá',
 
   /* ---- Lugar ----------------------------------------------------------
      Datos reales del salón.
