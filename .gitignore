@@ -22,3 +22,7 @@ dist/
 # intro.webm, intro.mp4 y el cartel.
 assets/video/original-*
 .claude/conversor/salida/
+
+# Notas y referencias para generar el video con IA (solo locales)
+assets/video/PROMPT*.txt
+assets/video/referencia-*
