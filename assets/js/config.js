@@ -224,9 +224,8 @@ window.CONFIG = {
       /* >>> CUENTA DE FOTOS <<<
          URL que da Google al publicar google-apps-script/cuenta-fotos.gs
          en la cuenta de la familia. Termina en /exec.
-         Mientras no se cambie, las fotos caen en la cuenta del
-         desarrollador (el script original), que sirve para probar. */
-      urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',
+         Ya es el de la cuenta de la familia. */
+      urlScript: 'https://script.google.com/macros/s/AKfycbyN4N9MXVZUd_Uc7UiRdwzRzo1RIj2aQ3jAhmktyCaALXn4ioD0eQ4UcJt36qQOt37NYQ/exec',
 
       /* Las fotos se encogen en el celular ANTES de enviarse. Se siguen
          viendo perfectas y pesan unas siete veces menos, asi que suben
@@ -247,7 +246,7 @@ window.CONFIG = {
     videos: {
       /* >>> CUENTA DE VIDEOS <<<
          URL que da Google al publicar cuenta-videos.gs. Termina en /exec */
-      urlScript: '',
+      urlScript: 'https://script.google.com/macros/s/AKfycbxr4yjZ1z495nX8F4oHKfmfdFXifcQTor6PBF2hWJfiUruFESbpnjtIcJq6QaokBHVY/exec',
 
       maxArchivos: 5,       // cuantos videos puede mandar cada invitado de una vez
       pesoMaximoMB: 1024,   // tope por video (1 GB). Igual o menor que MAX_MB del script
