@@ -18,7 +18,7 @@
      telefonos que ya habian entrado se quedaron con un main.js viejo que no
      entendia el CSS nuevo. En escritorios recien estrenados no se notaba,
      porque no tenian nada guardado. -->
-<link rel="stylesheet" href="assets/css/estilos.css?v=23">
+<link rel="stylesheet" href="assets/css/estilos.css?v=24">
 
 <!-- Decide si hay intro ANTES del primer pintado.
 
@@ -509,6 +509,30 @@
         <p class="subida__estado" id="subidaEstado" hidden></p>
       </div>
 
+      <!-- Formulario de subida de videos (segunda cuenta de Google). Lo arma
+           assets/js/videos.js -->
+      <div class="subida" id="videoSubida" hidden>
+        <label class="campo campo--subida">
+          <span>Tu nombre <i>(para saber quién lo grabó)</i></span>
+          <input type="text" id="videoNombre" placeholder="Nombre y apellido" autocomplete="name">
+        </label>
+
+        <input type="file" id="videoArchivos" accept="video/*" multiple hidden>
+        <button type="button" class="soltar" id="videoElegir">
+          <svg class="soltar__icono"><use href="#ico-video"/></svg>
+          <span class="soltar__texto">Toca para elegir tus videos</span>
+          <span class="soltar__nota" id="videoLimite"></span>
+        </button>
+
+        <ul class="lista" id="videoLista"></ul>
+
+        <button type="button" class="boton boton--solido boton--ancho" id="videoEnviar" hidden>
+          Enviar videos
+        </button>
+
+        <p class="subida__estado" id="videoEstado" hidden></p>
+      </div>
+
       <p class="aviso" id="fotosPendiente">Sección lista — falta conectar el enlace de subida</p>
     </div>
   </section>
@@ -539,8 +563,9 @@
 
 <canvas id="confeti" aria-hidden="true"></canvas>
 
-<script src="assets/js/config.js?v=24"></script>
+<script src="assets/js/config.js?v=25"></script>
 <script src="assets/js/subida.js?v=20"></script>
-<script src="assets/js/main.js?v=22"></script>
+<script src="assets/js/videos.js?v=1"></script>
+<script src="assets/js/main.js?v=23"></script>
 </body>
 </html>

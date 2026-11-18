@@ -123,11 +123,13 @@ window.CONFIG = {
   rsvp: {
     activo: true,
 
-    /* URL del script de Google que escribe en la hoja. Es el MISMO script
-       que recibe las fotos, asi que si se deja vacio se usa el de
-       fotos.drive.urlScript y no hay nada que llenar aqui.
-       El paso a paso esta en google-apps-script/LEEME.md               */
-    urlScript: '',
+    /* URL del script de Google que escribe en la hoja.
+       NO CAMBIAR. Es el script original (subida.gs), el que ya tiene la
+       hoja con las confirmaciones que han llegado. Las fotos y los videos
+       se mudaron a las cuentas de la familia, pero las confirmaciones se
+       quedan aqui para no partir la lista en dos. La hoja se comparte con
+       la familia desde Drive (ver ENTREGA.md).       */
+    urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',
 
     /* Fecha limite para confirmar, texto libre */
     limite: '26 de noviembre',
@@ -173,7 +175,7 @@ window.CONFIG = {
 
     /* En true, la pagina avisa que los enlaces todavia son de muestra.
        Ponlo en false cuando los enlaces reales ya esten puestos. */
-    demo: true,
+    demo: false,
 
     /* ---- Botones apagados a proposito ---------------------------------
        Para la beta. Los botones se siguen VIENDO y se pueden tocar, pero
@@ -184,27 +186,26 @@ window.CONFIG = {
        false devuelve el boton a su funcionamiento normal, sin mas cambios.
        ------------------------------------------------------------------- */
     deshabilitados: {
-      subirFotos: true,      // el formulario de subir fotos a Drive
-      subirVideos: true,     // el enlace de subir videos (OneDrive)
-      album: true,           // el album de la noche (tarjeta y boton flotante)
+      subirFotos: false,     // el formulario de subir fotos
+      subirVideos: false,    // el formulario de subir videos
+      album: false,          // el album de la noche (tarjeta y boton flotante)
       mensaje: 'Botón deshabilitado temporalmente'
     },
 
     destinos: [
       {
-        /* tipo 'drive' abre el formulario dentro de la misma pagina */
+        /* tipo 'drive' abre el formulario de FOTOS dentro de la pagina */
         tipo: 'drive',
         icono: 'camara',
         etiqueta: 'Subir fotos',
         nota: 'Elige varias a la vez, sin crear cuenta'
       },
       {
-        /* tipo 'enlace' manda al invitado a otro sitio (OneDrive, Dropbox...) */
-        tipo: 'enlace',
+        /* tipo 'videos' abre el formulario de VIDEOS dentro de la pagina */
+        tipo: 'videos',
         icono: 'video',
         etiqueta: 'Subir videos',
-        nota: 'Videos · archivos grandes, sin apuro',
-        enlace: 'https://ejemplo.com/videos-lindsey'   // <-- PENDIENTE (ficticio)
+        nota: 'Archivos grandes, sin crear cuenta'
       }
     ],
 
@@ -220,8 +221,12 @@ window.CONFIG = {
        Mientras urlScript este vacio, el boton de fotos se ve apagado.
        ------------------------------------------------------------------- */
     drive: {
-      /* URL que da Google al publicar el script. Termina en /exec */
-      urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',        // <-- PENDIENTE
+      /* >>> CUENTA DE FOTOS <<<
+         URL que da Google al publicar google-apps-script/cuenta-fotos.gs
+         en la cuenta de la familia. Termina en /exec.
+         Mientras no se cambie, las fotos caen en la cuenta del
+         desarrollador (el script original), que sirve para probar. */
+      urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',
 
       /* Las fotos se encogen en el celular ANTES de enviarse. Se siguen
          viendo perfectas y pesan unas siete veces menos, asi que suben
@@ -230,6 +235,23 @@ window.CONFIG = {
       calidad: 0.82,        // 0 a 1
       maxArchivos: 15,      // cuantas fotos puede mandar cada invitado de una vez
       pesoMaximoMB: 25      // tope por archivo, ya comprimido
+    },
+
+    /* ---- Videos: la SEGUNDA cuenta de Google ---------------------------
+       Mismo truco que las fotos, pero con su propio script en otra cuenta
+       (google-apps-script/cuenta-videos.gs), para que los videos no se
+       coman los 15 GB de las fotos. El video sube en trozos, con barra de
+       progreso real y retomando si se corta el internet.
+       Mientras urlScript este vacio, el boton de videos se ve apagado.
+       ------------------------------------------------------------------- */
+    videos: {
+      /* >>> CUENTA DE VIDEOS <<<
+         URL que da Google al publicar cuenta-videos.gs. Termina en /exec */
+      urlScript: '',
+
+      maxArchivos: 5,       // cuantos videos puede mandar cada invitado de una vez
+      pesoMaximoMB: 1024,   // tope por video (1 GB). Igual o menor que MAX_MB del script
+      trozoMB: 8            // tamaño de cada trozo. No hace falta tocarlo
     },
 
     /* ---- Galeria de fotos ---------------------------------------------

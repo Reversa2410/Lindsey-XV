@@ -916,6 +916,10 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 @keyframes subiendo{
   0%{margin-left:-40%} 100%{margin-left:100%}
 }
+/* Los videos si saben su avance real (van en trozos): barra quieta que
+   crece. El ancho lo pone videos.js. */
+.lista__fila--progreso{border-color:var(--oro-claro)}
+.lista__fila--progreso .lista__barra i{animation:none; margin-left:0}
 .lista__fila--lista{border-color:var(--oro); background:var(--tono-50)}
 .lista__fila--lista .lista__barra i{width:100% !important; animation:none; margin-left:0}
 .lista__fila--error{border-color:#C7503F; background:#FDF3F1}

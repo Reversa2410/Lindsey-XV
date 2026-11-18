@@ -190,10 +190,17 @@
     var sinEnlace = 0;
     var hayApagados = false;
 
+    /* Los dos destinos con formulario dentro de la pagina: 'drive' son las
+       fotos (cuenta de fotos) y 'videos' los videos (cuenta de videos).
+       Cualquier otro tipo es un enlace a otro sitio. */
+    var paneles = { drive: 'subida', videos: 'videoSubida' };
+
     var html = destinos.map(function (d) {
-      var esFormulario = d.tipo === 'drive';
+      var esFormulario = !!paneles[d.tipo];
       var enPausa = apagado(llaveDeDestino(d));
-      var listo = esFormulario ? driveListo() : !!d.enlace;
+      var listo = d.tipo === 'drive' ? driveListo()
+                : d.tipo === 'videos' ? videosListo()
+                : !!d.enlace;
 
       if (enPausa) hayApagados = true;
       else if (!listo) sinEnlace++;
@@ -206,7 +213,7 @@
       if (enPausa) {
         atributos = ' type="button" data-apagado="1"';
       } else if (listo && esFormulario) {
-        atributos = ' type="button" data-abre-subida="1"';
+        atributos = ' type="button" data-abre-subida="' + paneles[d.tipo] + '"';
       } else if (listo) {
         atributos = ' href="' + escapar(d.enlace) + '" target="_blank" rel="noopener"';
       } else if (esFormulario) {
@@ -245,14 +252,23 @@
 
     $('fotosDestinos').innerHTML = html;
 
-    var abre = $('fotosDestinos').querySelector('[data-abre-subida]');
-    if (abre) {
-      abre.addEventListener('click', function () {
-        var panel = $('subida');
-        panel.hidden = !panel.hidden;
-        if (!panel.hidden) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      });
-    }
+    /* Cada boton abre su formulario y cierra el otro, para que no queden
+       los dos abiertos uno debajo del otro. */
+    Array.prototype.forEach.call(
+      $('fotosDestinos').querySelectorAll('[data-abre-subida]'),
+      function (abre) {
+        abre.addEventListener('click', function () {
+          var id = abre.getAttribute('data-abre-subida');
+          Object.keys(paneles).forEach(function (k) {
+            var otro = $(paneles[k]);
+            if (otro && paneles[k] !== id) otro.hidden = true;
+          });
+          var panel = $(id);
+          panel.hidden = !panel.hidden;
+          if (!panel.hidden) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
+      }
+    );
 
     /* Un solo escucha para todos los apagados, en el contenedor. */
     $('fotosDestinos').addEventListener('click', function (e) {
@@ -295,6 +311,13 @@
 
   function driveListo() {
     return !!(Subida && Subida.driveListo());
+  }
+
+  /* Los videos tienen su propio script (otra cuenta): assets/js/videos.js */
+  var Videos = window.XVVideos;
+
+  function videosListo() {
+    return !!(Videos && Videos.listo());
   }
 
   /* El album se enseña solo cuando de verdad hay de donde sacar las fotos.
@@ -1166,6 +1189,7 @@
 
     pintarDatos();
     Subida.preparar();
+    if (Videos) Videos.preparar();
     prepararBotonGaleria();
     pintarCalendario();
     arrancarReloj();

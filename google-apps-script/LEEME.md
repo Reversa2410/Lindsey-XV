@@ -1,5 +1,11 @@
 # Receptor de la invitación en Google
 
+> **Para la entrega a la familia ver [`ENTREGA.md`](../ENTREGA.md).** Las fotos y
+> los videos se mudan a dos cuentas de la familia, con
+> [`cuenta-fotos.gs`](cuenta-fotos.gs) y [`cuenta-videos.gs`](cuenta-videos.gs).
+> Este documento describe el script original (`subida.gs`), que sigue
+> recibiendo **las confirmaciones**.
+
 Un solo script de Google atiende las dos cosas que manda la invitación:
 
 | Qué | Dónde cae | Para qué |
