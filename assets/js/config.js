@@ -30,12 +30,9 @@ window.CONFIG = {
     marco: 'assets/img/marco-floral.webp',
     lienzo: '943 / 2000',
 
-    /* Foto dentro del arco.
-       PENDIENTE: la que esta puesta es la del mockup de Canva, o sea una
-       foto de banco, solo de muestra. Hay que cambiarla por la foto real
-       de Lindsey antes de publicar. Si se deja en '' se ve en su lugar la
-       ilustracion SVG de la quinceañera. */
-    foto: 'assets/img/foto-muestra.webp',
+    /* Foto dentro del arco: la foto real de Lindsey. Si se deja en ''
+       se ve en su lugar la ilustracion SVG de la quinceañera. */
+    foto: 'assets/img/lindsey.jpeg',
     fotoAlt: 'Lindsey el día de sus quince años',
 
     /* Lo que va bajo la fecha, un renglon por elemento. Es aparte de
@@ -88,8 +85,8 @@ window.CONFIG = {
 
   /* ---- Itinerario (deja [] para ocultar la seccion) ------------------- */
   itinerario: [
-    { hora: '5:30 PM', titulo: 'Recepción',   detalle: 'Bienvenida a los invitados' },
-    { hora: '6:00 PM', titulo: 'Ceremonia',   detalle: 'Entrada de la quinceañera' },
+    { hora: '5:00 PM', titulo: 'Recepción',   detalle: 'Bienvenida a los invitados' },
+    { hora: '5:30 PM', titulo: 'Ceremonia',  detalle: 'Entrada de la quinceañera' },
     { hora: '7:00 PM', titulo: 'Vals',        detalle: 'Baile con papá y chambelanes' },
     { hora: '8:00 PM', titulo: 'Cena',        detalle: 'Servida en mesa' },
     { hora: '9:00 PM', titulo: 'Pool Party',  detalle: 'Traer traje especial para piscina' }
