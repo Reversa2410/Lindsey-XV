@@ -36,7 +36,12 @@ window.CONFIG = {
        de Lindsey antes de publicar. Si se deja en '' se ve en su lugar la
        ilustracion SVG de la quinceañera. */
     foto: 'assets/img/foto-muestra.webp',
-    fotoAlt: 'Lindsey el día de sus quince años'
+    fotoAlt: 'Lindsey el día de sus quince años',
+
+    /* Lo que va bajo la fecha, un renglon por elemento. Es aparte de
+       lugar.direccion porque la seccion "Lugar" ya muestra el nombre del
+       salon por su lado. Si se deja [] se usa lugar.direccion. */
+    lugar: ['Punto Azzurro', 'Primera entrada a San Mateo']
   },
 
   /* ---- Los papas ------------------------------------------------------ */
@@ -47,11 +52,10 @@ window.CONFIG = {
 
   /* ---- La carta ------------------------------------------------------- */
   carta: [
-    'Hoy celebramos tus 15 años y la inmensa bendición que Dios nos ha regalado al tenerte en nuestra familia.',
-    'Eres una niña alegre, entusiasta y llena de talentos. Nos encanta tu facilidad para hacer amigos, tu amor por aprender, bailar, reír y soñar en grande.',
-    'Verte crecer ha sido un regalo maravilloso que nos llena de orgullo y gratitud.',
-    'Le pedimos a Dios que guíe tus pasos y haga realidad tus sueños. Nunca pierdas tu inocencia, tu dulzura, tu alegría ni esa risa contagiosa que tanto amamos. ¡Guarda siempre tu corazoncito!',
-    'Con mucha emoción, invitamos a familiares y amigos a acompañarnos y compartir nuestra alegría al celebrar los 15 años de nuestra hija Lindsey.'
+    'Hoy celebramos tus 15 años, una hermosa bendición que Dios nos ha regalado.',
+    'Eres una niña alegre, llena de talentos, que disfruta hacer amigos, bailar, reír y soñar en grande. Verte crecer nos llena de orgullo y gratitud.',
+    'Le pedimos a Dios que guíe tus pasos y haga realidad tus sueños. Nunca pierdas tu dulzura, tu alegría y, sobre todo, guarda siempre tu corazón.',
+    'Te invitamos a acompañarnos y compartir nuestra alegría al celebrar los quince años de nuestra querida hija Lindsey.'
   ],
   firmaCarta: 'Con todo nuestro amor, mamá y papá',
 

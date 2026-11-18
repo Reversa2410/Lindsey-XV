@@ -512,7 +512,7 @@ body.abierta .invitacion{opacity:1}
 .lienzo__xv    {top:15.65%; font-size:15.87cqw; letter-spacing:.367em; padding-left:.367em}
 .lienzo__nombre{top:22.90%; font-size:19.92cqw; font-family:var(--firma);
                 line-height:1.25}
-.lienzo__dia   {top:67.40%; font-size:7.83cqw;  font-style:italic}
+.lienzo__dia   {top:68.00%; font-size:7.83cqw;  font-style:italic}
 .lienzo__fecha {top:73.10%; font-size:8.74cqw;  font-style:italic}
 /* La direccion se ancla por ABAJO, no por arriba. El diseño de Canva la
    tenia en dos renglones cortos, pero la direccion real sale de config.js
@@ -638,12 +638,15 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
   color:var(--tinta-suave); padding-bottom:10px; font-weight:600;
 }
+/* Los numeros del calendario van en Playfair, igual que la cuenta
+   regresiva: la serif fina del cuerpo se perdia a este tamaño. */
 .calendario__dia{
   position:relative; aspect-ratio:1; display:grid; place-items:center;
+  font-family:var(--gala); font-variant-numeric:lining-nums;
   font-size:.94rem; color:var(--tinta); font-weight:400;
 }
 .calendario__dia--vacio{visibility:hidden}
-.calendario__dia--marcado{color:var(--tono-800); font-weight:600}
+.calendario__dia--marcado{color:var(--tono-800); font-weight:500}
 .calendario__dia--marcado::before{
   content:''; position:absolute; inset:8%;
   --corazon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21C4.6 15.9 2 12.5 2 9a5 5 0 0 1 10-2.2A5 5 0 0 1 22 9c0 3.5-2.6 6.9-10 12z' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E");
@@ -664,11 +667,11 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 }
 .fechaGrande__dia{text-align:right} .fechaGrande__mes{text-align:left}
 .fechaGrande__num{
-  font-family:var(--display); font-size:3.2rem; line-height:1; color:var(--tono-600);
+  font-family:var(--gala); font-weight:500; font-variant-numeric:lining-nums; font-size:3.2rem; line-height:1; color:var(--tono-600);
   padding:0 16px; border-left:1px solid var(--oro); border-right:1px solid var(--oro);
 }
 .fechaGrande__hora{
-  margin:12px 0 26px; font-family:var(--display); font-size:1.5rem;
+  margin:12px 0 26px; font-family:var(--gala); font-weight:500; font-variant-numeric:lining-nums; font-size:1.4rem;
   letter-spacing:.16em; color:var(--tono-700);
 }
 

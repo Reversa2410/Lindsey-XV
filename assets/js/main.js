@@ -367,7 +367,13 @@
     $('heroNombre').textContent = C.nombre;
     $('heroDia').textContent = DIAS[FECHA_EVENTO.getDay()];
     $('heroFecha').textContent = F.dia + ' de ' + MESES[F.mes - 1].toLowerCase();
-    $('heroLugar').textContent = C.lugar.direccion;
+    var lineasLugar = (H.lugar && H.lugar.length) ? H.lugar : [C.lugar.direccion];
+    var heroLugar = $('heroLugar');
+    heroLugar.textContent = '';
+    lineasLugar.forEach(function (linea, i) {
+      if (i) heroLugar.appendChild(document.createElement('br'));
+      heroLugar.appendChild(document.createTextNode(linea));
+    });
 
     /* Sin foto real todavia? Entonces va la ilustracion en el arco. */
     var foto = $('heroFoto');
