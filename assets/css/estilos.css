@@ -734,9 +734,11 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   transition:background .4s, transform .4s;
 }
 .linea li.visible::before{background:var(--tono-500); transform:scale(1.15)}
+/* La hora va en Playfair 500, igual que el calendario y la cuenta
+   regresiva: en la serif fina y tan chica no se alcanzaba a leer. */
 .linea__hora{
-  display:block; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--tono-600); font-weight:600;
+  display:block; font-family:var(--gala); font-weight:500; font-variant-numeric:lining-nums;
+  font-size:.95rem; letter-spacing:.12em; text-transform:uppercase; color:var(--tono-600);
 }
 .linea__titulo{
   display:block; font-family:var(--display); font-size:1.12rem; letter-spacing:.1em;
