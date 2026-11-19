@@ -88,7 +88,7 @@ function listarVideos(e) {
 
     while (archivos.hasNext()) {
       const f = archivos.next();
-      if (!/^video//.test(f.getMimeType())) continue;
+      if (!/^video\//.test(f.getMimeType())) continue;
       videos.push({
         id: f.getId(),
         invitado: (f.getDescription() || '').replace('Subido por: ', ''),
@@ -334,7 +334,7 @@ function compartirTodos() {
   let arreglados = 0;
   while (archivos.hasNext()) {
     const f = archivos.next();
-    if (!/^video//.test(f.getMimeType())) continue;
+    if (!/^video\//.test(f.getMimeType())) continue;
     try {
       f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       arreglados++;
