@@ -7,10 +7,13 @@
  * está en ENTREGA.md, en la raíz del proyecto.
  *
  * QUÉ HACE
- *   Recibe los videos que suben los invitados desde la invitación y los
- *   guarda en una carpeta de Google Drive de esta cuenta. El invitado no
- *   necesita cuenta de Google: el script corre con los permisos de quien lo
- *   publica.
+ *   1. Recibe los videos que suben los invitados desde la invitación y los
+ *      guarda en una carpeta de Google Drive de esta cuenta.
+ *   2. Le pasa al "Álbum de la noche" (galeria.html) la lista de videos,
+ *      para que se vean junto a las fotos.
+ *
+ *   El invitado no necesita cuenta de Google: el script corre con los
+ *   permisos de quien lo publica.
  *
  * POR QUÉ ES DISTINTO AL DE LAS FOTOS
  *   Un video de celular pesa cientos de MB y Apps Script no acepta un envío
@@ -64,8 +67,42 @@ function instalar() {
 }
 
 
-function doGet() {
+/**
+ *   sin parámetros   : comprobar que el script quedó bien publicado
+ *   ?accion=listar   : la lista de videos que muestra el álbum
+ */
+function doGet(e) {
+  const accion = (e && e.parameter && e.parameter.accion) || '';
+  if (accion === 'listar') return listarVideos(e);
   return responder({ ok: true, mensaje: 'Receptor de videos activo' });
+}
+
+
+function listarVideos(e) {
+  try {
+    const pedidos = parseInt((e && e.parameter && e.parameter.max) || '60', 10);
+    const max = Math.min(isNaN(pedidos) ? 60 : pedidos, 200);
+
+    const archivos = DriveApp.getFolderById(idCarpeta()).getFiles();
+    const videos = [];
+
+    while (archivos.hasNext()) {
+      const f = archivos.next();
+      if (!/^video//.test(f.getMimeType())) continue;
+      videos.push({
+        id: f.getId(),
+        invitado: (f.getDescription() || '').replace('Subido por: ', ''),
+        fecha: f.getDateCreated().getTime()
+      });
+    }
+
+    videos.sort(function (a, b) { return b.fecha - a.fecha; });
+
+    return responder({ ok: true, total: videos.length, videos: videos.slice(0, max) });
+
+  } catch (err) {
+    return responder({ ok: false, error: String(err) });
+  }
 }
 
 
@@ -190,6 +227,16 @@ function responderSegunDrive(r) {
   if (codigo === 200 || codigo === 201) {
     let id = '';
     try { id = JSON.parse(r.getContentText()).id || ''; } catch (e) {}
+    /* Para que el álbum pueda reproducirlo, el video tiene que ser visible
+       con enlace. Si la cuenta no lo permite, igual queda guardado; solo
+       no se vería en el álbum. */
+    if (id) {
+      try {
+        DriveApp.getFileById(id).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (errCompartir) {
+        Logger.log('No se pudo compartir: ' + errCompartir);
+      }
+    }
     return responder({ ok: true, listo: true, id: id });
   }
 
@@ -273,4 +320,27 @@ function responder(objeto) {
   return ContentService
     .createTextOutput(JSON.stringify(objeto))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+/**
+ * Comparte con enlace los videos que ya estaban en la carpeta antes de que
+ * el script supiera hacerlo solo (o los que se vean en negro en el álbum).
+ * Ejecútala UNA vez desde el editor después de actualizar el script.
+ * Segura de repetir.
+ */
+function compartirTodos() {
+  const archivos = DriveApp.getFolderById(idCarpeta()).getFiles();
+  let arreglados = 0;
+  while (archivos.hasNext()) {
+    const f = archivos.next();
+    if (!/^video//.test(f.getMimeType())) continue;
+    try {
+      f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      arreglados++;
+    } catch (err) {
+      Logger.log('No se pudo compartir ' + f.getName() + ': ' + err);
+    }
+  }
+  Logger.log('Listo. Videos compartidos: ' + arreglados);
 }

@@ -965,6 +965,8 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   background:linear-gradient(#fff,var(--tono-50));
 }
 .destino--album .destino__icono{color:var(--oro-oscuro)}
+/* La segunda tarjeta (videos) va pegada a la primera: son una pareja. */
+.destino--album.destino--segundo{margin-top:10px}
 
 /* Cuando la tarjeta despliega el formulario aqui mismo, en vez de llevar a
    otro sitio, la punta es un chevron que gira: dice "esto se abre", no
@@ -998,6 +1000,21 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
 .galeria__foto:hover{border-color:var(--oro); box-shadow:0 8px 20px rgba(var(--rgb-800),.16)}
 .galeria__foto:hover img{transform:scale(1.06)}
 
+/* Videos: la miniatura lleva un play al centro, para que se distinga de
+   una foto antes de tocarla. */
+.galeria__play{
+  position:absolute; top:50%; left:50%; width:38px; height:38px;
+  margin:-19px 0 0 -19px; padding:9px; border-radius:50%;
+  color:#fff; background:rgba(var(--rgb-950),.48);
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  pointer-events:none; transition:transform .35s var(--curva), background .35s;
+}
+.galeria__foto--video:hover .galeria__play{transform:scale(1.1); background:rgba(var(--rgb-800),.7)}
+/* Recien subido, Drive todavia no tiene miniatura: queda el cuadro en
+   el tono de la paleta, con el play encima. */
+.galeria__foto--sinMiniatura{background:linear-gradient(150deg,var(--tono-300),var(--tono-700))}
+
 .galeria__estado{
   margin:26px 0 0; font-size:.94rem; font-style:italic; color:var(--tinta-suave);
 }
@@ -1021,6 +1038,18 @@ body.sonando .ecualizador i{animation:eq .9s ease-in-out infinite alternate; opa
   animation:entrarFoto .35s var(--curva);
 }
 @keyframes entrarFoto{from{opacity:0; transform:scale(.97)}to{opacity:1; transform:none}}
+.visor__marco img[hidden]{display:none}
+
+/* El reproductor de Drive. Los videos de celular casi siempre son
+   verticales, asi que el cuadro es 9:16 y se limita por el alto. */
+.visor__video{
+  width:min(100%, calc(76vh * 9 / 16)); aspect-ratio:9 / 16; max-height:76vh;
+  border-radius:var(--radio); overflow:hidden; background:#000;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  animation:entrarFoto .35s var(--curva);
+}
+.visor__video[hidden]{display:none}
+.visor__video iframe{width:100%; height:100%; border:0; display:block}
 
 .visor__pie{
   font-size:.78rem; letter-spacing:.18em; text-transform:uppercase;

@@ -13,6 +13,12 @@ fotos y los videos llegando directo a **sus** cuentas de Google.
 | Script de la cuenta de **fotos** | [`google-apps-script/cuenta-fotos.gs`](google-apps-script/cuenta-fotos.gs) |
 | Script de la cuenta de **videos** | [`google-apps-script/cuenta-videos.gs`](google-apps-script/cuenta-videos.gs) |
 | El único archivo que se modifica | [`assets/js/config.js`](assets/js/config.js) (dos líneas) |
+| QR de la invitación | [`qr/qr-invitacion.png`](qr/qr-invitacion.png) (y `.svg` para imprenta) → lindsey-xv.vercel.app |
+| QR del álbum de la noche | [`qr/qr-album-de-la-noche.png`](qr/qr-album-de-la-noche.png) (y `.svg`) → lindsey-xv.vercel.app/galeria |
+
+> Los QR apuntan a direcciones que no cambian: siguen sirviendo aunque se
+> actualice la página. Si alguna vez cambia el dominio, hay que generarlos de
+> nuevo.
 
 Cómo queda repartido:
 
@@ -109,6 +115,26 @@ de videos** y el archivo `cuenta-videos.gs`:
    `{"ok":true,"mensaje":"Receptor de videos activo"}`.
 9. Cerrar la ventana de incógnito.
 
+### Si el script de videos ya estaba publicado: actualizarlo
+
+El álbum ahora también muestra los videos. Para eso el script de videos
+aprendió dos cosas nuevas: **dar la lista de videos** al álbum y **compartir
+con enlace** cada video que llega (sin eso Drive no deja reproducirlo). Si la
+cuenta de videos se conectó antes de este cambio, hay que pasarle el código
+nuevo. **La URL no cambia**, así que `config.js` no se toca.
+
+1. Ventana de incógnito → <https://script.google.com> con la **cuenta de
+   videos** → abrir el proyecto **Receptor videos XV**.
+2. Borrar todo el código y pegar el `cuenta-videos.gs` nuevo. **Ctrl + S**.
+3. En el desplegable de funciones elegir **compartirTodos** → **Ejecutar**.
+   Comparte los videos que ya estaban subidos; los nuevos se comparten solos.
+4. **Implementar** → **Gestionar implementaciones** → lápiz ✏️ → *Versión:*
+   **Nueva versión** → **Implementar**.
+   > No usar *Nueva implementación*: esa crea una URL distinta y la invitación
+   > seguiría hablando con la vieja.
+5. Comprobar: abrir la URL de videos terminada en `?accion=listar`. Debe decir
+   `{"ok":true,"total":…,"videos":[…]}`.
+
 ## Parte 3 — Conectar la invitación (`assets/js/config.js`)
 
 Es **el único archivo que se toca**, y son **dos líneas**. Buscar los
@@ -174,6 +200,8 @@ videos** y:
 | **Subir fotos** → elegir 2 o 3 → Enviar | "¡Gracias! Tus fotos quedaron guardadas" y aparecen en *Fotos XV Lindsey* de la cuenta 1 |
 | **Álbum de la noche** | Se ven las fotos recién subidas (si `MODERAR_ALBUM` es `true`, solo después de moverlas a *Álbum público*) |
 | **Subir videos** → elegir un video corto → Enviar | Barra con porcentaje, luego "¡Gracias! Tu video quedó guardado" y aparece en *Videos XV Lindsey* de la cuenta 2 |
+| **Álbum de la noche** otra vez | El video aparece con un ▶ encima y se reproduce al tocarlo. Recién subido puede salir como un cuadro de color sin miniatura: Drive tarda unos minutos en sacarla, pero ya se puede ver |
+| Escanear los dos **QR** con la cámara del celular | Uno abre la invitación, el otro directo el álbum |
 | **Confirmar asistencia** con un nombre de prueba | Aparece una fila en la hoja de confirmaciones |
 
 Después de probar, **borrar las fotos, videos y filas de prueba** desde Drive y
@@ -203,5 +231,7 @@ la hoja.
 | La URL dice que no tiene acceso o pide iniciar sesión | La implementación no quedó como **Cualquier usuario** |
 | El botón *Subir videos* se ve apagado | `videos.urlScript` sigue vacío en `config.js`, o Vercel aún no termina de publicar |
 | Las fotos llegan a Drive pero el álbum no las muestra | La cuenta no permite compartir con enlace (cuenta de trabajo/colegio), o falta moverlas a *Álbum público* |
+| Los videos llegan a Drive pero no salen en el álbum | El script de videos es el viejo: ver *Si el script de videos ya estaba publicado* en la Parte 2 |
+| El video sale en el álbum pero al tocarlo dice que no hay acceso | Ese video no quedó compartido: ejecutar **compartirTodos** en el script de videos |
 | El video llega a 0 % y falla | Faltó aceptar el permiso de *servicio externo*: ejecutar **instalar** otra vez |
 | Se cambió algo en un script y no surte efecto | **Implementar** → **Gestionar implementaciones** → lápiz → Versión: **Nueva versión** → **Implementar**. La URL no cambia |

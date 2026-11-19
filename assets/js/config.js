@@ -257,7 +257,10 @@ window.CONFIG = {
        Vive en su propia pagina (galeria.html) y muestra lo que los
        invitados van subiendo. Se llega a ella por el boton flotante de la
        camara y por el enlace de la seccion de fotos.
-       Usa el mismo script de Drive, asi que no hay nada mas que configurar.
+       Muestra fotos Y videos: le pide la lista a los dos scripts (el de
+       fotos y el de videos) y los mezcla por fecha. No hay nada mas que
+       configurar; el script de videos tiene que ser la version que sabe
+       listar (ver ENTREGA.md, Parte 2).
 
        QUE SE VE aqui lo decide el script, no esta pagina: si en el script
        llenaste ID_CARPETA_GALERIA, solo se ve lo que muevas a esa carpeta;
@@ -266,10 +269,10 @@ window.CONFIG = {
     galeria: {
       activa: true,
       titulo: 'Álbum de la noche',
-      texto: 'Las fotos que los invitados van compartiendo.',
+      texto: 'Las fotos y videos que los invitados van compartiendo.',
 
       /* Texto chico del enlace que lleva al album desde la invitacion */
-      notaEnlace: 'Mira las fotos que ya compartieron',
+      notaEnlace: 'Mira las fotos y videos que ya compartieron',
 
       porPagina: 24,        // cuantas se cargan de golpe
       maximo: 200,          // tope que se le pide al script

@@ -23,7 +23,9 @@
 
    Se expone como window.XVVideos:
      .listo()      si el script de videos ya esta publicado
-     .preparar()   engancha el formulario
+     .preparar(opciones)  engancha el formulario. opciones.alSubir(cuantos)
+                          se llama cuando al menos un video llego bien,
+                          para que el album pueda refrescarse solo.
    ========================================================================= */
 (function () {
   'use strict';
@@ -34,6 +36,7 @@
 
   var elegidos = [];
   var subiendo = false;
+  var alSubir = null;
 
   function cfg() { return (C.fotos && C.fotos.videos) || {}; }
 
@@ -51,8 +54,9 @@
     return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
   }
 
-  function preparar() {
+  function preparar(opciones) {
     if (!C.fotos || !C.fotos.activo || !listo() || !$('videoSubida')) return false;
+    alSubir = (opciones && opciones.alSubir) || null;
     var c = cfg();
 
     $('videoLimite').textContent = 'Hasta ' + c.maxArchivos + ' videos a la vez · máx. ' +
@@ -248,6 +252,11 @@
       if (candado) { try { candado.release(); } catch (e) {} }
 
       var enviados = total - fallidos.length;
+
+      if (enviados > 0 && alSubir) {
+        try { alSubir(enviados); }
+        catch (e) { console.warn('[XV] Falló el aviso posterior a la subida', e); }
+      }
 
       if (!fallidos.length) {
         elegidos = [];

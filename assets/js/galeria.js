@@ -24,6 +24,9 @@
      dos paginas sin tener el codigo repetido en ninguna. */
   var Subida = window.XVSubida;
 
+  /* Los videos van a otra cuenta, con su propio script: assets/js/videos.js */
+  var Videos = window.XVVideos;
+
   function driveListo() {
     return !!(Subida && Subida.driveListo());
   }
@@ -35,6 +38,15 @@
      imagenes se le piden despues directamente a Drive, que las sirve ya
      redimensionadas al tamaño que se le pida. Asi la miniatura de la
      rejilla pesa poco y la grande solo se descarga si alguien la abre.
+
+     Fotos y videos viven en DOS cuentas distintas, cada una con su
+     script. Se piden las dos listas a la vez y se mezclan por fecha, de la
+     mas nueva a la mas vieja, para que el album se lea como la noche y no
+     como "primero todas las fotos, luego todos los videos". Si una de las
+     dos cuentas falla, se enseña la otra igual.
+
+     Cada elemento de galeriaFotos: { id, invitado, fecha, tipo }, con
+     tipo 'foto' o 'video'.
      ====================================================================== */
 
   var galeriaFotos = [];
@@ -89,36 +101,68 @@
     }
   }
 
-  function cargarGaleria() {
-    var g = C.fotos.galeria;
-    var url = C.fotos.drive.urlScript + '?accion=listar&max=' + g.maximo;
+  /* Pide la lista a uno de los dos scripts. Si falla devuelve null (no un
+     error), para que la otra cuenta se pueda enseñar igual. */
+  function pedirLista(urlScript, campo, tipo) {
+    if (!urlScript) return Promise.resolve([]);
+    var url = urlScript + '?accion=listar&max=' + C.fotos.galeria.maximo;
 
-    fetch(url)
+    return fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (!d || !d.ok) throw new Error((d && d.error) || 'respuesta inesperada');
-
-        galeriaFotos = d.fotos || [];
-        if (!galeriaFotos.length) {
-          $('galeria').innerHTML = '';
-          $('galeriaEstado').hidden = false;
-          $('galeriaEstado').textContent =
-            'Todavía no hay fotos. ¡Sé el primero en compartir una!';
-          $('galeriaMas').hidden = true;
-          return;
-        }
-        $('galeriaEstado').hidden = true;
-        pintarGaleria(Math.max(galeriaMostradas, g.porPagina));
+        /* Un script de videos publicado antes de que supiera listar
+           contesta ok pero sin lista: cuenta como "todavia no hay". */
+        return (d[campo] || []).map(function (x) {
+          return { id: x.id, invitado: x.invitado || '', fecha: x.fecha || 0, tipo: tipo };
+        });
       })
       .catch(function (e) {
-        console.warn('[XV] No se pudo cargar la galería', e);
-        /* Si ya hay fotos en pantalla no se borran por un fallo de red:
+        console.warn('[XV] No se pudo cargar la lista de ' + campo, e);
+        return null;
+      });
+  }
+
+  function cargarGaleria() {
+    var g = C.fotos.galeria;
+    var urlVideos = C.fotos.videos && C.fotos.videos.urlScript;
+
+    Promise.all([
+      pedirLista(C.fotos.drive.urlScript, 'fotos', 'foto'),
+      pedirLista(urlVideos, 'videos', 'video')
+    ]).then(function (listas) {
+      var fotos = listas[0];
+      var videos = listas[1];
+
+      if (fotos === null && videos === null) {
+        /* Si ya hay algo en pantalla no se borra por un fallo de red:
            mejor dejar lo que se ve que vaciar el álbum. */
         if (!galeriaFotos.length) {
           $('galeriaEstado').hidden = false;
           $('galeriaEstado').textContent = 'No se pudo cargar el álbum ahora mismo.';
         }
-      });
+        return;
+      }
+
+      galeriaFotos = (fotos || []).concat(videos || []);
+      galeriaFotos.sort(function (a, b) { return b.fecha - a.fecha; });
+
+      if (!galeriaFotos.length) {
+        $('galeria').innerHTML = '';
+        $('galeriaEstado').hidden = false;
+        $('galeriaEstado').textContent =
+          'Todavía no hay fotos ni videos. ¡Sé el primero en compartir!';
+        $('galeriaMas').hidden = true;
+        return;
+      }
+      $('galeriaEstado').hidden = true;
+      pintarGaleria(Math.max(galeriaMostradas, g.porPagina));
+    });
+  }
+
+  function descripcion(f) {
+    var que = f.tipo === 'video' ? 'Video' : 'Foto';
+    return f.invitado ? que + ' de ' + f.invitado : que + ' del evento';
   }
 
   function pintarGaleria(cuantas) {
@@ -126,11 +170,12 @@
     galeriaMostradas = visibles;
 
     $('galeria').innerHTML = galeriaFotos.slice(0, visibles).map(function (f, i) {
-      var de = f.invitado ? 'Foto de ' + escapar(f.invitado) : 'Foto del evento';
-      return '<button type="button" class="galeria__foto" data-i="' + i + '" ' +
-             'style="--d:' + ((i % 12) * 45) + 'ms">' +
-               '<img src="' + urlFoto(f.id, 400) + '" alt="' + de + '" ' +
+      var esVideo = f.tipo === 'video';
+      return '<button type="button" class="galeria__foto' + (esVideo ? ' galeria__foto--video' : '') + '" ' +
+             'data-i="' + i + '" style="--d:' + ((i % 12) * 45) + 'ms">' +
+               '<img src="' + urlFoto(f.id, 400) + '" alt="' + escapar(descripcion(f)) + '" ' +
                'loading="lazy" decoding="async" referrerpolicy="no-referrer">' +
+               (esVideo ? '<svg class="galeria__play" aria-hidden="true"><use href="#ico-play"/></svg>' : '') +
              '</button>';
     }).join('');
 
@@ -160,6 +205,14 @@
             }, 700 * intentos);
             return;
           }
+          /* Drive tarda un rato en sacar la miniatura de un video recien
+             subido, pero el video ya se puede ver. No se quita: se queda
+             como un cuadro con el boton de play. */
+          if (galeriaFotos[idx] && galeriaFotos[idx].tipo === 'video') {
+            img.remove();
+            boton.classList.add('galeria__foto--lista', 'galeria__foto--sinMiniatura');
+            return;
+          }
           boton.remove();
           avisarSiQuedoVacia();
         });
@@ -181,11 +234,11 @@
 
     $('galeriaEstado').hidden = false;
     $('galeriaEstado').textContent =
-      'Hay ' + galeriaFotos.length + ' foto' + (galeriaFotos.length === 1 ? '' : 's') +
-      ' en el álbum, pero no se pudieron mostrar. Revisa que estén compartidas.';
+      'Hay ' + galeriaFotos.length + ' archivo' + (galeriaFotos.length === 1 ? '' : 's') +
+      ' en el álbum, pero no se pudieron mostrar. Revisa que estén compartidos.';
     $('galeriaMas').hidden = true;
     console.warn('[XV] La galería recibió fotos pero ninguna cargó. ' +
-      'Ejecuta compartirTodas() en el script de Google.');
+      'Ejecuta compartirTodas() y compartirTodos() en los scripts de Google.');
   }
 
   /* --------------------------- visor a pantalla completa --------------- */
@@ -226,6 +279,9 @@
   }
 
   function cerrarVisor() {
+    /* Vaciar el reproductor es lo que para el video; si no, se sigue
+       oyendo con el visor cerrado. */
+    $('visorVideoMarco').removeAttribute('src');
     $('visor').hidden = true;
     document.body.classList.remove('bloqueado');
   }
@@ -239,14 +295,27 @@
   function mostrarEnVisor() {
     var f = galeriaFotos[visorIndice];
     if (!f) return;
-    $('visorImagen').src = urlFoto(f.id, 1600);
-    $('visorImagen').alt = f.invitado ? 'Foto de ' + f.invitado : 'Foto del evento';
+    var esVideo = f.tipo === 'video';
+
+    $('visorImagen').hidden = esVideo;
+    $('visorVideo').hidden = !esVideo;
+
+    if (esVideo) {
+      $('visorImagen').removeAttribute('src');
+      $('visorVideoMarco').src = 'https://drive.google.com/file/d/' +
+        encodeURIComponent(f.id) + '/preview';
+      $('visorVideoMarco').title = descripcion(f);
+    } else {
+      $('visorVideoMarco').removeAttribute('src');
+      $('visorImagen').src = urlFoto(f.id, 1600);
+      $('visorImagen').alt = descripcion(f);
+    }
     $('visorPie').textContent = (f.invitado ? f.invitado + ' · ' : '') +
       (visorIndice + 1) + ' de ' + Math.min(galeriaMostradas, galeriaFotos.length);
   }
 
   /* ======================================================================
-     2. SUBIR FOTOS DESDE EL ALBUM
+     2. SUBIR FOTOS Y VIDEOS DESDE EL ALBUM
      ----------------------------------------------------------------------
      El invitado que esta mirando el album es justo el que quiere agregar
      la suya, asi que mandarlo de vuelta a la invitacion para subirla era
@@ -254,37 +323,57 @@
      montado aqui.
      ====================================================================== */
   function prepararSubidaEnAlbum() {
-    var tarjeta = $('tarjetaSubir');
+    var d = (C.fotos && C.fotos.deshabilitados) || {};
+
+    /* Cuando termine de subir se vuelve a pedir la lista, para que lo
+       recien mandado aparezca solo en la rejilla. Es el momento en que el
+       invitado lo esta esperando. */
+    montarTarjeta('tarjetaSubir', 'subida', d.subirFotos, function () {
+      return Subida.preparar({ alSubir: cargarGaleria });
+    });
+    montarTarjeta('tarjetaVideos', 'videoSubida', d.subirVideos, function () {
+      return !!(Videos && Videos.preparar({ alSubir: cargarGaleria }));
+    });
+  }
+
+  var paneles = [];
+
+  function montarTarjeta(idTarjeta, idPanel, apagado, preparar) {
+    var tarjeta = $(idTarjeta);
+    var d = C.fotos && C.fotos.deshabilitados;
 
     /* Mismo interruptor que en la invitacion. Aqui el boton se enseña
        igual, pero apagado: si en la invitacion avisa que la subida esta
        en pausa, entrar por el album no puede saltarse esa pausa. */
-    var d = C.fotos && C.fotos.deshabilitados;
-    if (d && d.subirFotos) {
+    if (apagado) {
       tarjeta.hidden = false;
       tarjeta.classList.add('destino--apagado');
       tarjeta.setAttribute('data-apagado', '1');
       tarjeta.addEventListener('click', function () {
-        avisar(d.mensaje || 'Botón deshabilitado temporalmente');
+        avisar((d && d.mensaje) || 'Botón deshabilitado temporalmente');
       });
       return;
     }
 
-    /* Cuando termine de subir se vuelve a pedir la lista, para que la foto
-       recien mandada aparezca sola en la rejilla. Es el momento en que el
-       invitado la esta esperando. */
-    var montado = Subida.preparar({ alSubir: cargarGaleria });
-
     /* Sin script publicado no hay a donde mandar nada: mejor no enseñar
        un boton que no podria cumplir. */
-    if (!montado) return;
+    if (!preparar()) return;
 
+    var panel = $(idPanel);
+    paneles.push({ tarjeta: tarjeta, panel: panel });
     tarjeta.hidden = false;
     tarjeta.addEventListener('click', function () {
-      var panel = $('subida');
-      panel.hidden = !panel.hidden;
-      tarjeta.classList.toggle('destino--abierto', !panel.hidden);
-      if (!panel.hidden) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      var abrir = panel.hidden;
+
+      /* Uno abierto a la vez: los dos formularios juntos son una pared. */
+      paneles.forEach(function (p) {
+        p.panel.hidden = true;
+        p.tarjeta.classList.remove('destino--abierto');
+      });
+
+      panel.hidden = !abrir;
+      tarjeta.classList.toggle('destino--abierto', abrir);
+      if (abrir) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
 
