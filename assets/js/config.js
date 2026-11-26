@@ -132,7 +132,7 @@ window.CONFIG = {
     urlScript: 'https://script.google.com/macros/s/AKfycbxQM152Zo28Ph0qw4q3-GvAH-CmCFBVOxOG_rFQy5wJZNvsCerNz2iEHN28-jYs6qRk/exec',
 
     /* Fecha limite para confirmar, texto libre */
-    limite: '26 de noviembre',
+    limite: '30 de noviembre',
 
     /* Aclara por que no se pregunta cuantos van. Deja '' para no mostrarlo. */
     nota: 'Tu espacio ya está reservado a tu nombre; solo necesitamos saber si nos acompañarás. Una vez confirmada tu asistencia, te haremos llegar tu pase de acceso.',
